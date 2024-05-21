@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.domain.comment.repository;
+package com.elice.ustory.domain.comment.repository;
 
 public interface CommentRepository {
 }

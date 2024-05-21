@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.domain.comment.controller;
+package com.elice.ustory.domain.comment.controller;
 
 public class CommentController {
 }
