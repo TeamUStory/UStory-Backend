@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.ustory'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // Java Mail Sender
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // Swagger
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.3.0'
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // jwt
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+    // Spring Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    // Spring Devtools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // H2 Database
+    runtimeOnly 'com.h2database:h2'
+    // MySQL Database
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
