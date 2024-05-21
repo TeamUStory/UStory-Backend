@@ -35,21 +35,21 @@ public class Page {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Long writer_id;
+    private Long writerId;
 
     @ManyToOne
     @JoinColumn(name = "diary_id")
-    private Long diary_id;
+    private Long diaryId;
 
     @ManyToOne
     @JoinColumn(name = "address_id")
-    private Long address_id;
+    private Long addressId;
 
     @OneToMany(mappedBy = "page")
     private List<Comment> comments;
 
-    @Column(nullable = false)
-    private LocalDate target_date;
+    @Column(name = "target_date", nullable = false)
+    private LocalDate targetDate;
 
     @Column(nullable = false, length = 8)
     private String delete;
@@ -58,11 +58,11 @@ public class Page {
     private String locked;
 
     @CreatedDate
-    @Column(updatable = false, nullable = false)
-    LocalDateTime created_at;
+    @Column(name = "created_at", updatable = false, nullable = false)
+    LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(nullable = false)
-    LocalDateTime modified_at;
+    @Column(name = "created_at", nullable = false)
+    LocalDateTime modifiedAt;
 
 }
