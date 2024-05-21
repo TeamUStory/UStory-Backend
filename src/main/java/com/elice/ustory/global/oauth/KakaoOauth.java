@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.global.oauth;
+package com.elice.ustory.global.oauth;
 
 public class KakaoOauth {
 }
