@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.global.config;
+package com.elice.ustory.global.config;
 
 public class SecurityConfig {
 }

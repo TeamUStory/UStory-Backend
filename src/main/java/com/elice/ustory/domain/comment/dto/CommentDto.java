@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.domain.comment.dto;
+package com.elice.ustory.domain.comment.dto;
 
 public class CommentDto {
 }

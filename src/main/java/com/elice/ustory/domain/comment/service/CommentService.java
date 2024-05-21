@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.domain.comment.service;
+package com.elice.ustory.domain.comment.service;
 
 public class CommentService {
 }

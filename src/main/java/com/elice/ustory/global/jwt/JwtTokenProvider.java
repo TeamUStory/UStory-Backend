@@ -1,4 +1,4 @@
-package com.ustory.ustory_service.global.jwt;
+package com.elice.ustory.global.jwt;
 
 public class JwtTokenProvider {
 }
