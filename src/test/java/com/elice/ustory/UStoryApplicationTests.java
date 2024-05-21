@@ -1,4 +1,4 @@
-package com.ustory.ustory_service;
+package com.elice.ustory;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

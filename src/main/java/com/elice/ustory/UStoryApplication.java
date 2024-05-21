@@ -1,4 +1,4 @@
-package com.ustory.ustory_service;
+package com.elice.ustory;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
