@@ -33,20 +33,21 @@ public class Page {
     @Column(nullable = false, length = 20)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Long writerId;
-
-    @ManyToOne
-    @JoinColumn(name = "diary_id")
-    private Long diaryId;
-
-    @ManyToOne
-    @JoinColumn(name = "address_id")
-    private Long addressId;
-
-    @OneToMany(mappedBy = "page")
-    private List<Comment> comments;
+    // TODO: 다른 엔티티 전부 만들어지면 주석 해제
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private Long writerId;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "diary_id")
+//    private Long diaryId;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "address_id")
+//    private Long addressId;
+//
+//    @OneToMany(mappedBy = "page")
+//    private List<Comment> comments;
 
     @Column(name = "target_date", nullable = false)
     private LocalDate targetDate;
@@ -57,12 +58,13 @@ public class Page {
     @Column(nullable = false, length = 10)
     private String locked;
 
-    @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "created_at", nullable = false)
-    LocalDateTime modifiedAt;
+    // TODO: BaseEntity 만들어지면 주석 해제 후 수정
+//    @CreatedDate
+//    @Column(name = "created_at", updatable = false, nullable = false)
+//    LocalDateTime createdAt;
+//
+//    @LastModifiedDate
+//    @Column(name = "created_at", nullable = false)
+//    LocalDateTime modifiedAt;
 
 }
