@@ -1,0 +1,56 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 공통 설정 -->
+    <appender name="DISCORD" class="com.github.napstr.logback.DiscordAppender">
+        <webhookUri>${DISCORD_WEBHOOK_URL}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss} [%thread] [%-5level] %logger{36} - %msg%n```%ex{full}```</pattern>
+        </layout>
+        <username>서버 에러가 발생했어요...</username>
+        <avatarUrl>https://mblogthumb-phinf.pstatic.net/MjAyMTA2MDlfMTMy/MDAxNjIzMjAzNzk0ODM2.FEyMkfzKYrw-N7s5DyLE2jap16BBpvvEv52CrBUx3iUg.CuSWzmWqLlfbNvdhWZi6E3sivVS87N4KDcwge4aBig0g.JPEG.nicenice133/3.jpeg?type=w800</avatarUrl>
+        <tts>false</tts>
+    </appender>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_DISCORD" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DISCORD"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- 로컬 환경 -->
+    <springProfile name="local">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 개발 환경 -->
+    <springProfile name="dev">
+        <property resource="application-dev.yml"/>
+        <springProperty name="DISCORD_WEBHOOK_URL" source="logging.discord.webhook-url"/>
+        <root level="INFO">
+            <appender-ref ref="ASYNC_DISCORD"/>
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+
+    <!-- 운영 환경 -->
+    <springProfile name="prod">
+        <property resource="application-prod.yml"/>
+        <springProperty name="DISCORD_WEBHOOK_URL" source="logging.discord.webhook-url"/>
+        <root level="INFO">
+            <appender-ref ref="ASYNC_DISCORD"/>
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+</configuration>
