@@ -2,10 +2,7 @@ package com.elice.ustory.domain.page;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,7 +16,7 @@ import com.ustory.ustory_service.domain.comment.entity.Comment;
 // TODO: 엔티티 ERD 참조하여 작성
 @Entity
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -32,6 +29,13 @@ public class Page {
 
     @Column(nullable = false, length = 20)
     private String title;
+
+    // TODO : 이거 있지 않았나? 페이지에? 메인 사진은 따로 두고, 사진들 URL 저장을 여기다 하는거 아니었나? 일단 먼저 추가합니다. 나머지는 알려주셔야 할 것 같습니다 기중느임
+    @Column(name = "main_image_url", nullable = false, columnDefinition = "varchar(1000)")
+    private String mainImageURI;
+
+    @Column(name = "visited_at", nullable = false)
+    private LocalDate visitedAt;
 
     // TODO: 다른 엔티티 전부 만들어지면 주석 해제
 //    @ManyToOne
@@ -49,11 +53,10 @@ public class Page {
 //    @OneToMany(mappedBy = "page")
 //    private List<Comment> comments;
 
-    @Column(name = "target_date", nullable = false)
-    private LocalDate targetDate;
-
-    @Column(nullable = false, length = 8)
-    private String delete;
+    // TODO : 이거 세터 써도 됩니까? 빌더 써야하나요?
+    @Column(name = "deleted_at")
+    @Setter
+    private LocalDateTime deletedAt;
 
     @Column(nullable = false, length = 10)
     private String locked;
@@ -61,10 +64,10 @@ public class Page {
     // TODO: BaseEntity 만들어지면 주석 해제 후 수정
 //    @CreatedDate
 //    @Column(name = "created_at", updatable = false, nullable = false)
-//    LocalDateTime createdAt;
+//    private LocalDateTime createdAt;
 //
 //    @LastModifiedDate
-//    @Column(name = "created_at", nullable = false)
-//    LocalDateTime modifiedAt;
+//    @Column(name = "modified_at", nullable = false)
+//    private LocalDateTime modifiedAt;
 
 }
