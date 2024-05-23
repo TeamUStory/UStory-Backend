@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.page.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,8 +9,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.ustory.ustory_service.domain.comment.entity.Comment;
 
 @Entity
 @Getter
