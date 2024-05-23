@@ -1,7 +1,7 @@
-package com.elice.ustory.domain.page.service;
+package com.elice.ustory.domain.paper.service;
 
-import com.elice.ustory.domain.page.entity.Address;
-import com.elice.ustory.domain.page.repository.AddressRepository;
+import com.elice.ustory.domain.paper.entity.Address;
+import com.elice.ustory.domain.paper.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class AddressService {
                 address.getCoordinateY()
         );
 
-        savedAddress.getPage().setAddress(savedAddress);
+        savedAddress.getPaper().setAddress(savedAddress);
 
         return savedAddress;
     }

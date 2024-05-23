@@ -1,13 +1,13 @@
-package com.elice.ustory.domain.page.dto;
+package com.elice.ustory.domain.paper.dto;
 
-import com.elice.ustory.domain.page.entity.Page;
+import com.elice.ustory.domain.paper.entity.Paper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
-public class PageListResponse {
+public class PaperListResponse {
 
-    @Schema(name = "페이지 타이틀")
+    @Schema(name = "타이틀")
     private String title;
 
     @Schema(name = "썸네일 이미지")
@@ -19,15 +19,15 @@ public class PageListResponse {
     @Schema(name = "상호명")
     private String store;
 
-    @Schema(name = "페이지 Id")
-    private Long pageId;
+    @Schema(name = "paper Id")
+    private Long paperId;
 
     // TODO: 다이어리 엔티티 연동 후 주석 풀어야 함
-    public PageListResponse(Page page) {
-        this.title = page.getTitle();
-        this.thumbnailImage = page.getThumbnailImage();
+    public PaperListResponse(Paper paper) {
+        this.title = paper.getTitle();
+        this.thumbnailImage = paper.getThumbnailImage();
         this.diaryName = "다이어리 이름"; //page.getDiary().getTitle();
-        this.store = page.getAddress().getStore();
-        this.pageId = page.getId();
+        this.store = paper.getAddress().getStore();
+        this.paperId = paper.getId();
     }
 }

@@ -1,7 +1,7 @@
-package com.elice.ustory.domain.page.dto;
+package com.elice.ustory.domain.paper.dto;
 
-import com.elice.ustory.domain.page.entity.Image;
-import com.elice.ustory.domain.page.entity.Page;
+import com.elice.ustory.domain.paper.entity.Image;
+import com.elice.ustory.domain.paper.entity.Paper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class PageResponse {
+public class PaperResponse {
 
-    @Schema(name = "페이지 이름")
+    @Schema(name = "타이틀")
     private String title;
 
     @Schema(name = "썸네일 URL")
@@ -33,15 +33,15 @@ public class PageResponse {
     @Schema(name = "상호명")
     private String store;
 
-    public PageResponse(Page page) {
-        this.title = page.getTitle();
-        this.thumbnailImage = page.getThumbnailImage();
-        this.images = page.getImages().stream()
+    public PaperResponse(Paper paper) {
+        this.title = paper.getTitle();
+        this.thumbnailImage = paper.getThumbnailImage();
+        this.images = paper.getImages().stream()
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
-        this.visitedAt = page.getVisitedAt();
-        this.city = page.getAddress().getCity();
-        this.detail = page.getAddress().getDetail();
-        this.store = page.getAddress().getStore();
+        this.visitedAt = paper.getVisitedAt();
+        this.city = paper.getAddress().getCity();
+        this.detail = paper.getAddress().getDetail();
+        this.store = paper.getAddress().getStore();
     }
 }
