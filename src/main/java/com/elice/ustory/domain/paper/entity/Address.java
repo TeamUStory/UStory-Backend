@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.page.entity;
+package com.elice.ustory.domain.paper.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,21 +24,21 @@ public class Address {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    private Page page;
+    private Paper paper;
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "city", nullable = false, length = 30)
     private String city;
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "detail", nullable = false, length = 30)
     private String detail;
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "store", nullable = false, length = 30)
     private String store;
 
-    @Column(nullable = false)
+    @Column(name = "coordinate_x", nullable = false)
     private float coordinateX;
 
-    @Column(nullable = false)
+    @Column(name = "coordinate_y", nullable = false)
     private float coordinateY;
 
     // 주소 생성자
@@ -62,7 +62,7 @@ public class Address {
         return this;
     }
 
-    public void setPage(Page page) {
-        this.page = page;
+    public void setPaper(Paper paper) {
+        this.paper = paper;
     }
 }

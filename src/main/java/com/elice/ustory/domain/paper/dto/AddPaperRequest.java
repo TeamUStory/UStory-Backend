@@ -1,8 +1,8 @@
-package com.elice.ustory.domain.page.dto;
+package com.elice.ustory.domain.paper.dto;
 
-import com.elice.ustory.domain.page.entity.Address;
-import com.elice.ustory.domain.page.entity.Image;
-import com.elice.ustory.domain.page.entity.Page;
+import com.elice.ustory.domain.paper.entity.Address;
+import com.elice.ustory.domain.paper.entity.Image;
+import com.elice.ustory.domain.paper.entity.Paper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class AddPageRequest {
+public class AddPaperRequest {
 
-    @Schema(description = "페이지 타이틀", example = "합정역 맛집 우규")
+    @Schema(description = "타이틀", example = "합정역 맛집 우규")
     private String title;
 
     @Schema(description = "썸네일 URL", example = "https://~~~~")
@@ -51,8 +51,8 @@ public class AddPageRequest {
     @Schema(description = "Y좌표", example = "126.9169")
     private float coordinateY;
 
-    public Page toPageEntity() {
-        return Page.createBuilder()
+    public Paper toPageEntity() {
+        return Paper.createBuilder()
                 .title(this.title)
                 .thumbnailImage(this.thumbnailImage)
                 .visitedAt(this.visitedAt)

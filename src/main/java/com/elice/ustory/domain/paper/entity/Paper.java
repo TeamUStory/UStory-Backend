@@ -1,9 +1,7 @@
-package com.elice.ustory.domain.page.entity;
+package com.elice.ustory.domain.paper.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -14,8 +12,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "page")
-public class Page {
+@Table(name = "paper")
+public class Paper {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +22,11 @@ public class Page {
     @Column(nullable = false, length = 20)
     private String title;
 
-    // TODO : 이거 있지 않았나? 페이지에? 메인 사진은 따로 두고, 사진들 URL 저장을 여기다 하는거 아니었나? 일단 먼저 추가합니다. 나머지는 알려주셔야 할 것 같습니다 기중느임
     @Column(name = "thumbnail_image", nullable = false, columnDefinition = "varchar(1000)")
     private String thumbnailImage;
 
     @OneToMany(
-            mappedBy = "page",
+            mappedBy = "paper",
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
@@ -70,13 +67,13 @@ public class Page {
 
     // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
-    public Page(String title, String thumbnailImage, LocalDate visitedAt) {
+    public Paper(String title, String thumbnailImage, LocalDate visitedAt) {
         this.title = title;
         this.thumbnailImage = thumbnailImage;
         this.visitedAt = visitedAt;
     }
 
-    public Page update(String title, String thumbnailImage, /*List<Image> images,*/ LocalDate visitedAt) {
+    public Paper update(String title, String thumbnailImage, /*List<Image> images,*/ LocalDate visitedAt) {
         this.title = title;
         this.thumbnailImage = thumbnailImage;
         this.visitedAt = visitedAt;
@@ -97,16 +94,16 @@ public class Page {
     public void addImage(Image image) {
         this.images.add(image);
 
-        if (image.getPage() != this) {
-            image.setPage(this);
+        if (image.getPaper() != this) {
+            image.setPaper(this);
         }
     }
 
     public void setAddress(Address address) {
         this.address = address;
 
-        if (address.getPage() != this) {
-            address.setPage(this);
+        if (address.getPaper() != this) {
+            address.setPaper(this);
         }
     }
 }
