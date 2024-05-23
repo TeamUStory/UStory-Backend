@@ -36,25 +36,23 @@ public class CommentService {
         return commentDto;
     }
 
-    public CommentDto updateComment(CommentDto commentDto) {
-        Optional<Comment> optionalComment = commentRepository.findById(commentDto.getId());
+    public CommentDto updateComment(Long id, CommentDto commentDto) {
+        Optional<Comment> optionalComment = commentRepository.findById(id);
 
         if(optionalComment.isPresent()){
-            Comment existingComment = optionalComment.get();
-
             Comment updatedComment = Comment.builder()
-                    .id(existingComment.getId())
+                    .id(id)
                     .content(commentDto.getContent())
                     .build();
 
             commentRepository.save(updatedComment);
 
             return CommentDto.builder()
-                    .id(updatedComment.getId())
+                    .id(id)
                     .content(updatedComment.getContent())
                     .build();
         }else{
-            throw new RuntimeException("Comment not found");
+            throw new RuntimeException("해당 Id에 대한 댓글을 찾을 수 없습니다.");
         }
     }
 

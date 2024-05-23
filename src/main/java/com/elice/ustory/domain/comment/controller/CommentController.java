@@ -42,9 +42,9 @@ public class CommentController {
     }
 
     @Operation(summary = "Update Comment API", description = "댓글을 수정함")
-    @PutMapping
-    public ResponseEntity<CommentDto> updateComment(@RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.updateComment(commentDto));
+    @PutMapping("/{id}")
+    public ResponseEntity<CommentDto> updateComment(@PathVariable Long id, @RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok().body(commentService.updateComment(id, commentDto));
     }
 
     @Operation(summary = "Delete Comment API", description = "댓글을 삭제함")
