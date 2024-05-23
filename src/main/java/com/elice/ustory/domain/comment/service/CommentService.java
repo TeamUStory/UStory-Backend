@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.comment.service;
 
+import com.elice.ustory.domain.comment.dto.CommentDto;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
 import jakarta.transaction.Transactional;
@@ -25,12 +26,36 @@ public class CommentService {
         return commentRepository.findById(id);
     }
 
-    public Comment addComment(Comment comment) {
-        return commentRepository.save(comment);
+    public CommentDto addComment(CommentDto commentDto) {
+        Comment comment = Comment.builder()
+                .id(commentDto.getId())
+                .content(commentDto.getContent())
+                .build();
+        commentRepository.save(comment);
+
+        return commentDto;
     }
 
-    public Comment updateComment(Comment comment) {
-        return commentRepository.save(comment);
+    public CommentDto updateComment(CommentDto commentDto) {
+        Optional<Comment> optionalComment = commentRepository.findById(commentDto.getId());
+
+        if(optionalComment.isPresent()){
+            Comment existingComment = optionalComment.get();
+
+            Comment updatedComment = Comment.builder()
+                    .id(existingComment.getId())
+                    .content(commentDto.getContent())
+                    .build();
+
+            commentRepository.save(updatedComment);
+
+            return CommentDto.builder()
+                    .id(updatedComment.getId())
+                    .content(updatedComment.getContent())
+                    .build();
+        }else{
+            throw new RuntimeException("Comment not found");
+        }
     }
 
     public void deleteComment(Long id) {

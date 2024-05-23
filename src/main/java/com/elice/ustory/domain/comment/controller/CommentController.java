@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.comment.controller;
 
+import com.elice.ustory.domain.comment.dto.CommentDto;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,14 +37,14 @@ public class CommentController {
 
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
-        return ResponseEntity.ok().body(commentService.addComment(comment));
+    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok().body(commentService.addComment(commentDto));
     }
 
     @Operation(summary = "Update Comment API", description = "댓글을 수정함")
     @PutMapping
-    public ResponseEntity<Comment> updateComment(@RequestBody Comment comment) {
-        return ResponseEntity.ok().body(commentService.updateComment(comment));
+    public ResponseEntity<CommentDto> updateComment(@RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok().body(commentService.updateComment(commentDto));
     }
 
     @Operation(summary = "Delete Comment API", description = "댓글을 삭제함")
