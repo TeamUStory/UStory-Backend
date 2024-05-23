@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.comment.entity;
 
+import com.elice.ustory.domain.page.entity.Page;
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +19,7 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-//    @ManyToOne(fetch = FetchType.LAZY) TODO: Page 엔티티 만들어질 때까지 대기
-//    @JoinColumn(name = "page_id")
-//    private Page page;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "page_id")
+    private Page page;
 }
