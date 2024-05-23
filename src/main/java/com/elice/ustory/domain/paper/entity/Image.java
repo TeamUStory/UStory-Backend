@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.page.entity;
+package com.elice.ustory.domain.paper.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,8 +23,8 @@ public class Image {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "page_id")
-    private Page page;
+    @JoinColumn(name = "paper_id")
+    private Paper paper;
 
     @Column(name = "image_url", nullable = false, columnDefinition = "varchar(1000)")
     private String imageUrl;
@@ -33,11 +33,11 @@ public class Image {
         this.imageUrl = imageUrl;
     }
 
-    public void setPage(Page page){
-        this.page = page;
+    public void setPaper(Paper paper){
+        this.paper = paper;
 
-        if(!page.getImages().contains(this)) {
-            page.getImages().add(this);
+        if(!paper.getImages().contains(this)) {
+            paper.getImages().add(this);
         }
     }
 

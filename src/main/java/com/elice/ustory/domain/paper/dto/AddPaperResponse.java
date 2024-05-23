@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.page.dto;
+package com.elice.ustory.domain.paper.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class AddPageResponse {
-    @Schema(description = "페이지 Id", example = "12345678")
-    private Long pageId;
+public class AddPaperResponse {
+    @Schema(description = "Paper Id", example = "12345678")
+    private Long paperId;
 }
