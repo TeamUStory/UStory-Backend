@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "paper")
+@Table(name = "paper", uniqueConstraints = @UniqueConstraint(name = "UK_PAPER_ADDRESS_ID", columnNames = "address_id"))
 public class Paper {
 
     @Id
@@ -45,7 +45,7 @@ public class Paper {
 //    private Long diaryId;
 //
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "FK_ADDRESS_ID"))
     private Address address;
 //
 //    @OneToMany(mappedBy = "page")
