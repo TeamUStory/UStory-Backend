@@ -12,25 +12,24 @@ import java.util.stream.Collectors;
 @Getter
 public class PaperResponse {
 
-    @Schema(name = "타이틀")
+    @Schema(description = "타이틀", example = "우규 갔다왔어요.")
     private String title;
 
-    @Schema(name = "썸네일 URL")
+    @Schema(description = "썸네일 URL", example = "https://~~~~~")
     private String thumbnailImage;
 
-    @Schema(name = "이미지 URL")
     private List<String> images;
 
-    @Schema(name = "방문 날짜")
+    @Schema(description = "방문 날짜", example = "2024-05-24")
     private LocalDate visitedAt;
 
-    @Schema(name = "도로 주소")
+    @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
 
-    @Schema(name = "상세 주소")
+    @Schema(description = "상세 주소")
     private String detail;
 
-    @Schema(name = "상호명")
+    @Schema(description = "상호명", example = "우규")
     private String store;
 
     public PaperResponse(Paper paper) {

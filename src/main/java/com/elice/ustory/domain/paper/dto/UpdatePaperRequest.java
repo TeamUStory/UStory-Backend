@@ -17,39 +17,38 @@ import java.util.List;
 @Getter
 public class UpdatePaperRequest {
 
-    @Schema(name = "타이틀")
+    @Schema(description = "타이틀", example = "우규")
     private String title;
 
-    @Schema(name = "썸네일 URL")
+    @Schema(description = "썸네일 URL", example = "https://~~~~~")
     private String thumbnailImage;
 
-    @Schema(name = "이미지 URL")
     private List<String> images;
 
-    @Schema(name = "방문 날짜")
+    @Schema(description = "방문 날짜", example = "2024-05-24")
     private LocalDate visitedAt;
 
 
-    @Schema(name = "다이어리 Id")
+    @Schema(description = "다이어리 Id", example = "12345678")
     private Long diaryId;
 
-    @Schema(name = "사용자 Id", description = "우선 사용자 Id를 기입했지만, 토큰 사용할 때 사라질 예정")
+    @Schema(description = "사용자 Id, 토큰 사용할 때 사라질 예정", example = "12345678")
     private Long memberId;
 
 
-    @Schema(name = "도로 주소")
+    @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
 
-    @Schema(name = "상세 주소")
+    @Schema(description = "상세 주소")
     private String detail;
 
-    @Schema(name = "상호명")
+    @Schema(description = "상호명", example = "우규")
     private String store;
 
-    @Schema(name = "X좌표")
+    @Schema(description = "X좌표", example = "37.5494")
     private float coordinateX;
 
-    @Schema(name = "Y좌표")
+    @Schema(description = "Y좌표", example = "126.9169")
     private float coordinateY;
 
     public Paper toPageEntity() {
