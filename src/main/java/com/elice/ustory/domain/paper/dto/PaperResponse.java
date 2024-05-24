@@ -26,9 +26,6 @@ public class PaperResponse {
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
 
-    @Schema(description = "상세 주소")
-    private String detail;
-
     @Schema(description = "상호명", example = "우규")
     private String store;
 
@@ -40,7 +37,6 @@ public class PaperResponse {
                 .collect(Collectors.toList());
         this.visitedAt = paper.getVisitedAt();
         this.city = paper.getAddress().getCity();
-        this.detail = paper.getAddress().getDetail();
         this.store = paper.getAddress().getStore();
     }
 }

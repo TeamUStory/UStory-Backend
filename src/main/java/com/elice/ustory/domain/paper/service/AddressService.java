@@ -24,7 +24,6 @@ public class AddressService {
 
         savedAddress.update(
                 address.getCity(),
-                address.getDetail(),
                 address.getStore(),
                 address.getCoordinateX(),
                 address.getCoordinateY()

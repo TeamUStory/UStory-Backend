@@ -29,9 +29,6 @@ public class Address {
     @Column(name = "city", nullable = false, length = 30)
     private String city;
 
-    @Column(name = "detail", nullable = false, length = 30)
-    private String detail;
-
     @Column(name = "store", nullable = false, length = 30)
     private String store;
 
@@ -43,18 +40,16 @@ public class Address {
 
     // 주소 생성자
     @Builder(builderMethodName = "createBuilder")
-    public Address(String city, String detail, String store, float coordinateX, float coordinateY) {
+    public Address(String city, String store, float coordinateX, float coordinateY) {
         this.city = city;
-        this.detail = detail;
         this.store = store;
         this.coordinateX = coordinateX;
         this.coordinateY = coordinateY;
     }
 
     // 주소 정보 업데이트
-    public Address update(String city, String detail, String store, float coordinateX, float coordinateY) {
+    public Address update(String city, String store, float coordinateX, float coordinateY) {
         this.city = city;
-        this.detail = detail;
         this.store = store;
         this.coordinateX = coordinateX;
         this.coordinateY = coordinateY;

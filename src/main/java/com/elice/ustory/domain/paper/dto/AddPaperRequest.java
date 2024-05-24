@@ -39,9 +39,6 @@ public class AddPaperRequest {
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
 
-    @Schema(description = "상세 주소", example = "2층")
-    private String detail;
-
     @Schema(description = "상호명", example = "우규")
     private String store;
 
@@ -62,7 +59,6 @@ public class AddPaperRequest {
     public Address toAddressEntity() {
         return Address.createBuilder()
                 .city(this.city)
-                .detail(this.detail)
                 .store(this.store)
                 .coordinateX(this.coordinateX)
                 .coordinateY(this.coordinateY)
