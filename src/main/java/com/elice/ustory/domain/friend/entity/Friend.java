@@ -1,20 +1,39 @@
 package com.elice.ustory.domain.friend.entity;
 
-import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Entity
+@Table(name="friend")
 public class Friend {
     @EmbeddedId
     private FriendId id;
 
-    private LocalDateTime invitationDate;
-    private LocalDateTime acceptanceDate;
+
+    @Column(nullable = false, name="invited_at")
+    private LocalDateTime invitedAt;
+
+    @Column(name="accepted_at")
+    private LocalDateTime acceptedAt;
+
+    //:TODO Users 연결되면 @ManyToOne user id 연결하기
+//    @ManyToOne
+//    @MapsId("userId")
+//    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+//    private Users user;
+//
+//    @ManyToOne
+//    @MapsId("friendId")
+//    @JoinColumn(name = "friend_id", insertable = false, updatable = false)
+//    private Users friendUser;
+
 }
+
 
