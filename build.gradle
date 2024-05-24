@@ -54,6 +54,12 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // Spring Discord Appender
     implementation('com.github.napstr:logback-discord-appender:1.0.0')
+    // queryDSL
+    implementation 'com.querydsl:querydsl-core'
+    implementation 'com.querydsl:querydsl-jpa'
+    annotationProcessor 'com.querydsl:querydsl-apt::jpa'
+    annotationProcessor 'javax.persistence:javax.persistence-api'
+    annotationProcessor 'javax.annotation:javax.annotation-api'
 }
 
 tasks.named('test') {
