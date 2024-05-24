@@ -37,14 +37,16 @@ public class CommentController {
 
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
     @PostMapping
-    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.addComment(commentDto));
+    public ResponseEntity<Comment> createComment(@RequestBody CommentDto commentDto) {
+        Comment comment = commentService.addComment(commentDto);
+        return ResponseEntity.ok().body(comment);
     }
 
     @Operation(summary = "Update Comment API", description = "댓글을 수정함")
     @PutMapping("/{id}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable Long id, @RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.updateComment(id, commentDto));
+    public ResponseEntity<Comment> updateComment(@PathVariable Long id, @RequestBody CommentDto commentDto) {
+        Comment updatedComment = commentService.updateComment(id, commentDto);
+        return ResponseEntity.ok().body(updatedComment);
     }
 
     @Operation(summary = "Delete Comment API", description = "댓글을 삭제함")

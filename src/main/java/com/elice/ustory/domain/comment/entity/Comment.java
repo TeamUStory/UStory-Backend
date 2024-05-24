@@ -22,4 +22,9 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paper_id")
     private Paper paper;
+
+    public Comment update(String content) {
+        this.content = content;
+        return this;
+    }
 }
