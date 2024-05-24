@@ -43,10 +43,10 @@ public class UpdatePaperRequest {
     private String store;
 
     @Schema(description = "X좌표", example = "37.5494")
-    private float coordinateX;
+    private double coordinateX;
 
     @Schema(description = "Y좌표", example = "126.9169")
-    private float coordinateY;
+    private double coordinateY;
 
     public Paper toPageEntity() {
         return Paper.createBuilder()

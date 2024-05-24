@@ -30,10 +30,10 @@ public class Address {
     private String store;
 
     @Column(name = "coordinate_x", nullable = false, columnDefinition = "decimal(15,13)")
-    private float coordinateX;
+    private Double coordinateX;
 
     @Column(name = "coordinate_y", nullable = false, columnDefinition = "decimal(16,13)")
-    private float coordinateY;
+    private Double coordinateY;
 
     /**
      * Address 객체 생성자
@@ -44,7 +44,7 @@ public class Address {
      * @param coordinateY   경도
      */
     @Builder(builderMethodName = "createBuilder")
-    public Address(String city, String store, float coordinateX, float coordinateY) {
+    public Address(String city, String store, double coordinateX, double coordinateY) {
         this.city = city;
         this.store = store;
         this.coordinateX = coordinateX;
@@ -60,7 +60,7 @@ public class Address {
      * @param coordinateY   경도
      * @return              업데이트 된 객체
      */
-    public Address update(String city, String store, float coordinateX, float coordinateY) {
+    public Address update(String city, String store, double coordinateX, double coordinateY) {
         this.city = city;
         this.store = store;
         this.coordinateX = coordinateX;
