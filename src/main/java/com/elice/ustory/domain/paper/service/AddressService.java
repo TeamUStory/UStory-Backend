@@ -19,8 +19,12 @@ public class AddressService {
 
     @Transactional
     public Address updateAddress(Long addressId, Address address) {
-        // TODO: 예외 처리 해야함
+
         Address savedAddress = addressRepository.findById(addressId).orElse(null);
+
+        if (savedAddress == null) {
+            throw new IllegalArgumentException();
+        }
 
         savedAddress.update(
                 address.getCity(),
