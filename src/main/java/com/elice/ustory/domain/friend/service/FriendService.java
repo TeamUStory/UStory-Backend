@@ -48,11 +48,9 @@ public class FriendService {
         List<Friend> friends = friendRepository.findAllByIdUserId(userId);
         List<Users> friendList = new ArrayList<>();
         for (Friend friend : friends) {
-            Users user = userRepository.findById(friend.getId().getFriendId()).orElseThrow(null);
+            Users user = userRepository.findById(friend.getId().getFriendId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID" + friend.getId().getFriendId() + " not found"));
 
-            if (user == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID" + friend.getId().getFriendId() + " not found");
-            }
             friendList.add(user);
         }
         return friendList;
@@ -65,8 +63,9 @@ public class FriendService {
      * @param nickname 검색할 닉네임
      * @return 검색된 사용자 목록
      */
-    public Optional<Users> searchUserByNickname(String nickname) {
-        return userRepository.findByNickname(nickname);
+    public Users searchUserByNickname(String nickname) {
+        return userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with nickname: " + nickname));
     }
 
 
@@ -88,9 +87,13 @@ public class FriendService {
         // 친구 요청이 이미 존재하지 않는 경우에만 추가
         if (!friendRepository.existsById(friendId)) {
             // 친구 요청 저장
-            Friend friend = new Friend(friendId, LocalDateTime.now(), null);
+            Friend friend = Friend.builder()
+                                    .id(friendId)
+                                    .invitedAt(LocalDateTime.now())
+                                    .user(sender)
+                                    .friendUser(receiver)
+                                    .build();
             friendRepository.save(friend);
-
             // 알림 전송
             noticeService.sendFriendRequestNotice(senderId, receiver.getId());
         } else {
@@ -110,7 +113,11 @@ public class FriendService {
         FriendId friendId = new FriendId(receiverId, senderId);
 
         if (!friendRepository.existsById(friendId)) {
-            Friend friend = new Friend(friendId, LocalDateTime.now(), LocalDateTime.now());
+            Friend friend = Friend.builder()
+                                    .id(friendId)
+                                    .invitedAt(LocalDateTime.now())
+                                    .acceptedAt(LocalDateTime.now())
+                                    .build();
             friendRepository.save(friend);
 
             //알림삭제

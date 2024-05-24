@@ -32,7 +32,7 @@ public class FriendController {
      * @param userId 조회할 사용자의 ID
      * @return 친구 목록
      */
-    @Operation(summary = "Get Friend API", description = "친구리스트 userId를 통해 불러옴.")
+    @Operation(summary = "Get / Friend List", description = "사용자의 전체 친구 리스트를 조회합니다.")
     @GetMapping("/{userId}")
     public ResponseEntity<List<Users>> getAllFriends(@PathVariable Long userId) {
         List<Users> friends = friendService.getAllFriends(userId);
@@ -45,13 +45,13 @@ public class FriendController {
      * @param nickname 검색할 닉네임
      * @return 검색된 사용자 (없으면 404 Not Found)
      */
-    @Operation(summary = "Get Friend API", description = "닉네임으로 검색함.")
+    @Operation(summary = "Get / Search User by Nickname", description = "닉네임을 이용하여 사용자를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<Users> searchUserByNickname(@RequestParam String nickname) {
-        Users user = friendService.searchUserByNickname(nickname)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        Users user = friendService.searchUserByNickname(nickname);
         return ResponseEntity.ok(user);
     }
+
 
     /**
      * 닉네임을 이용하여 친구 요청을 보냅니다.
@@ -60,7 +60,7 @@ public class FriendController {
      * @return 검색된 사용자 (없으면 404 Not Found)
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Post Friend API", description = "친구요청 보냄")
+    @Operation(summary = "Post / Send Friend Request", description = "닉네임을 이용하여 친구 요청을 보냅니다.")
     @PostMapping("/request")
     public ResponseEntity<String> sendFriendRequest(@RequestParam Long senderId, @RequestParam String nickname) {
         friendService.sendFriendRequest(senderId, nickname);
@@ -75,7 +75,7 @@ public class FriendController {
      * @param receiverId 친구 요청을 받은 사용자의 ID
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Post Friend API", description = "친구 수락 후 친구 추가 됨")
+    @Operation(summary = "Post / Accept Friend Request", description = "친구 요청을 수락하고 친구 관계를 추가합니다.")
     @PostMapping("/accept")
     public ResponseEntity<String> acceptFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
         friendService.acceptFriendRequest(senderId, receiverId);
@@ -89,7 +89,7 @@ public class FriendController {
      * @param receiverId 친구 요청을 받은 사용자의 ID
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Post Friend API", description = "친구요청 거절")
+    @Operation(summary = "Post / Reject Friend Request", description = "친구 요청을 거절합니다.")
     @PostMapping("/reject")
     public ResponseEntity<String> rejectFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
         friendService.rejectFriendRequest(senderId, receiverId);
@@ -103,7 +103,7 @@ public class FriendController {
      * @param friendId 삭제할 친구의 ID > request HTTP 요청 객체 (토큰을 추출하기 위해 사용)
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Delete Friend API", description = "친구삭제")
+    @Operation(summary = "Delete / Delete Friend", description = "친구 관계를 삭제합니다.")
     @DeleteMapping("/{friendId}")
     public ResponseEntity<Void>deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) {
         friendService.deleteFriendById(userId, friendId);
