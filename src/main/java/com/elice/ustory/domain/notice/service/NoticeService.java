@@ -60,12 +60,17 @@ public class NoticeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
         Users receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "receiver not found"));
+
+        // MessageType enum의 createMessage 메서드를 사용하여 message 생성
         String message = MessageType.Friend.createMessage(sender.getNickname());
-        Notice notice = new Notice();
-        notice.setReceiverId(receiverId);
-        notice.setSenderId(senderId);
-        notice.setMessage(message);
-        notice.setMessageType(MessageType.Friend);
+
+        // Builder를 사용하여 Notice 객체 생성
+        Notice notice = Notice.builder()
+                                .receiverId(receiverId)
+                                .senderId(senderId)
+                                .message(message)
+                                .messageType(MessageType.Friend)
+                                .build();
         noticeRepository.save(notice);
     }
 

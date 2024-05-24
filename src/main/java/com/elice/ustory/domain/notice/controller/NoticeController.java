@@ -30,12 +30,12 @@ public class NoticeController {
      * @param userId 조회할 사용자의 ID
      * @return 알림 목록
      */
-//    @Operation(summary = "Get Notice API", description = "사용자의 모든 알림 조회")
-//    @GetMapping("/notices/{userId}")
-//    public ResponseEntity<List<Notice>> getAllNoticesByUserId(@PathVariable Long userId) {
-//        List<Notice> notices = noticeService.getAllNoticesByUserId(userId);
-//        return ResponseEntity.ok(notices);
-//    }
+    @Operation(summary = "Get Notice API", description = "사용자의 모든 알림 조회")
+    @GetMapping("/notices/{userId}")
+    public ResponseEntity<List<Notice>> getAllNoticesByUserId(@PathVariable Long userId) {
+        List<Notice> notices = noticeService.getAllNoticesByUserId(userId);
+        return ResponseEntity.ok(notices);
+    }
 
 
     /**
@@ -51,6 +51,13 @@ public class NoticeController {
         noticeService.respondToFriendRequest(noticeId, accepted);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 알림을 삭제합니다.
+     *
+     * @
+     */
+//    @DeleteMapping("/{id}")
 
 
 
