@@ -26,14 +26,8 @@ public class CommentService {
         return commentRepository.findById(id);
     }
 
-    public Comment addComment(CommentDto commentDto) {
-        Comment comment = Comment.builder()
-                .id(commentDto.getId())
-                .content(commentDto.getContent())
-                .build();
-        commentRepository.save(comment);
-
-        return comment;
+    public Comment addComment(Comment comment) {
+        return commentRepository.save(comment);
     }
 
     public Comment updateComment(Long id, CommentDto commentDto) {

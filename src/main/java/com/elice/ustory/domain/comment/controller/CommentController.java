@@ -38,7 +38,7 @@ public class CommentController {
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
     @PostMapping
     public ResponseEntity<Comment> createComment(@RequestBody CommentDto commentDto) {
-        Comment comment = commentService.addComment(commentDto);
+        Comment comment = commentService.addComment(commentDto.toCommentEntity());
         return ResponseEntity.ok().body(comment);
     }
 
