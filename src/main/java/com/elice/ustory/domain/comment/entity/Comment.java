@@ -27,4 +27,6 @@ public class Comment extends BaseEntity {
         this.content = content;
         return this;
     }
+    @JoinColumn(name = "paper_id")
+    private Paper paper;
 }
