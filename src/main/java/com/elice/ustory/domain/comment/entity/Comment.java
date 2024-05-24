@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.comment.entity;
 
-import com.elice.ustory.domain.page.entity.Page;
+import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,5 +21,5 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "page_id")
-    private Page page;
+    private Paper paper;
 }
