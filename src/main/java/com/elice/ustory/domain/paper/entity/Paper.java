@@ -44,7 +44,8 @@ public class Paper {
 //    @JoinColumn(name = "diary_id")
 //    private Long diaryId;
 //
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
     private Address address;
 //
 //    @OneToMany(mappedBy = "page")
