@@ -26,31 +26,15 @@ public class CommentService {
         return commentRepository.findById(id);
     }
 
-    public CommentDto addComment(CommentDto commentDto) {
-        Comment comment = Comment.builder()
-                .id(commentDto.getId())
-                .content(commentDto.getContent())
-                .build();
-        commentRepository.save(comment);
-
-        return commentDto;
+    public Comment addComment(Comment comment) {
+        return commentRepository.save(comment);
     }
 
-    public CommentDto updateComment(Long id, CommentDto commentDto) {
+    public Comment updateComment(Long id, CommentDto commentDto) {
         Optional<Comment> optionalComment = commentRepository.findById(id);
 
         if(optionalComment.isPresent()){
-            Comment updatedComment = Comment.builder()
-                    .id(id)
-                    .content(commentDto.getContent())
-                    .build();
-
-            commentRepository.save(updatedComment);
-
-            return CommentDto.builder()
-                    .id(id)
-                    .content(updatedComment.getContent())
-                    .build();
+            return optionalComment.get().update(commentDto.getContent());
         }else{
             throw new RuntimeException("해당 Id에 대한 댓글을 찾을 수 없습니다.");
         }
