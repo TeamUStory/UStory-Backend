@@ -20,6 +20,6 @@ public class Comment extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "page_id")
+    @JoinColumn(name = "paper_id")
     private Paper paper;
 }
