@@ -69,8 +69,9 @@ public class UpdatePaperRequest {
 
         List<Image> images = new ArrayList<>();
 
+        int count = 1;
         for (String imageUrl : this.images) {
-            images.add(new Image(imageUrl));
+            images.add(new Image(imageUrl, count++));
         }
 
         return images;

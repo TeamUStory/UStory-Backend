@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,8 +67,13 @@ public class AddPaperRequest {
     }
 
     public List<Image> toImagesEntity() {
-        return images.stream()
-                .map(Image::new)
-                .collect(Collectors.toList());
+        List<Image> images = new ArrayList<>();
+
+        int count = 1;
+        for (String imageUrl : this.images) {
+            images.add(new Image(imageUrl, count++));
+        }
+
+        return images;
     }
 }
