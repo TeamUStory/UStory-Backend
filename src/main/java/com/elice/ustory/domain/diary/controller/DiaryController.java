@@ -4,6 +4,7 @@ import com.elice.ustory.domain.diary.dto.DiaryDto;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Diary API")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -38,6 +40,16 @@ public class DiaryController {
 
 
         return null;
+    }
+
+    @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
+    @PutMapping("/diary/{diaryId}")
+    public ResponseEntity<Diary> updateDiary(@PathVariable("diaryId") Long diaryId, @RequestBody DiaryDto diaryDto){
+        if(diaryId==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Diary diary = diaryService.updateDiary(diaryId, diaryDto.toDiary());
+        return ResponseEntity.ok(diary);
     }
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
