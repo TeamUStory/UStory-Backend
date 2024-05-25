@@ -21,9 +21,7 @@ public class PaperService {
 
         Paper savedPaper = paperRepository.save(paper);
 
-        for (Image image : images) {
-            savedPaper.addImage(image);
-        }
+        savedPaper.updateImages(images);
 
         savedPaper.setAddress(address);
 
@@ -35,22 +33,32 @@ public class PaperService {
         return paperRepository.findById(Id).orElse(null);
     }
 
+    // TODO: 삭제 예정인 코드
     public List<Paper> getAllPapers() {
         return paperRepository.findAll();
     }
 
     @Transactional
-    public Paper updatePaper(Paper paper) {
+    public Paper updatePaper(Paper paper, List<Image> images, Address address) {
 
         Paper previousPaper = paperRepository.findById(paper.getId()).orElse(null);
 
-        previousPaper.update(paper.getTitle(), paper.getThumbnailImage(), paper.getVisitedAt());
+        previousPaper.update(
+                paper.getTitle(),
+                paper.getThumbnailImage(),
+                paper.getVisitedAt()
+        );
+
+        previousPaper.updateImages(images);
+
+        previousPaper.setAddress(address);
+
         return previousPaper;
     }
 
     public void deleteById(Long Id) {
         Paper paper = paperRepository.findById(Id).orElse(null);
-        paper.delete();
+        paper.softDelete();
     }
 
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,12 +20,51 @@ public class ImageService {
         return imageRepository.save(image);
     }
 
-    @Transactional
     public List<Image> createImages(List<Image> images) {
+        List<Image> result = new ArrayList<>();
+
         for (Image image : images) {
-            imageRepository.save(image);
+            result.add(createImage(image));
         }
 
-        return images;
+        return result;
+    }
+
+    public List<Image> findImagesByPaperId(Long paperId) {
+        return imageRepository.findByPaperIdOrderBySequenceAsc(paperId);
+    }
+
+    @Transactional
+    public List<Image> updateImages(Long paperId, List<Image> images) {
+        List<Image> savedImages = findImagesByPaperId(paperId);
+        List<Image> result = new ArrayList<>();
+
+        updateExistingImages(savedImages, images, result);
+
+        if (savedImages.size() < images.size()) {
+            updateNewImages(savedImages.size(), images, result);
+        }
+
+        return result;
+    }
+
+    private void updateExistingImages(List<Image> savedImages, List<Image> newImages, List<Image> result) {
+        for (int i = 0; i < savedImages.size(); i++) {
+            Image savedImage = savedImages.get(i);
+
+            if (newImages.size() <= i) {
+                imageRepository.delete(savedImage);
+                continue;
+            }
+
+            result.add(savedImage.update(newImages.get(i).getImageUrl()));
+        }
+    }
+
+    private void updateNewImages(int savedImageSize, List<Image> newImages, List<Image> result) {
+        for (int i = savedImageSize; i < newImages.size(); i++) {
+            Image newImage = newImages.get(i);
+            result.add(imageRepository.save(newImage));
+        }
     }
 }

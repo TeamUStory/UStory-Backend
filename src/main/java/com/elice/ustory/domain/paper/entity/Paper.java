@@ -55,7 +55,8 @@ public class Paper {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(nullable = false, length = 10)
+    // TODO: 개발의 편의를 위해 Nullable 가능하도록 바꿈 추후 false 재설정 필요
+    @Column(nullable = true, length = 10)
     private String locked;
 
     // TODO: BaseEntity 만들어지면 주석 해제 후 수정
@@ -75,7 +76,7 @@ public class Paper {
         this.visitedAt = visitedAt;
     }
 
-    public Paper update(String title, String thumbnailImage, /*List<Image> images,*/ LocalDate visitedAt) {
+    public Paper update(String title, String thumbnailImage, LocalDate visitedAt) {
         this.title = title;
         this.thumbnailImage = thumbnailImage;
         this.visitedAt = visitedAt;
@@ -83,7 +84,7 @@ public class Paper {
         return this;
     }
 
-    public boolean delete() {
+    public boolean softDelete() {
 
         if (deletedAt != null) {
             return false;
@@ -93,7 +94,27 @@ public class Paper {
         return true;
     }
 
-    public void addImage(Image image) {
+    /**
+     * Paper 생성 및 업데이트에 사용
+     *
+     * @param images 생성되거나 업데이트된 Image List
+     */
+    public void updateImages(List<Image> images) {
+
+        // 이미지 개수가 동일하면 CascadeType.PERSIST 로 인해 추가할 필요가 없음
+        if (this.images.size() == images.size()) {
+            return;
+        }
+
+        // 이미지 개수가 늘어나 포함되지 않은 이미지 추가하는 로직
+        for (Image image : images) {
+            if (!this.images.contains(image)) {
+                addImage(image);
+            }
+        }
+    }
+
+    private void addImage(Image image) {
         this.images.add(image);
 
         if (image.getPaper() != this) {

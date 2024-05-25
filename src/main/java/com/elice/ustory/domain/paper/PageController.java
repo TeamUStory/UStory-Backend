@@ -69,11 +69,9 @@ public class PageController {
 
         Address address = addressService.updateAddress(paper.getAddress().getId(), updatePaperRequest.toAddressEntity());
 
-        // 이미지 업데이트 시, 삭제되거나 추가되는 이미지들이 존재한다.
-        // 삭제되는 이미지 존재시 해당 이미지를 삭제하고, 추가되는 이미지를 추가해야 한다.
-        // 이를 어떻게 구현할지 생각해봐야 한다.
+        List<Image> images = imageService.updateImages(pageId, updatePaperRequest.toImagesEntity());
 
-        paperService.updatePaper(paper);
+        paperService.updatePaper(paper, images, address);
 
         return ResponseEntity.ok(new UpdatePaperResponse());
     }
