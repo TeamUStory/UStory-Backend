@@ -3,11 +3,13 @@ package com.elice.ustory.domain.user.entity;
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Builder(builderMethodName = "innerBuilder")
 @Entity
-@Builder
 @Table(name = "users")
 public class Users extends BaseEntity {
     @Id
@@ -31,4 +33,13 @@ public class Users extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public static UsersBuilder builder(String email, String name, String nickname, String password, String profileImg) {
+        return innerBuilder()
+                .email(email)
+                .name(name)
+                .nickname(nickname)
+                .password(password)
+                .profileImg(profileImg);
+    }
 }
