@@ -39,9 +39,9 @@ public class PaperService {
     }
 
     @Transactional
-    public Paper updatePaper(Paper paper, List<Image> images, Address address) {
+    public Paper updatePaper(Long savedPaperId, Paper paper, List<Image> images, Address address) {
 
-        Paper previousPaper = paperRepository.findById(paper.getId()).orElse(null);
+        Paper previousPaper = paperRepository.findById(savedPaperId).orElse(null);
 
         previousPaper.update(
                 paper.getTitle(),

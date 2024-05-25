@@ -71,7 +71,7 @@ public class PageController {
 
         List<Image> images = imageService.updateImages(pageId, updatePaperRequest.toImagesEntity());
 
-        paperService.updatePaper(paper, images, address);
+        paperService.updatePaper(pageId, updatePaperRequest.toPageEntity(), images, address);
 
         return ResponseEntity.ok(new UpdatePaperResponse());
     }
