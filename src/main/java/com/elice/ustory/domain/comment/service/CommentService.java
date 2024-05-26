@@ -3,6 +3,8 @@ package com.elice.ustory.domain.comment.service;
 import com.elice.ustory.domain.comment.dto.CommentDto;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
+import com.elice.ustory.domain.paper.entity.Paper;
+import com.elice.ustory.domain.paper.service.PaperService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -13,20 +15,29 @@ import java.util.Optional;
 @Transactional
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final PaperService paperService;
 
-    public CommentService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository, PaperService paperService) {
         this.commentRepository = commentRepository;
+        this.paperService = paperService;
     }
 
-    public List<Comment> getComments() {
-        return commentRepository.findAll();
+    public List<Comment> getComments(Long paperId) {
+        Paper paper = paperService.getPaperById(paperId);
+        return commentRepository.findByPaper(paper);
     }
 
-    public Optional<Comment> getComment(Long id) {
-        return commentRepository.findById(id);
+    public Optional<Comment> getComment(Long paperId, Long id) {
+        Paper paper = paperService.getPaperById(paperId);
+        List<Comment> comments = commentRepository.findByPaper(paper);
+        return comments.stream().filter(comment -> comment.getId().equals(id)).findFirst();
     }
 
-    public Comment addComment(Comment comment) {
+    public Comment addComment(CommentDto commentDto, Long paperId) {
+        Comment comment = Comment.addCommentBuilder()
+                .content(commentDto.getContent())
+                .paper(paperService.getPaperById(paperId))
+                .build();
         return commentRepository.save(comment);
     }
 
