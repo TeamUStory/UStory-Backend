@@ -15,12 +15,18 @@ public class UserService {
 
     public ResponseEntity<SignUpResponse> signUp(SignUpRequest signUpRequest) {
 
-        Users newUser = Users.builder()
-                .email(signUpRequest.getEmail())
-                .name(signUpRequest.getName())
-                .nickname(signUpRequest.getNickname())
-                .password(signUpRequest.getPassword())
-                .profileImg(signUpRequest.getProfileImg())
+        String email = signUpRequest.getEmail();
+        String name = signUpRequest.getName();
+        String nickname = signUpRequest.getNickname();
+        String password = signUpRequest.getPassword();
+        String profileImg = signUpRequest.getProfileImg();
+
+        Users newUser = Users.addUserBuilder()
+                .email(email)
+                .name(name)
+                .nickname(nickname)
+                .password(password)
+                .profileImg(profileImg)
                 .build();
 
         userRepository.save(newUser);
