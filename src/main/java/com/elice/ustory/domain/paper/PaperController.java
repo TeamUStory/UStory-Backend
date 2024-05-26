@@ -71,9 +71,9 @@ public class PaperController {
 
         List<Image> images = imageService.updateImages(paperId, updatePaperRequest.toImagesEntity());
 
-        paperService.updatePaper(paperId, updatePaperRequest.toPageEntity(), images, address);
+        Paper result = paperService.updatePaper(paperId, updatePaperRequest.toPageEntity(), images, address);
 
-        return ResponseEntity.ok(new UpdatePaperResponse());
+        return ResponseEntity.ok(new UpdatePaperResponse(result.getId()));
     }
 
     @Operation(summary = "Read Paper API", description = "페이퍼를 불러온다.")
