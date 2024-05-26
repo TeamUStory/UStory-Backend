@@ -29,18 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "Page API")
+@Tag(name = "Paper API")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class PageController {
+public class PaperController {
 
     private final AddressService addressService;
     private final PaperService paperService;
     private final ImageService imageService;
 
-    @Operation(summary = "Create Page API", description = "페이지를 생성한다.")
-    @PostMapping("/page")
+    @Operation(summary = "Create Paper API", description = "페이퍼를 생성한다.")
+    @PostMapping("/paper")
     public ResponseEntity<AddPaperResponse> create(@RequestBody AddPaperRequest addPaperRequest) {
 
         // 사용자 검증 메서드
@@ -56,51 +56,51 @@ public class PageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new AddPaperResponse(paper.getId()));
     }
 
-    @Operation(summary = "Update Page API", description = "페이지를 수정한다.")
-    @PutMapping("/page/{pageId}")
-    public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long pageId,
+    @Operation(summary = "Update Paper API", description = "페이퍼를 수정한다.")
+    @PutMapping("/paper/{paperId}")
+    public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long paperId,
                                                       @RequestBody UpdatePaperRequest updatePaperRequest) {
 
         // 다이어리 검증 메서드 (다이어리에 해당 페이지가 존재하는지 확인)
 
         // 사용자 검증 메서드 (사용자가 존재하는지, 다이어리에 포함되는지 확인)
 
-        Paper paper = paperService.getPaperById(pageId);
+        Paper paper = paperService.getPaperById(paperId);
 
         Address address = addressService.updateAddress(paper.getAddress().getId(), updatePaperRequest.toAddressEntity());
 
-        List<Image> images = imageService.updateImages(pageId, updatePaperRequest.toImagesEntity());
+        List<Image> images = imageService.updateImages(paperId, updatePaperRequest.toImagesEntity());
 
-        paperService.updatePaper(pageId, updatePaperRequest.toPageEntity(), images, address);
+        paperService.updatePaper(paperId, updatePaperRequest.toPageEntity(), images, address);
 
         return ResponseEntity.ok(new UpdatePaperResponse());
     }
 
-    @Operation(summary = "Read Page API", description = "페이지를 불러온다.")
-    @GetMapping("/page/{pageId}")
-    public ResponseEntity<PaperResponse> read(@PathVariable Long pageId) {
+    @Operation(summary = "Read Paper API", description = "페이퍼를 불러온다.")
+    @GetMapping("/paper/{paperId}")
+    public ResponseEntity<PaperResponse> get(@PathVariable Long paperId) {
 
-        Paper paper = paperService.getPaperById(pageId);
+        Paper paper = paperService.getPaperById(paperId);
 
         return ResponseEntity.ok(new PaperResponse(paper));
     }
 
-    @Operation(summary = "Read Pages API", description = "모든 페이지를 불러온다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
-    @GetMapping("/pages")
-    public ResponseEntity<List<PaperListResponse>> getAllPages(@RequestParam(name = "page", defaultValue = "1") int page,
+    @Operation(summary = "Read Papers API", description = "모든 페이퍼를 불러온다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
+    @GetMapping("/papers")
+    public ResponseEntity<List<PaperListResponse>> getAllPaper(@RequestParam(name = "page", defaultValue = "1") int page,
                                                                @RequestParam(name = "size", defaultValue = "20") int size) {
 
-        List<PaperListResponse> pages = paperService.getAllPapers().stream()
+        List<PaperListResponse> papers = paperService.getAllPapers().stream()
                 .map(PaperListResponse::new)
                 .toList();
 
-        return ResponseEntity.ok(pages);
+        return ResponseEntity.ok(papers);
     }
 
     // TODO: userId를 임시로 작성해놨지만 변경 해야함
-    @Operation(summary = "Read Pages By User API", description = "유저와 연관된 모든 페이지를 불러온다.")
-    @GetMapping(value = "/pages/user", params = "userId")
-    public ResponseEntity<List<AddPaperResponse>> getAllPagesByUser(@RequestParam(name = "userId") Long userId,
+    @Operation(summary = "Read Papers By User API", description = "유저와 연관된 모든 페이퍼를 불러온다.")
+    @GetMapping(value = "/paper/user", params = "userId")
+    public ResponseEntity<List<AddPaperResponse>> getAllPapersByUser(@RequestParam(name = "userId") Long userId,
                                                                     @RequestParam(name = "page", defaultValue = "1") int page,
                                                                     @RequestParam(name = "size", defaultValue = "20") int size) {
 
@@ -110,8 +110,8 @@ public class PageController {
         return ResponseEntity.ok(List.of(new AddPaperResponse()));
     }
 
-    @Operation(summary = "Read Pages By Diary API", description = "다이어리와 연관된 모든 페이지를 불러온다.")
-    @GetMapping(value = "/pages/diary", params = "diaryId")
+    @Operation(summary = "Read Papers By Diary API", description = "다이어리와 연관된 모든 페이퍼를 불러온다.")
+    @GetMapping(value = "/papers/diary", params = "diaryId")
     public ResponseEntity<List<AddPaperResponse>> getAllPagesByDiary(@RequestParam(name = "diaryId") Long diaryId,
                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
                                                                      @RequestParam(name = "size", defaultValue = "20") int size) {
@@ -122,12 +122,12 @@ public class PageController {
         return ResponseEntity.ok(List.of(new AddPaperResponse()));
     }
 
-    @Operation(summary = "Delete Page API", description = "페이지를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
-    @DeleteMapping("/page/{pageId}")
-    public ResponseEntity<Void> delete(@PathVariable Long pageId) {
+    @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
+    @DeleteMapping("/paper/{paperId}")
+    public ResponseEntity<Void> delete(@PathVariable Long paperId) {
 
-        // pageId에 해당하는 page 삭제
-        paperService.deleteById(pageId);
+        // paperId에 해당하는 paper 삭제
+        paperService.deleteById(paperId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
