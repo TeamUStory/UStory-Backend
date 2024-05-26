@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @Repository
-public interface FriendRepository extends JpaRepository<Friend, FriendId>, QuerydslPredicateExecutor<Friend>
+public interface FriendRepository extends JpaRepository<Friend, FriendId>, FriendRepositoryCustom
 {
-    List<Friend> findAllByIdUserId(Long userId);
+
 }

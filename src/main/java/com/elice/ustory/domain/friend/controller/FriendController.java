@@ -1,6 +1,10 @@
 package com.elice.ustory.domain.friend.controller;
 
+import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
+import com.elice.ustory.domain.friend.dto.UserFriendDTO;
+import com.elice.ustory.domain.friend.dto.UserListDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
+import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,91 +25,81 @@ import java.util.Optional;
 public class FriendController {
 
     private FriendService friendService;
+    private NoticeService noticeService;
 
-    public FriendController(FriendService friendService) {
+    public FriendController(FriendService friendService, NoticeService noticeService) {
         this.friendService = friendService;
+        this.noticeService = noticeService;
     }
 
     /**
-     * 사용자의 전체 친구 리스트를 조회합니다.
+     * 사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.
      *
-     * @param userId 조회할 사용자의 ID
-     * @return 친구 목록
+     * @param userId   조회할 사용자의 ID (옵션)
+     * @param nickname 검색할 닉네임 (옵션)
+     * @return 친구 목록 또는 검색된 친구 목록
      */
-    @Operation(summary = "Get / Friend List", description = "사용자의 전체 친구 리스트를 조회합니다.")
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Users>> getAllFriends(@PathVariable Long userId) {
-        List<Users> friends = friendService.getAllFriends(userId);
+    @Operation(summary = "Get / Friends", description = "사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.")
+    @GetMapping("/friends")
+    public ResponseEntity<List<UserFriendDTO>> getFriends(@RequestParam(required = false) Long userId, @RequestParam(required = false) String nickname) {
+        List<UserFriendDTO> friends = friendService.getFriends(userId, nickname);
         return ResponseEntity.ok(friends);
     }
 
     /**
-     * 닉네임을 이용하여 사용자를 검색합니다.
+     * 닉네임으로 전체 사용자를 검색합니다.
      *
      * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 (없으면 404 Not Found)
+     * @return 검색된 사용자 목록
      */
-    @Operation(summary = "Get / Search User by Nickname", description = "닉네임을 이용하여 사용자를 검색합니다.")
-    @GetMapping("/search")
-    public ResponseEntity<Users> searchUserByNickname(@RequestParam String nickname) {
-        Users user = friendService.searchUserByNickname(nickname);
-        return ResponseEntity.ok(user);
+    @Operation(summary = "Get / Search Users by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
+    @GetMapping("/search-users")
+    public ResponseEntity<List<UserListDTO>> findAllUsersByNickname(@RequestParam String nickname) {
+        List<UserListDTO> users = friendService.findAllUsersByNickname(nickname);
+        return ResponseEntity.ok(users);
     }
 
 
+
     /**
-     * 닉네임을 이용하여 친구 요청을 보냅니다.
-     * TDOD: 추후에 토큰 보내주는거 작성해야됨
-     * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 (없으면 404 Not Found)
+     * 친구 추가 요청을 보냅니다.
+     *
+     * @param friendRequestDTO 친구 요청 정보
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Post / Send Friend Request", description = "닉네임을 이용하여 친구 요청을 보냅니다.")
+    @Operation(summary = "Post / Friend Request", description = "친구 추가 요청을 보냅니다.")
     @PostMapping("/request")
-    public ResponseEntity<String> sendFriendRequest(@RequestParam Long senderId, @RequestParam String nickname) {
-        friendService.sendFriendRequest(senderId, nickname);
+    public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
+        friendService.sendFriendRequest(friendRequestDTO);
         return ResponseEntity.ok("Friend request sent successfully.");
     }
 
 
     /**
-     * 친구 요청을 수락하고 친구 관계를 추가합니다.
+     * 친구 요청에 응답합니다.(친구 요청에 대한 응답 처리)
      *
-     * @param senderId 친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
+     * @param noticeId 알람 ID
+     * @param accepted true이면 요청 수락, false이면 요청 거절
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Post / Accept Friend Request", description = "친구 요청을 수락하고 친구 관계를 추가합니다.")
-    @PostMapping("/accept")
-    public ResponseEntity<String> acceptFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
-        friendService.acceptFriendRequest(senderId, receiverId);
-        return ResponseEntity.ok("Friend request accepted successfully.");
+    @Operation(summary = "Post / Friend Request Response", description = "친구 요청에 응답합니다.")
+    @PostMapping("/respond")
+    public ResponseEntity<String> respondToFriendRequest(@RequestParam Long noticeId, @RequestParam boolean accepted) {
+        friendService.respondToFriendRequest(noticeId, accepted);
+        return ResponseEntity.ok("Friend request " + (accepted ? "accepted" : "rejected") + " successfully.");
     }
 
-    /**
-     * 친구 요청을 거절합니다.
-     *
-     * @param senderId 친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
-     * @return 요청 성공 여부
-     */
-    @Operation(summary = "Post / Reject Friend Request", description = "친구 요청을 거절합니다.")
-    @PostMapping("/reject")
-    public ResponseEntity<String> rejectFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
-        friendService.rejectFriendRequest(senderId, receiverId);
-        return ResponseEntity.ok("Friend request rejected successfully.");
-    }
 
     /**
      * 친구 관계를 삭제합니다.
-     * TDOD: jwt토큰 id 보내줘야됨.
-     * @param userId 현재 사용자의 ID > friendId
-     * @param friendId 삭제할 친구의 ID > request HTTP 요청 객체 (토큰을 추출하기 위해 사용)
+     * TODO: 나중에 jwt토큰에서 사용자 ID를 추출하는 로직으로 변경
+     * @param userId 현재 사용자의 ID
+     * @param friendId 삭제할 친구의 ID
      * @return 요청 성공 여부
      */
     @Operation(summary = "Delete / Delete Friend", description = "친구 관계를 삭제합니다.")
-    @DeleteMapping("/{friendId}")
-    public ResponseEntity<Void>deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+    @DeleteMapping("/{userId}/{friendId}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) {
         friendService.deleteFriendById(userId, friendId);
         return ResponseEntity.noContent().build();
     }
