@@ -24,7 +24,6 @@ public class Friend {
     @Column(name="accepted_at")
     private LocalDateTime acceptedAt;
 
-    //:TODO Users 연결되면 @ManyToOne user id 연결하기
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
@@ -34,6 +33,17 @@ public class Friend {
     @MapsId("friendId")
     @JoinColumn(name = "friend_id", insertable = false, updatable = false)
     private Users friendUser;
+
+    @Enumerated(EnumType.STRING)  // 열거형 값을 문자열로 저장
+    @Column(nullable = false)
+    private FriendStatus status;
+
+    public void updateStatus(FriendStatus status) {
+        this.status = status;
+        if (status == FriendStatus.ACCEPTED) {
+            this.acceptedAt = LocalDateTime.now();
+        }
+    }
 
 }
 
