@@ -27,6 +27,4 @@ public class FriendId implements Serializable {
         this.friendId = friendId;
     }
 
-
-
 }
