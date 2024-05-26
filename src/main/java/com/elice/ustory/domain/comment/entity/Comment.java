@@ -23,8 +23,9 @@ public class Comment extends BaseEntity {
     private Paper paper;
 
     @Builder(builderMethodName = "addCommentBuilder")
-    public Comment(String content) {
+    public Comment(String content, Paper paper) {
         this.content = content;
+        this.paper = paper;
     }
 
     public Comment update(String content) {
