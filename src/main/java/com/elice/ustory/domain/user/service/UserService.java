@@ -21,7 +21,13 @@ public class UserService {
         String password = signUpRequest.getPassword();
         String profileImg = signUpRequest.getProfileImg();
 
-        Users newUser = Users.builder(email, name, nickname, password, profileImg).build();
+        Users newUser = Users.addUserBuilder()
+                .email(email)
+                .name(name)
+                .nickname(nickname)
+                .password(password)
+                .profileImg(profileImg)
+                .build();
 
         userRepository.save(newUser);
         return SignUpResponse.success();

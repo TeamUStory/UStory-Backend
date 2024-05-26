@@ -8,7 +8,6 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder(builderMethodName = "innerBuilder")
 @Entity
 @Table(name = "users")
 public class Users extends BaseEntity {
@@ -34,12 +33,12 @@ public class Users extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public static UsersBuilder builder(String email, String name, String nickname, String password, String profileImg) {
-        return innerBuilder()
-                .email(email)
-                .name(name)
-                .nickname(nickname)
-                .password(password)
-                .profileImg(profileImg);
+    @Builder(builderMethodName = "addUserBuilder")
+    public Users(String email, String name, String nickname, String password, String profileImg) {
+        this.email = email;
+        this.name = name;
+        this.nickname = nickname;
+        this.password = password;
+        this.profileImg = profileImg;
     }
 }
