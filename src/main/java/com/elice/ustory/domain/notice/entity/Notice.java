@@ -23,6 +23,7 @@ public class Notice {
     @Column(nullable = false, name = "sender_id")
     private long senderId;
 
+    @Enumerated(EnumType.STRING) // Enum을 문자열로 저장
     @Column(nullable = false, name = "message_type")
     private MessageType messageType;
 }

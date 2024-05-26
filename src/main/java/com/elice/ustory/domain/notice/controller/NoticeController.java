@@ -38,26 +38,21 @@ public class NoticeController {
     }
 
 
-    /**
-     * 친구 요청 알람에 응답합니다.
-     *
-     * @param noticeId 알람 ID
-     * @param accepted true이면 수락, false이면 거절
-     * @return 요청 성공 여부
-     */
-    @Operation(summary = "Post Notice API", description = "친구 요청 알림 응답")
-    @PostMapping("/{noticeId}/response")
-    public ResponseEntity<Void> respondToFriendRequest(@PathVariable Long noticeId, @RequestParam boolean accepted) {
-        noticeService.respondToFriendRequest(noticeId, accepted);
-        return ResponseEntity.noContent().build();
-    }
+
+
 
     /**
      * 알림을 삭제합니다.
      *
-     * @
+     * @param id 삭제할 알림의 ID
+     * @return 요청 성공 여부
      */
-//    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete / Notice", description = "알림을 삭제합니다.")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNotice(@PathVariable Long id) {
+        noticeService.deleteNotice(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
 

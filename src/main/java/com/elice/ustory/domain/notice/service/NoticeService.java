@@ -31,7 +31,6 @@ public class NoticeService {
         this.friendService = friendService;
     }
 
-
     /**
      * 특정 사용자의 모든 알림을 조회합니다.
      *
@@ -48,7 +47,6 @@ public class NoticeService {
         return noticeRepository.findByReceiverId(userId);
     }
 
-
     /**
      * 친구 요청 알람을 전송합니다.
      *
@@ -59,20 +57,20 @@ public class NoticeService {
         Users sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
         Users receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "receiver not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"));
 
-        // MessageType enum의 createMessage 메서드를 사용하여 message 생성
         String message = MessageType.Friend.createMessage(sender.getNickname());
 
         // Builder를 사용하여 Notice 객체 생성
         Notice notice = Notice.builder()
-                                .receiverId(receiverId)
-                                .senderId(senderId)
-                                .message(message)
-                                .messageType(MessageType.Friend)
-                                .build();
+                .receiverId(receiverId)
+                .senderId(senderId)
+                .message(message)
+                .messageType(MessageType.Friend)
+                .build();
         noticeRepository.save(notice);
     }
+
 
 
     /**
@@ -92,13 +90,8 @@ public class NoticeService {
         Long senderId = notice.getSenderId();
         Long receiverId = notice.getReceiverId();
 
-        if (accepted) {
-            friendService.acceptFriendRequest(senderId, receiverId);
-        } else {
-            friendService.rejectFriendRequest(senderId, receiverId);
-        }
+        friendService.respondToFriendRequest(senderId, receiverId, accepted);
     }
-
 
     /**
      * 친구 요청 알람을 삭제합니다.
@@ -107,8 +100,30 @@ public class NoticeService {
      * @param receiverId 친구 요청을 받은 사용자의 ID
      */
     public void deleteFriendRequestNotice(Long senderId, Long receiverId) {
-        Optional<Notice> noticeOptional = Optional.ofNullable(noticeRepository.findBySenderIdAndReceiverIdAndMessageType(senderId, receiverId, MessageType.Friend));
+        Optional<Notice> noticeOptional = noticeRepository.findBySenderIdAndReceiverIdAndMessageType(senderId, receiverId, MessageType.Friend);
         noticeOptional.ifPresent(notice -> noticeRepository.delete(notice));
+    }
+
+    /**
+     * 알림을 삭제합니다.
+     *
+     * @param noticeId 삭제할 알림의 ID
+     */
+    public void deleteNotice(Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
+        noticeRepository.delete(notice);
+    }
+
+
+    /**
+     * 알림 ID로 알림을 조회합니다.
+     *
+     * @param noticeId 알림 ID
+     * @return 알림 객체
+     */
+    public Optional<Notice> findById(Long noticeId) {
+        return noticeRepository.findById(noticeId);
     }
 
 
