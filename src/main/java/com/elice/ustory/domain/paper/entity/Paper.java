@@ -45,7 +45,10 @@ public class Paper {
 //    @JoinColumn(name = "diary_id")
 //    private Long diaryId;
 //
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
     @JoinColumn(name = "address_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "FK_ADDRESS_ID"))
     private Address address;
 //

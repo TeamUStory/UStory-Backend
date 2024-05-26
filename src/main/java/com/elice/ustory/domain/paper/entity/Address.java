@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "address")
 public class Address {
 
     @Id
@@ -38,10 +40,10 @@ public class Address {
     /**
      * Address 객체 생성자
      *
-     * @param city          도로명 주소
-     * @param store         상호명
-     * @param coordinateX   위도
-     * @param coordinateY   경도
+     * @param city        도로명 주소
+     * @param store       상호명
+     * @param coordinateX 위도
+     * @param coordinateY 경도
      */
     @Builder(builderMethodName = "createBuilder")
     public Address(String city, String store, double coordinateX, double coordinateY) {
@@ -54,11 +56,11 @@ public class Address {
     /**
      * Address 객체 업데이트
      *
-     * @param city          도로명 주소
-     * @param store         상호명
-     * @param coordinateX   위도
-     * @param coordinateY   경도
-     * @return              업데이트 된 객체
+     * @param city        도로명 주소
+     * @param store       상호명
+     * @param coordinateX 위도
+     * @param coordinateY 경도
+     * @return 업데이트 된 객체
      */
     public Address update(String city, String store, double coordinateX, double coordinateY) {
         this.city = city;
@@ -72,7 +74,7 @@ public class Address {
     /**
      * Paper 객체를 지정한다.
      *
-     * @param paper         Paper 객체
+     * @param paper Paper 객체
      */
     public void setPaper(Paper paper) {
         this.paper = paper;
