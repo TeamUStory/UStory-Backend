@@ -8,7 +8,6 @@ import lombok.*;
 @Entity
 @Table(name = "comment")
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment extends BaseEntity {
@@ -22,4 +21,15 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paper_id")
     private Paper paper;
+
+    @Builder(builderMethodName = "addCommentBuilder")
+    public Comment(String content, Paper paper) {
+        this.content = content;
+        this.paper = paper;
+    }
+
+    public Comment update(String content) {
+        this.content = content;
+        return this;
+    }
 }
