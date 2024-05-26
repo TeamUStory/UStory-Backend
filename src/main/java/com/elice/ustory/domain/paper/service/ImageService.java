@@ -30,6 +30,18 @@ public class ImageService {
         return result;
     }
 
+    // TODO: 과연 단일 image 업데이트 메서드가 필요한가?
+//    @Transactional
+//    public Image updateImage(Long paperId, Image image) {
+//        Image savedImage = imageRepository.findByPaperIdAndSequence(image.getPaper().getId(), image.getSequence()).orElse(null);
+//
+//        if (savedImage != null) {
+//            return savedImage.update(image.getImageUrl());
+//        }
+//
+//        return imageRepository.save(image);
+//    }
+
     public List<Image> findImagesByPaperId(Long paperId) {
         return imageRepository.findByPaperIdOrderBySequenceAsc(paperId);
     }
