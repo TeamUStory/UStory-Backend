@@ -5,13 +5,16 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     public Users signUp(SignUpRequest signUpRequest) {
@@ -83,5 +86,10 @@ public class UserService {
 
         Users deletedUser = userRepository.save(user);
         return deletedUser;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
+        return (UserDetails) userRepository.findByNickname(nickname).orElseThrow(() -> new UsernameNotFoundException(nickname));
     }
 }

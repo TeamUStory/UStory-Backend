@@ -1,5 +1,6 @@
 package com.elice.ustory.global.jwt;
 
+import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -40,9 +41,10 @@ public class JwtTokenProvider {
         log.info("[init] JwtTokenProvider 내 SecretKey 초기화 완료");
     }
 
-    public String createAccessToken(String name) { //TODO: 토큰 파라미터 추가 필요
+    public String createAccessToken(String name, Users.LoginType loginType) {
         Claims claims = Jwts.claims().setSubject(name);
         Date now = new Date();
+        claims.put("loginType", loginType);
         log.info("[createToken] 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
@@ -64,12 +66,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-//    public Authentication getAuthentication(String token) {
-//        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-//        UserDetails userDetails = userService.loadUserByUsername(this.getUserPk(token));  TODO: User Service 수정
-//        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}", userDetails.getUsername());
-//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-//    }
+    public Authentication getAuthentication(String token) {
+        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
+        UserDetails userDetails = userService.loadUserByUsername(this.getUserPk(token));
+        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}", userDetails.getUsername());
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
 
     public String getUserPk(String token) {
         log.info("[getUserPk] 토큰 기반 회원 구별 정보 추출");

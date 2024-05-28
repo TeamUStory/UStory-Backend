@@ -32,40 +32,40 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-//        String accessToken = getTokenFromRequest(request, "Authorization");
-//
-//        log.info("[doFilterInternal] accessToken 값 추출 완료, token: {}", accessToken);
-//        log.info("[doFilterInternal] accessToken 값 유효성 체크 시작");
-//
-//        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
-//            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            log.info("[doFilterInternal] accessToken 값 유효성 체크 완료");
-//        } else {
-//            log.warn("[doFilterInternal] AccessToken이 만료되었습니다.");
-//            refreshAuthentication(request, response);
-//        }
-//
-//        filterChain.doFilter(request, response);
+        String accessToken = getTokenFromRequest(request, "Authorization");
+
+        log.info("[doFilterInternal] accessToken 값 추출 완료, token: {}", accessToken);
+        log.info("[doFilterInternal] accessToken 값 유효성 체크 시작");
+
+        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("[doFilterInternal] accessToken 값 유효성 체크 완료");
+        } else {
+            log.warn("[doFilterInternal] AccessToken이 만료되었습니다.");
+            refreshAuthentication(request, response);
+        }
+
+        filterChain.doFilter(request, response);
     }
 
-//    private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-//        String refreshToken = getTokenFromRequest(request, "Refresh");
-//        if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
-//            log.info("[refreshToken] RefreshToken으로 AccessToken 재발급 시작");
-//            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken),
-//                    userService.loadUserInfoByUsername(jwtTokenProvider.getUserPk(refreshToken)).getRole()); TODO: User Service 수정
-//            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            Cookie cookie = new Cookie("Authorization", accessToken);
-//            cookie.setPath("/");
-//            cookie.setMaxAge(60 * 60);
-//            response.addCookie(cookie);
-//            log.info("[refreshToken] AccessToken이 재발급 되었습니다.");
-//        } else {
-//            log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
-//        }
-//    }
+    private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        String refreshToken = getTokenFromRequest(request, "Refresh");
+        if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
+            log.info("[refreshToken] RefreshToken으로 AccessToken 재발급 시작");
+            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken),
+                    userService.readByNickname(jwtTokenProvider.getUserPk(refreshToken)).getLoginType());
+            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Cookie cookie = new Cookie("Authorization", accessToken);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60);
+            response.addCookie(cookie);
+            log.info("[refreshToken] AccessToken이 재발급 되었습니다.");
+        } else {
+            log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
+        }
+    }
 
     private String getTokenFromRequest(HttpServletRequest request, String tokenName) throws UnsupportedEncodingException {
         if (request.getCookies() != null) {
