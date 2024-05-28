@@ -26,8 +26,6 @@ public class UserController {
         return ResponseEntity.ok().body(newUser);
     }
 
-    // TODO: 일부만 일치하는 검색
-    // TODO: 유저 정보 담아 보내기
     @Operation(summary = "Read User API", description = "닉네임이 일치하는 유저를 조회한다.")
     @GetMapping("/user")
     public ResponseEntity<Users> readByNickname(@Parameter @Valid @RequestParam("nickname") String nickname) {
