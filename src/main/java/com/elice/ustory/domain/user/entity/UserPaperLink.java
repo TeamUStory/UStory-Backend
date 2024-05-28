@@ -1,11 +1,10 @@
 package com.elice.ustory.domain.user.entity;
 
 import com.elice.ustory.global.entity.BaseEntity;
+import com.elice.ustory.domain.paper.entity.Paper;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.awt.print.Paper;
 
 @Entity
 @Getter
