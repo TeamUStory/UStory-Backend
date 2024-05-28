@@ -1,7 +1,7 @@
 package com.elice.ustory.global.jwt;
 
 import com.elice.ustory.domain.user.entity.Users;
-import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -24,10 +24,10 @@ import java.util.Date;
 public class JwtTokenProvider {
     private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
-    private final UserService userService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public JwtTokenProvider(UserService userService) {
-        this.userService = userService;
+    public JwtTokenProvider(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Value("${key.salt}")
@@ -68,7 +68,7 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-        UserDetails userDetails = userService.loadUserByUsername(this.getUserPk(token));
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getUserPk(token));
         log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}", userDetails.getUsername());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }

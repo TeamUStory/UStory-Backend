@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
     private final UserRepository userRepository;
 
     public Users signUp(SignUpRequest signUpRequest) {
@@ -86,10 +86,5 @@ public class UserService implements UserDetailsService {
 
         Users deletedUser = userRepository.save(user);
         return deletedUser;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
-        return (UserDetails) userRepository.findByNickname(nickname).orElseThrow(() -> new UsernameNotFoundException(nickname));
     }
 }
