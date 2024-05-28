@@ -19,6 +19,10 @@ public class Users extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "login_type")
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
     @Column(unique = true, name = "email", length = 20)
     private String email;
 
@@ -36,6 +40,12 @@ public class Users extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public enum LoginType {
+        KAKAO,
+        NAVER,
+        GOOGLE
+    }
 
     @Builder(builderMethodName = "addUserBuilder")
     public Users(String email, String name, String nickname, String password, String profileImg) {
