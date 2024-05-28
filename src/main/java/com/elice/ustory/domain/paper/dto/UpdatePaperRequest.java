@@ -21,9 +21,9 @@ public class UpdatePaperRequest {
     private String title;
 
     @Schema(description = "썸네일 URL", example = "https://~~~~~")
-    private String thumbnailImage;
+    private String thumbnailImageUrl;
 
-    private List<String> images;
+    private List<String> imageUrls;
 
     @Schema(description = "방문 날짜", example = "2024-05-24")
     private LocalDate visitedAt;
@@ -51,7 +51,7 @@ public class UpdatePaperRequest {
     public Paper toPageEntity() {
         return Paper.createBuilder()
                 .title(this.title)
-                .thumbnailImage(this.thumbnailImage)
+                .thumbnailImage(this.thumbnailImageUrl)
                 .visitedAt(this.visitedAt)
                 .build();
     }
@@ -70,7 +70,7 @@ public class UpdatePaperRequest {
         List<Image> images = new ArrayList<>();
 
         int count = 1;
-        for (String imageUrl : this.images) {
+        for (String imageUrl : this.imageUrls) {
             images.add(new Image(imageUrl, count++));
         }
 

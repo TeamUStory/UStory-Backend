@@ -11,7 +11,7 @@ public class PaperListResponse {
     private String title;
 
     @Schema(description = "썸네일 이미지", example = "https://~~~~~~")
-    private String thumbnailImage;
+    private String thumbnailImageUrl;
 
     @Schema(description = "다이어리 이름", example = "꽁냥껑냥")
     private String diaryName;
@@ -25,7 +25,7 @@ public class PaperListResponse {
     // TODO: 다이어리 엔티티 연동 후 주석 풀어야 함
     public PaperListResponse(Paper paper) {
         this.title = paper.getTitle();
-        this.thumbnailImage = paper.getThumbnailImage();
+        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
         this.diaryName = "다이어리 이름"; //page.getDiary().getTitle();
         this.store = paper.getAddress().getStore();
         this.paperId = paper.getId();

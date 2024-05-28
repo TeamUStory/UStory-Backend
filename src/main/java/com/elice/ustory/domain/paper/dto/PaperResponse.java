@@ -16,9 +16,9 @@ public class PaperResponse {
     private String title;
 
     @Schema(description = "썸네일 URL", example = "https://~~~~~")
-    private String thumbnailImage;
+    private String thumbnailImageUrl;
 
-    private List<String> images;
+    private List<String> imageUrls;
 
     @Schema(description = "방문 날짜", example = "2024-05-24")
     private LocalDate visitedAt;
@@ -31,8 +31,8 @@ public class PaperResponse {
 
     public PaperResponse(Paper paper) {
         this.title = paper.getTitle();
-        this.thumbnailImage = paper.getThumbnailImage();
-        this.images = paper.getImages().stream()
+        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
+        this.imageUrls = paper.getImages().stream()
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
         this.visitedAt = paper.getVisitedAt();

@@ -45,7 +45,7 @@ public class PaperService {
 
         previousPaper.update(
                 paper.getTitle(),
-                paper.getThumbnailImage(),
+                paper.getThumbnailImageUrl(),
                 paper.getVisitedAt()
         );
 

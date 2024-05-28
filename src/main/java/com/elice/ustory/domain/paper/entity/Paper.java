@@ -23,8 +23,8 @@ public class Paper {
     @Column(nullable = false, length = 20)
     private String title;
 
-    @Column(name = "thumbnail_image", nullable = false, columnDefinition = "varchar(1000)")
-    private String thumbnailImage;
+    @Column(name = "thumbnail_image_url", nullable = false, columnDefinition = "varchar(1000)")
+    private String thumbnailImageUrl;
 
     @OneToMany(
             mappedBy = "paper",
@@ -73,15 +73,15 @@ public class Paper {
 
     // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
-    public Paper(String title, String thumbnailImage, LocalDate visitedAt) {
+    public Paper(String title, String thumbnailImageUrl, LocalDate visitedAt) {
         this.title = title;
-        this.thumbnailImage = thumbnailImage;
+        this.thumbnailImageUrl = thumbnailImageUrl;
         this.visitedAt = visitedAt;
     }
 
-    public Paper update(String title, String thumbnailImage, LocalDate visitedAt) {
+    public Paper update(String title, String thumbnailImageUrl, LocalDate visitedAt) {
         this.title = title;
-        this.thumbnailImage = thumbnailImage;
+        this.thumbnailImageUrl = thumbnailImageUrl;
         this.visitedAt = visitedAt;
 
         return this;
