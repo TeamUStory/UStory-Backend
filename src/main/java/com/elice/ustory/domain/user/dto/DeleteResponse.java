@@ -5,13 +5,10 @@ import com.elice.ustory.domain.user.dto.common.ResponseDto;
 import com.elice.ustory.domain.user.dto.common.ResponseMessage;
 import org.springframework.http.ResponseEntity;
 
-public class SignUpResponse extends ResponseDto {
+public class DeleteResponse extends ResponseDto {
 
-    private SignUpResponse()  {
-        super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-    }
+    private DeleteResponse() { super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);}
 
-    public static ResponseEntity<SignUpResponse> success() {
-        return ResponseEntity.ok(new SignUpResponse());
+    public static ResponseEntity<DeleteResponse> success() { return ResponseEntity.ok(new DeleteResponse());
     }
 }
