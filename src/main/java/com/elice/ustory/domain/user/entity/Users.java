@@ -2,14 +2,18 @@ package com.elice.ustory.domain.user.entity;
 
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter //TODO: 수동 세터로 변경
+@Where(clause = "deleted_at IS NULL")
 @Entity
 @Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
