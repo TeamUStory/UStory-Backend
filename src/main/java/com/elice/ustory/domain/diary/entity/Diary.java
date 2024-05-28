@@ -2,13 +2,14 @@ package com.elice.ustory.domain.diary.entity;
 
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @Table(name = "diary")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Diary extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,13 +29,15 @@ public class Diary extends BaseEntity {
     private String description;
 
     @Column(name="color", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Color color;
 
-    public Diary(String name, String imgUrl, DiaryCategory diaryCategory, String description) {
+    public Diary(String name, String imgUrl, DiaryCategory diaryCategory, String description, Color color) {
         this.name = name;
         this.imgUrl = imgUrl;
         this.diaryCategory = diaryCategory;
         this.description = description;
+        this.color = color;
     }
 
     public void updateDiary(Diary diary){
