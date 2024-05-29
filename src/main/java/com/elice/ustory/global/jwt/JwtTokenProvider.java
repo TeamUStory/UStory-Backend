@@ -30,7 +30,7 @@ public class JwtTokenProvider {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-//    @Value("${key.salt}")
+    @Value("${key.salt}")
     private String salt;
     private Key secretKey;
 
