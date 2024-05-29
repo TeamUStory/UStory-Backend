@@ -8,12 +8,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    public Optional<Users> findById(Long userId){
+        return userRepository.findById(userId);
+    }
 
     public Users signUp(SignUpRequest signUpRequest) {
 
