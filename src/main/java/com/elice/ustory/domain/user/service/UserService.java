@@ -3,11 +3,8 @@ package com.elice.ustory.domain.user.service;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public Users signUp(SignUpRequest signUpRequest) {
 
@@ -86,5 +84,25 @@ public class UserService {
 
         Users deletedUser = userRepository.save(user);
         return deletedUser;
+    }
+
+    public LoginResponse login(String id, String password) {
+        //TODO: 예외처리
+        Users loginUser = userRepository.findByEmail(id)
+                .orElseThrow();
+
+        if (!loginUser.getPassword().equals(password)) {
+            //TODO: 비밀번호 오류 예외처리
+            return null;
+        }
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .token(jwtTokenProvider.createAccessToken(
+                        loginUser.getNickname(),
+                        loginUser.getLoginType()
+                        ))
+                .build();
+
+        return loginResponse;
     }
 }
