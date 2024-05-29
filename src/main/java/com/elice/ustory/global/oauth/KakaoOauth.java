@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 @Slf4j
-@Component
+//@Component
 @Getter
 public class KakaoOauth {
 //    @Value("${kakao.api_key}")
@@ -39,7 +39,7 @@ public class KakaoOauth {
 //    @Value("${kakao.userInfo_uri}")
     private String userInfoUri;
 
-    @Value("${kakao.expireKakaoToken_uri}")
+//    @Value("${kakao.expireKakaoToken_uri}")
     private String expireKakaoTokenUri;
 
     public String getKakaoAccessToken(String code, HttpServletResponse response) {
