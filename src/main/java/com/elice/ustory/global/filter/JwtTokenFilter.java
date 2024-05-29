@@ -50,7 +50,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        String refreshToken = getTokenFromRequest(request, "Refresh");
+        String refreshToken = getTokenFromRequest(request, "Refresh"); // TODO: Redis RefreshToken에 맞게 수정 1
         if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
             log.info("[refreshToken] RefreshToken으로 AccessToken 재발급 시작");
             String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken),
@@ -65,7 +65,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
         }
-    }
+    } // TODO: Redis RefreshToken에 맞게 수정 2
 
     private String getTokenFromRequest(HttpServletRequest request, String tokenName) throws UnsupportedEncodingException {
         if (request.getCookies() != null) {

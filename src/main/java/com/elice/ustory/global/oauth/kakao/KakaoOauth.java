@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 @Slf4j
-//@Component
+@Component
 @Getter
 public class KakaoOauth {
     @Value("${kakao.api_key}")
