@@ -1,7 +1,13 @@
 package com.elice.ustory.domain.paper.entity;
 
+import com.elice.ustory.domain.comment.entity.Comment;
+import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -14,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "paper", uniqueConstraints = @UniqueConstraint(name = "UK_PAPER_ADDRESS_ID", columnNames = "address_id"))
-public class Paper {
+public class Paper extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,24 +42,23 @@ public class Paper {
     @Column(name = "visited_at", nullable = false)
     private LocalDate visitedAt;
 
-    // TODO: 다른 엔티티 전부 만들어지면 주석 해제
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private Long writerId;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "diary_id")
-//    private Long diaryId;
-//
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users writer;
+
+    @ManyToOne
+    @JoinColumn(name = "diary_id")
+    private Diary diary;
+
     @OneToOne(
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
     @JoinColumn(name = "address_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "FK_ADDRESS_ID"))
     private Address address;
-//
-//    @OneToMany(mappedBy = "page")
-//    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "paper")
+    private List<Comment> comments;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -62,14 +67,13 @@ public class Paper {
     @Column(nullable = true, length = 10)
     private String locked;
 
-    // TODO: BaseEntity 만들어지면 주석 해제 후 수정
-//    @CreatedDate
-//    @Column(name = "created_at", updatable = false, nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    @Column(name = "modified_at", nullable = false)
-//    private LocalDateTime modifiedAt;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "modified_at", nullable = false)
+    private LocalDateTime modifiedAt;
 
     // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
@@ -95,6 +99,26 @@ public class Paper {
 
         deletedAt = LocalDateTime.now();
         return true;
+    }
+
+    // TODO: 최초 생성시에만 등록되기 때문에 방안 모색
+    public void updateWriter(Users writer) {
+
+        if (this.writer != null) {
+            return;
+        }
+
+        this.writer = writer;
+    }
+
+    // TODO: 최초 생성시에만 등록되기 때문에 방안 모색
+    public void updateDiary(Diary diary) {
+
+        if (this.diary != null) {
+            return;
+        }
+
+        this.diary = diary;
     }
 
     /**
