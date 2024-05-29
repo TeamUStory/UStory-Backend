@@ -24,19 +24,19 @@ import java.util.HashMap;
 @Component
 @Getter
 public class KakaoOauth {
-    @Value("${kakao.api_key}")
+//    @Value("${kakao.api_key}")
     private String kakaoApiKey;
 
-    @Value("${kakao.redirect_uri}")
+//    @Value("${kakao.redirect_uri}")
     private String kakaoRedirectUri;
 
-    @Value("${kakao.logoutRedirect_uri}")
+//    @Value("${kakao.logoutRedirect_uri}")
     private String kakaoLogoutRedirectUri;
 
-    @Value("${kakao.code_uri}")
+//    @Value("${kakao.code_uri}")
     private String kakaoTokenUri;
 
-    @Value("${kakao.userInfo_uri}")
+//    @Value("${kakao.userInfo_uri}")
     private String userInfoUri;
 
     @Value("${kakao.expireKakaoToken_uri}")
