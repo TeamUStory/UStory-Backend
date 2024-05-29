@@ -2,9 +2,14 @@ package com.elice.ustory.domain.diary.service;
 
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
+import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,26 +17,43 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DiaryService {
     private final DiaryRepository diaryRepository;
+    private final DiaryUserRepository diaryUserRepository;
+    private final UserRepository userRepository;
 
-    public Diary createDiary(Diary diary, List<Users> users) {
+    @Transactional
+    public Diary createDiary(Diary diary, List<String> users) {
         Diary savedDiary = diaryRepository.save(diary);
+        for (String nickname : users) {
+            Users user = userRepository.findByNickname(nickname).orElse(null);
 
-        // TODO : Diary_User Table Update
+            DiaryUserId diaryUserId = new DiaryUserId(savedDiary, user);
+            diaryUserRepository.save(new DiaryUser(diaryUserId));
+        }
 
         return savedDiary;
     }
 
     public Diary getDiaryById(Long id) {
-        Diary findDiary = diaryRepository.findById(id).orElse(null);
-        return findDiary;
+        return id!=null ? diaryRepository.findById(id).orElse(null) : null;
     }
 
-    public Diary updateDiary(Long id, Diary diary) {
-        Diary updateDiary = diaryRepository.findById(id).orElse(null);
-        if (updateDiary == null) return null;
+    public Diary updateDiary(Long id, Diary diary, List<String> users) {
+        Diary updatedDiary = diaryRepository.findById(id).orElse(null);
+        if (updatedDiary == null) return null;
+        updatedDiary.updateDiary(diary);
 
-        updateDiary.updateDiary(diary);
-        return updateDiary;
+        // 다이어리에 유저가 추가된 경우
+        if(users.size()!=diaryUserRepository.countUserByDiary(id)){
+            List<String> userList = diaryUserRepository.findUserByDiary(id);
+            for (String nickname : users) {
+                if(userList.contains(nickname)) continue;
+
+                Users user = userRepository.findByNickname(nickname).orElse(null);
+                DiaryUserId diaryUserId = new DiaryUserId(diary, user);
+                diaryUserRepository.save(new DiaryUser(diaryUserId));
+            }
+        }
+        return updatedDiary;
     }
 
     public void deleteDiary(Long id) {

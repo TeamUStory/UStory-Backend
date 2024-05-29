@@ -23,9 +23,9 @@ public class DiaryController {
     @PostMapping("/diary")
     public ResponseEntity<Diary> createDiary(@RequestBody DiaryDto diaryDto) {
         Diary diary = diaryService.createDiary(diaryDto.toDiary(), diaryDto.getUsers());
-
-        // TODO: Diary와 userId List를 링크 테이블에 저장 로직 필요
-
+        if(diary==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(diary);
     }
@@ -48,7 +48,9 @@ public class DiaryController {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Diary diary = diaryService.updateDiary(diaryId, diaryDto.toDiary());
+        Diary diary = diaryService.updateDiary(diaryId, diaryDto.toDiary(), diaryDto.getUsers());
+        // TODO : 인원 수 변동 확인
+
         return ResponseEntity.ok(diary);
     }
 
