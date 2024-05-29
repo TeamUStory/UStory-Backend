@@ -33,7 +33,7 @@ public class AddPaperRequest {
     private Long diaryId;
 
     @Schema(description = "사용자 Id (토큰 사용할 때 사라질 예정)", example = "12345678")
-    private Long memberId;
+    private Long userId;
 
 
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
@@ -51,7 +51,7 @@ public class AddPaperRequest {
     public Paper toPageEntity() {
         return Paper.createBuilder()
                 .title(this.title)
-                .thumbnailImage(this.thumbnailImageUrl)
+                .thumbnailImageUrl(this.thumbnailImageUrl)
                 .visitedAt(this.visitedAt)
                 .build();
     }
