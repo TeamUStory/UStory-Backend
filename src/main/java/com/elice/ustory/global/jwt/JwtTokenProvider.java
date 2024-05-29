@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
-@Component
+//@Component
 @Slf4j
 public class JwtTokenProvider {
     private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
@@ -30,7 +30,7 @@ public class JwtTokenProvider {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    @Value("${key.salt}")
+//    @Value("${key.salt}")
     private String salt;
     private Key secretKey;
 
