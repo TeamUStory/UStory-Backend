@@ -22,29 +22,31 @@ public class CommentController {
     }
 
     @Operation(summary = "Get Comment API", description = "댓글 ID를 통해 불러옴.")
-    @GetMapping("/{id}")
-    public ResponseEntity<Comment> getComment(@PathVariable Long id) {
-        Optional<Comment> comment = commentService.getComment(id);
+    @GetMapping("/paper/{paperId}/comment/{id}")  // 시험용이라 uri 더러운건 무시하셔도 됩니다.
+    public ResponseEntity<Comment> getComment(@PathVariable Long paperId, @PathVariable Long id) {
+        Optional<Comment> comment = commentService.getComment(paperId, id);
         return comment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Get Comments API", description = "모든 댓글들을 불러옴")
-    @GetMapping
-    public ResponseEntity<List<Comment>> getComments() {
-        List<Comment> comments = commentService.getComments();
+    @GetMapping("/paper/{paperId}/comment")   // 시험용이라 uri 더러운건 무시하셔도 됩니다.
+    public ResponseEntity<List<Comment>> getComments(@PathVariable Long paperId) {
+        List<Comment> comments = commentService.getComments(paperId);
         return ResponseEntity.ok().body(comments);
     }
 
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
     @PostMapping
-    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.addComment(commentDto));
+    public ResponseEntity<Comment> createComment(@RequestBody CommentDto commentDto, @RequestParam Long paperId) {
+        Comment comment = commentService.addComment(commentDto, paperId);
+        return ResponseEntity.ok().body(comment);
     }
 
     @Operation(summary = "Update Comment API", description = "댓글을 수정함")
     @PutMapping("/{id}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable Long id, @RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.updateComment(id, commentDto));
+    public ResponseEntity<Comment> updateComment(@PathVariable Long id, @RequestBody CommentDto commentDto) {
+        Comment updatedComment = commentService.updateComment(id, commentDto);
+        return ResponseEntity.ok().body(updatedComment);
     }
 
     @Operation(summary = "Delete Comment API", description = "댓글을 삭제함")
