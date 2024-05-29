@@ -67,14 +67,6 @@ public class Paper extends BaseEntity {
     @Column(nullable = true, length = 10)
     private String locked;
 
-    @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "modified_at", nullable = false)
-    private LocalDateTime modifiedAt;
-
     // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
     public Paper(String title, String thumbnailImageUrl, LocalDate visitedAt) {
