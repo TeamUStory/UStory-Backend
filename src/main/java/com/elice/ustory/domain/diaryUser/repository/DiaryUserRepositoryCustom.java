@@ -8,8 +8,11 @@ import java.util.List;
 
 public interface DiaryUserRepositoryCustom {
     List<DiaryListResponse> searchListDiary(Long userId);
+
     Long countUserByDiary(Long diaryId);
+
     List<String> findUserByDiary(Long diaryId);
+
     Page<DiaryListResponse> searchDiary(Long userId, Pageable pageable);
 
 }
