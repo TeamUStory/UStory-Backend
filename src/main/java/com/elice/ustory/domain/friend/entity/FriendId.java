@@ -1,21 +1,30 @@
 package com.elice.ustory.domain.friend.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+
+/**
+ * 복합키 유니크 유효성 체크 어노테이션
+ */
+@Getter
 @Embeddable
 @NoArgsConstructor
 @EqualsAndHashCode
 public class FriendId implements Serializable {
-    private long user_id;
-    private long friend_id;
+    @Column(nullable = false, name="user_id")
+    private long userId;
+    @Column(nullable = false, name="friend_id")
+    private long friendId;
 
-    public FriendId(long user_id, long friend_id) {
-        this.user_id = user_id;
-        this.friend_id = friend_id;
+    public FriendId(long userId, long friendId) {
+        this.userId = userId;
+        this.friendId = friendId;
     }
 
 }
