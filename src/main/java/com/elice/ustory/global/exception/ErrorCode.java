@@ -11,6 +11,7 @@ public enum ErrorCode {
     // Validation Exception: 400
     VALIDATION_EXCEPTION("V001", "잘못된 요청입니다."),
     MISSING_REQUIRED_PARAMETER("V002", "필수 파라미터가 누락되었습니다."),
+    VALIDATION_PARAMETER_EXCEPTION("V003", "파라미터 값이 잘못되었습니다."),
 
     // Unauthorized Exception: 401,
     UNAUTHORIZED_EXCEPTION("U001", "인증되지 않은 접근입니다."),
