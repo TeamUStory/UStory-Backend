@@ -54,6 +54,7 @@ public class UserController {
         String password = loginRequest.getPassword();
         LoginResponse loginResponse = userService.login(id, password);
 
+        //TODO: 유저 정보 Cookie에 저장
         return ResponseEntity.ok().body(loginResponse);
     }
 }
