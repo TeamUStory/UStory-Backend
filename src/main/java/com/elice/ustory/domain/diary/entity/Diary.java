@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Getter
 @Entity
 @Table(name = "diary")
@@ -21,14 +23,14 @@ public class Diary extends BaseEntity {
     @Column(name = "img_url", columnDefinition = "varchar(255) not null")
     private String imgUrl;
 
-    @Column(name = "diary_category",nullable = false)
+    @Column(name = "diary_category", nullable = false)
     @Enumerated(EnumType.STRING)
     private DiaryCategory diaryCategory;
 
     @Column(name = "description", columnDefinition = "varchar(255)")
     private String description;
 
-    @Column(name="color", nullable = false)
+    @Column(name = "color", nullable = false)
     @Enumerated(EnumType.STRING)
     private Color color;
 
@@ -40,21 +42,21 @@ public class Diary extends BaseEntity {
         this.color = color;
     }
 
-    public void updateDiary(Diary diary){
-        if(diary.getName()!=null){
-            this.name=diary.getName();
+    public void updateDiary(Diary diary) {
+        if (hasText(diary.getName())) {
+            this.name = diary.getName();
         }
-        if(diary.getImgUrl()!=null){
-            this.imgUrl=diary.getImgUrl();
+        if (hasText(diary.getImgUrl())) {
+            this.imgUrl = diary.getImgUrl();
         }
-        if(diary.diaryCategory!=null){
-            this.diaryCategory=diary.diaryCategory;
+        if (diary.diaryCategory != null) {
+            this.diaryCategory = diary.diaryCategory;
         }
-        if(diary.getDescription()!=null){
-            this.description=diary.getDescription();
+        if (hasText(diary.getDescription())) {
+            this.description = diary.getDescription();
         }
-        if(diary.getColor()!=null){
-            this.color=diary.getColor();
+        if (diary.getColor() != null) {
+            this.color = diary.getColor();
         }
     }
 }

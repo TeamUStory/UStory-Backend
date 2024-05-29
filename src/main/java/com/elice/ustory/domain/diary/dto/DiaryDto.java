@@ -22,9 +22,9 @@ public class DiaryDto {
 
     private Color color;
 
-    private List<Users> users;
+    private List<String> users;
 
-    public DiaryDto(String name, String diaryImg, DiaryCategory diaryCategory, String description, Color color,List<Users> users) {
+    public DiaryDto(String name, String diaryImg, DiaryCategory diaryCategory, String description, Color color, List<String> users) {
         this.name = name;
         this.diaryImg = diaryImg;
         this.diaryCategory = diaryCategory;
