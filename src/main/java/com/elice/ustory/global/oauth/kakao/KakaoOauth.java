@@ -39,7 +39,7 @@ public class KakaoOauth {
     @Value("${kakao.userInfo_uri}")
     private String userInfoUri;
 
-    @Value("${kakao.expireKakaoToken_uri}")
+//    @Value("${kakao.expireKakaoToken_uri}")
     private String expireKakaoTokenUri;
 
     public String getKakaoAccessToken(String code, HttpServletResponse response) {
