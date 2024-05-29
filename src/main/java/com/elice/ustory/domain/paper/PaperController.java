@@ -35,6 +35,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaperController {
 
+//    private final UserService userService;
+//    private final DiaryService diaryService;
     private final AddressService addressService;
     private final PaperService paperService;
     private final ImageService imageService;
@@ -44,8 +46,10 @@ public class PaperController {
     public ResponseEntity<AddPaperResponse> create(@RequestBody AddPaperRequest addPaperRequest) {
 
         // 사용자 검증 메서드
+//        Users user = userService.findById(addPaperRequest.getUserId());
 
         // 다이어리 검증 메서드
+//        Diary diary = diaryService.findById(addPaperRequest.getDiaryId());
 
         Address address = addressService.createAddress(addPaperRequest.toAddressEntity());
 
@@ -85,39 +89,51 @@ public class PaperController {
         return ResponseEntity.ok(new PaperResponse(paper));
     }
 
-    @Operation(summary = "Read Papers API", description = "모든 페이퍼를 불러온다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
-    @GetMapping("/papers")
-    public ResponseEntity<List<PaperListResponse>> getAllPaper(@RequestParam(name = "page", defaultValue = "1") int page,
-                                                               @RequestParam(name = "size", defaultValue = "20") int size) {
-
-        List<PaperListResponse> papers = paperService.getAllPapers().stream()
-                .map(PaperListResponse::new)
-                .toList();
-
-        return ResponseEntity.ok(papers);
-    }
-
     // TODO: userId를 임시로 작성해놨지만 변경 해야함
-    @Operation(summary = "Read Papers By User API", description = "유저와 연관된 모든 페이퍼를 불러온다.")
+    @Operation(summary = "Read Papers By User API", description = "유저가 작성한 페이퍼 리스트를 불러온다.")
     @GetMapping(value = "/paper/user", params = "userId")
-    public ResponseEntity<List<AddPaperResponse>> getAllPapersByUser(@RequestParam(name = "userId") Long userId,
-                                                                    @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                    @RequestParam(name = "size", defaultValue = "20") int size) {
+    public ResponseEntity<List<PaperListResponse>> getAllPapersByUser(@RequestParam(name = "userId") Long userId,
+                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                      @RequestParam(name = "size", defaultValue = "20") int size) {
 
         // user 검증
         // user 연관된 모든 page 불러오기
 
-        return ResponseEntity.ok(List.of(new AddPaperResponse()));
+        List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
+
+        List<PaperListResponse> result = papers.stream()
+                .map(PaperListResponse::new)
+                .toList();
+
+        return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Read Papers By Diary API", description = "다이어리와 연관된 모든 페이퍼를 불러온다.")
+    @Operation(summary = "Read Papers By Diary API", description = "다이어리에 포함된 페이퍼 리스트를 불러온다.")
     @GetMapping(value = "/papers/diary", params = "diaryId")
-    public ResponseEntity<List<AddPaperResponse>> getAllPagesByDiary(@RequestParam(name = "diaryId") Long diaryId,
-                                                                     @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                     @RequestParam(name = "size", defaultValue = "20") int size) {
+    public ResponseEntity<List<PaperListResponse>> getAllPagesByDiary(@RequestParam(name = "diaryId") Long diaryId,
+                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                      @RequestParam(name = "size", defaultValue = "20") int size) {
 
         // diary 검증
         // diary 연관된 모든 page 불러오기
+
+        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size);
+
+        List<PaperListResponse> result = papers.stream()
+                .map(PaperListResponse::new)
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Read Papers By Bookmark API", description = "유저가 북마크한 페이퍼 리스트를 불러온다.")
+    @GetMapping(value = "/paper/bookmark", params = "userId")
+    public ResponseEntity<List<AddPaperResponse>> getAllPapersByBookmark(@RequestParam(name = "userId") Long userId,
+                                                                         @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                         @RequestParam(name = "size", defaultValue = "20") int size) {
+
+        // user 검증
+        // user 연관된 모든 page 불러오기
 
         return ResponseEntity.ok(List.of(new AddPaperResponse()));
     }
