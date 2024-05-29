@@ -8,8 +8,6 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class UserListDTO {
-    private final Long userId;
-    private final String email;
     private final String name;
     private final String nickname;
     private final String profileImg;
