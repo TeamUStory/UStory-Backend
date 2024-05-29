@@ -42,6 +42,7 @@ public class Users extends BaseEntity {
     private LocalDateTime deletedAt;
 
     public enum LoginType {
+        BASIC,
         KAKAO,
         NAVER,
         GOOGLE
