@@ -5,21 +5,23 @@ import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
-import jakarta.transaction.Transactional;
+import com.elice.ustory.domain.user.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CommentService {
     private final CommentRepository commentRepository;
     private final PaperService paperService;
+    private final UserService userService;
 
-    public CommentService(CommentRepository commentRepository, PaperService paperService) {
+    public CommentService(CommentRepository commentRepository, PaperService paperService,
+                          UserService userService) {
         this.commentRepository = commentRepository;
         this.paperService = paperService;
+        this.userService = userService;
     }
 
     public List<Comment> getComments(Long paperId) {
@@ -33,10 +35,11 @@ public class CommentService {
         return comments.stream().filter(comment -> comment.getId().equals(id)).findFirst();
     }
 
-    public Comment addComment(CommentDto commentDto, Long paperId) {
+    public Comment addComment(CommentDto commentDto, Long paperId, Long userId) {
         Comment comment = Comment.addCommentBuilder()
                 .content(commentDto.getContent())
                 .paper(paperService.getPaperById(paperId))
+                .user(userService.findById(userId).orElseThrow())
                 .build();
         return commentRepository.save(comment);
     }
