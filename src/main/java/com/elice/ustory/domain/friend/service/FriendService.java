@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.friend.service;
 
+import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.dto.UserListDTO;
@@ -7,8 +8,6 @@ import com.elice.ustory.domain.friend.entity.Friend;
 import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.repository.FriendRepository;
-import com.elice.ustory.domain.notice.entity.MessageType;
-import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
@@ -17,21 +16,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.elice.ustory.domain.user.entity.QUsers.users;
 
 @Service
 @Transactional
@@ -42,13 +32,15 @@ public class FriendService {
     private final NoticeService noticeService;
 
 
+
+
+
     @Autowired
     public FriendService(FriendRepository friendRepository, UserRepository userRepository, @Lazy NoticeService noticeService, NoticeRepository noticeRepository) {
         this.friendRepository = friendRepository;
         this.userRepository = userRepository;
         this.noticeService = noticeService;
     }
-
 
     /**
      * 사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.
@@ -58,29 +50,9 @@ public class FriendService {
      * @return 친구 목록 또는 검색된 친구 목록
      */
     public List<UserFriendDTO> getFriends(Long userId, String nickname) {
-        if (userId != null) {
-            List<UserFriendDTO> friends = Optional.ofNullable(nickname)
-                    .filter(name -> !name.isEmpty())
-                    .map(name -> friendRepository.findFriendsByUserIdAndNickname(userId, name))
-                    .orElseGet(() -> friendRepository.findAllFriendsByUserId(userId));
-
-            if (friends.isEmpty() && nickname != null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No friends found with nickname " + nickname);
-            }
-            return friends;
-        } else if (nickname != null && !nickname.isEmpty()) {
-            Users user = userRepository.findByNickname(nickname)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with nickname " + nickname + " not found"));
-
-            List<UserFriendDTO> friends = friendRepository.findFriendsByUserIdAndNickname(user.getId(), nickname);
-            if (friends.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No friends found with nickname " + nickname);
-            }
-            return friends;
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either userId or nickname must be provided");
-        }
+        return friendRepository.findFriends(userId, nickname);
     }
+
 
 
     /**
@@ -89,30 +61,17 @@ public class FriendService {
      * @param nickname 검색할 닉네임
      * @return 검색된 사용자 목록
      */
-    public List<UserListDTO> findAllUsersByNickname(String nickname) {
-        if (nickname == null || nickname.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nickname cannot be null or empty");
-        }
-
-        List<UserListDTO> users = userRepository.findByNicknameContaining(nickname)
-                .stream()
-                .map(u -> UserListDTO.builder()
-                        .userId(u.getId())
-                        .email(u.getEmail())
-                        .name(u.getName())
-                        .nickname(u.getNickname())
-                        .profileImg(u.getProfileImg())
-                        .build())
-                .collect(Collectors.toList());
-
-        if (users.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found with nickname " + nickname);
-        }
-
-        return users;
+    public UserListDTO findAllUsersByNickname(String nickname) {
+        return Optional.ofNullable(nickname)
+                .filter(name -> !name.isEmpty())
+                .flatMap(name -> userRepository.findByNickname(name)
+                        .map(u -> UserListDTO.builder()
+                                .name(u.getName())
+                                .nickname(u.getNickname())
+                                .profileImg(u.getProfileImg())
+                                .build()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nickname cannot be null, empty, or not found"));
     }
-
-
 
 
     /**
@@ -132,7 +91,6 @@ public class FriendService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Friend request already exists");
         }
 
-        // 친구 요청 저장 (임시)
         Friend friend = Friend.builder()
                 .id(friendId)
                 .invitedAt(LocalDateTime.now())
@@ -142,8 +100,27 @@ public class FriendService {
                 .build();
         friendRepository.save(friend);
 
-        // 알림 전송
-        noticeService.sendFriendRequestNotice(friendRequestDTO.getSenderId(), friendRequestDTO.getReceiverId());
+        FriendNoticeDTO noticeDTO = FriendNoticeDTO.builder()
+                .receiverId(friendRequestDTO.getReceiverId())
+                .senderId(friendRequestDTO.getSenderId())
+                .messageType(1)
+                .invitedAt(LocalDateTime.now())
+                .nickname(sender.getNickname())
+                .build();
+
+        System.out.println("FriendNoticeDTO before sending notice: " + noticeDTO);
+
+        noticeService.sendNotice(noticeDTO);
+    }
+
+    /**
+     * 특정 사용자가 받은 친구 요청 목록을 조회합니다.
+     *
+     * @param userId 사용자의 ID
+     * @return 친구 요청 목록
+     */
+    public List<FriendRequestDTO> getFriendRequests(Long userId) {
+        return friendRepository.findFriendRequests(userId);
     }
 
 
@@ -175,38 +152,28 @@ public class FriendService {
                     .status(FriendStatus.ACCEPTED)
                     .build();
             friendRepository.save(reverseFriend);
+
+            // 수락한 사람 (receiver)의 닉네임 조회
+            Users receiver = userRepository.findById(receiverId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid receiver ID"));
+            String receiverNickname = receiver.getNickname();
+
+            // 친구 수락 알림 전송
+            FriendNoticeDTO noticeDTO = FriendNoticeDTO.builder()
+                    .receiverId(senderId)
+                    .senderId(receiverId)
+                    .messageType(3)
+                    .acceptedAt(LocalDateTime.now())
+                    .nickname(receiverNickname)
+                    .build();
+            noticeService.sendNotice(noticeDTO);
         } else {
             // 친구 요청을 거절하는 경우
             friendRepository.delete(friend);
-            // 알림 삭제
-            noticeService.deleteFriendRequestNotice(senderId, receiverId);
-            return;
         }
 
-        friendRepository.save(friend);
-        // 알림 삭제
-        noticeService.deleteFriendRequestNotice(senderId, receiverId);
-    }
-
-
-    /**
-     * 알림 ID를 이용해 친구 요청에 응답합니다.
-     *
-     * @param noticeId 알림 ID
-     * @param accepted true이면 요청 수락, false이면 요청 거절
-     */
-    public void respondToFriendRequest(Long noticeId, boolean accepted) {
-        Notice notice = noticeService.findById(noticeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
-
-        if (notice.getMessageType() != MessageType.Friend) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid message type");
-        }
-
-        Long senderId = notice.getSenderId();
-        Long receiverId = notice.getReceiverId();
-
-        respondToFriendRequest(senderId, receiverId, accepted);
+        // 친구 요청 알림 삭제
+        noticeService.deleteNoticeBySender(senderId, receiverId, 1);
     }
 
 

@@ -1,9 +1,11 @@
 package com.elice.ustory.domain.notice.service;
 
+import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
-import com.elice.ustory.domain.notice.entity.MessageType;
+import com.elice.ustory.domain.notice.dto.NoticeDTO;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
+import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,6 +26,15 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final UserRepository userRepository;
     private FriendService friendService;
+
+
+
+    // 알림 메시지 상수
+    private static final String FRIEND_REQUEST_MESSAGE = "친구 요청이 있습니다.";
+    private static final String COMMENT_REQUEST_MESSAGE = "당신의 코멘트가 필요해요!";
+    private static final String FRIEND_ACCEPT_MESSAGE = "%s님이 친구를 수락하였습니다.";
+    private static final String PAPER_OPEN_MESSAGE = "페이퍼 오픈!";
+
 
     @Autowired
     public NoticeService(NoticeRepository noticeRepository, UserRepository userRepository, @Lazy FriendService friendService) {
@@ -38,93 +50,139 @@ public class NoticeService {
      * @return 알림 목록
      */
     public List<Notice> getAllNoticesByUserId(Long userId) {
-        // 사용자가 존재하지 않는 경우 예외를 던짐
-        if (!userRepository.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-
-        // 알림 목록 조회
         return noticeRepository.findByReceiverId(userId);
     }
 
+
+
     /**
-     * 친구 요청 알람을 전송합니다.
+     * 공통 알림 전송 메서드
      *
-     * @param senderId 친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
+     * @param noticeDTO 알림 DTO
      */
-    public void sendFriendRequestNotice(Long senderId, Long receiverId) {
-        Users sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
-        Users receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"));
+    public void sendNotice(NoticeDTO noticeDTO) {
+        String message = generateMessage(noticeDTO);
+        Long senderId = extractSenderId(noticeDTO);
+//        Paper paper = extractPaper(noticeDTO);
 
-        String message = MessageType.Friend.createMessage(sender.getNickname());
-
-        // Builder를 사용하여 Notice 객체 생성
         Notice notice = Notice.builder()
-                .receiverId(receiverId)
+                .receiverId(noticeDTO.getReceiverId())
                 .senderId(senderId)
+//                .paper(paper)
                 .message(message)
-                .messageType(MessageType.Friend)
+                .messageType(noticeDTO.getMessageType())
                 .build();
+
+        // populateNotice 호출하여 필요한 값 설정
+        noticeDTO.populateNotice(notice);
+
+        // 로그 추가
+        System.out.println("Notice before save: " + notice);
+
         noticeRepository.save(notice);
     }
 
-
-
     /**
-     * 친구 요청 알람에 응답합니다.
+     * 알림 DTO에서 senderId를 추출합니다.
      *
-     * @param noticeId 알람 ID
-     * @param accepted true이면 수락, false이면 거절
+     * @param noticeDTO 알림 DTO
+     * @return senderId
      */
-    public void respondToFriendRequest(Long noticeId, boolean accepted) {
-        Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
-
-        if (notice.getMessageType() != MessageType.Friend) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid message type");
+    private Long extractSenderId(NoticeDTO noticeDTO) {
+        if (noticeDTO instanceof FriendNoticeDTO) {
+            return ((FriendNoticeDTO) noticeDTO).getSenderId();
         }
-
-        Long senderId = notice.getSenderId();
-        Long receiverId = notice.getReceiverId();
-
-        friendService.respondToFriendRequest(senderId, receiverId, accepted);
+        return null;
     }
 
     /**
-     * 친구 요청 알람을 삭제합니다.
+     * 알림 DTO에서 Paper 객체를 추출합니다.
      *
-     * @param senderId 친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
+     * @param noticeDTO 알림 DTO
+     * @return Paper 객체
      */
-    public void deleteFriendRequestNotice(Long senderId, Long receiverId) {
-        Optional<Notice> noticeOptional = noticeRepository.findBySenderIdAndReceiverIdAndMessageType(senderId, receiverId, MessageType.Friend);
-        noticeOptional.ifPresent(notice -> noticeRepository.delete(notice));
-    }
+//    private Paper extractPaper(NoticeDTO noticeDTO) {
+//        if (noticeDTO instanceof PaperNoticeDTO) {
+//            Long paperId = ((PaperNoticeDTO) noticeDTO).getPaperId();
+//            return paperRepository.findById(paperId)
+//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found"));
+//        }
+//        return null;
+//    }
+
+
+
+
+
 
     /**
-     * 알림을 삭제합니다.
+     * 메시지 생성 메서드
      *
-     * @param noticeId 삭제할 알림의 ID
+     * @param noticeDTO 알림 DTO
+     * @return 생성된 메시지
      */
-    public void deleteNotice(Long noticeId) {
-        Notice notice = noticeRepository.findById(noticeId)
+    private String generateMessage(NoticeDTO noticeDTO) {
+        int messageType = noticeDTO.getMessageType();
+
+        switch (messageType) {
+            case 1:
+                return FRIEND_REQUEST_MESSAGE;
+            case 2:
+//                PaperNoticeDTO paperNoticeDTO = (PaperNoticeDTO) noticeDTO;
+//                return String.format(COMMENT_REQUEST_MESSAGE, paperNoticeDTO.getPaperId(), paperNoticeDTO.getCreatedAt());
+            case 3:
+                return generateFriendAcceptMessage((FriendNoticeDTO) noticeDTO);
+            case 4:
+                return PAPER_OPEN_MESSAGE;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown message type");
+        }
+    }
+
+    private String generateFriendAcceptMessage(FriendNoticeDTO friendNoticeDTO) {
+        String receiverNickname = friendNoticeDTO.getNickname();
+        return String.format(FRIEND_ACCEPT_MESSAGE, receiverNickname);
+    }
+
+
+    /**
+     * 알림을 ID로 삭제합니다.
+     *
+     * @param id 삭제할 알림의 ID
+     */
+    public void deleteNoticeById(Long id) {
+        Notice notice = noticeRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
         noticeRepository.delete(notice);
     }
 
 
     /**
-     * 알림 ID로 알림을 조회합니다.
+     * 특정 조건으로 알림을 삭제합니다 (senderId 기준).
      *
-     * @param noticeId 알림 ID
-     * @return 알림 객체
+     * @param senderId 알림을 보낸 사용자의 ID
+     * @param receiverId 알림을 받은 사용자의 ID
+     * @param messageType 알림의 유형
      */
-    public Optional<Notice> findById(Long noticeId) {
-        return noticeRepository.findById(noticeId);
+    public void deleteNoticeBySender(Long senderId, Long receiverId, int messageType) {
+        Optional<Notice> noticeOptional = noticeRepository.findBySenderIdAndReceiverIdAndMessageType(senderId, receiverId, messageType);
+        noticeOptional.ifPresent(noticeRepository::delete);
     }
+
+    /**
+     * 특정 조건으로 알림을 삭제합니다 (paperId 기준).
+     *
+     * @param paperId 알림과 관련된 페이퍼 ID
+     * @param receiverId 알림을 받은 사용자의 ID
+     * @param messageType 알림의 유형
+     */
+    public void deleteNoticeByPaper(Long paperId, Long receiverId, int messageType) {
+        Optional<Notice> noticeOptional = noticeRepository.findByPaperIdAndReceiverIdAndMessageType(paperId, receiverId, messageType);
+        noticeOptional.ifPresent(noticeRepository::delete);
+    }
+
+
+
 
 
 }
