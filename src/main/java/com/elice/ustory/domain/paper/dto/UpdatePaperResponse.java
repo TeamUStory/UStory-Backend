@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class UpdatePaperResponse {
-    @Schema(name = "Paper Id")
+    @Schema(description = "Paper Id", example = "12345678")
     private Long paperId;
 }

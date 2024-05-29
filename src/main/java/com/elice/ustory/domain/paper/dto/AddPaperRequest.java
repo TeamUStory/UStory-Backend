@@ -9,8 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,9 +21,9 @@ public class AddPaperRequest {
     private String title;
 
     @Schema(description = "썸네일 URL", example = "https://~~~~")
-    private String thumbnailImage;
+    private String thumbnailImageUrl;
 
-    private List<String> images;
+    private List<String> imageUrls;
 
     @Schema(description = "방문 날짜", example = "2024-05-23")
     private LocalDate visitedAt;
@@ -33,28 +33,25 @@ public class AddPaperRequest {
     private Long diaryId;
 
     @Schema(description = "사용자 Id (토큰 사용할 때 사라질 예정)", example = "12345678")
-    private Long memberId;
+    private Long userId;
 
 
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
 
-    @Schema(description = "상세 주소", example = "2층")
-    private String detail;
-
     @Schema(description = "상호명", example = "우규")
     private String store;
 
     @Schema(description = "X좌표", example = "37.5494")
-    private float coordinateX;
+    private double coordinateX;
 
     @Schema(description = "Y좌표", example = "126.9169")
-    private float coordinateY;
+    private double coordinateY;
 
     public Paper toPageEntity() {
         return Paper.createBuilder()
                 .title(this.title)
-                .thumbnailImage(this.thumbnailImage)
+                .thumbnailImageUrl(this.thumbnailImageUrl)
                 .visitedAt(this.visitedAt)
                 .build();
     }
@@ -62,7 +59,6 @@ public class AddPaperRequest {
     public Address toAddressEntity() {
         return Address.createBuilder()
                 .city(this.city)
-                .detail(this.detail)
                 .store(this.store)
                 .coordinateX(this.coordinateX)
                 .coordinateY(this.coordinateY)
@@ -70,8 +66,13 @@ public class AddPaperRequest {
     }
 
     public List<Image> toImagesEntity() {
-        return images.stream()
-                .map(Image::new)
-                .collect(Collectors.toList());
+        List<Image> images = new ArrayList<>();
+
+        int count = 1;
+        for (String imageUrl : this.imageUrls) {
+            images.add(new Image(imageUrl, count++));
+        }
+
+        return images;
     }
 }
