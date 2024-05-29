@@ -53,8 +53,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String refreshToken = getTokenFromRequest(request, "Refresh"); // TODO: Redis RefreshToken에 맞게 수정 1
         if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
             log.info("[refreshToken] RefreshToken으로 AccessToken 재발급 시작");
-            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken),
-                    userService.readByNickname(jwtTokenProvider.getUserPk(refreshToken)).getLoginType());
+            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken));
             Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             Cookie cookie = new Cookie("Authorization", accessToken);

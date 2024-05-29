@@ -6,10 +6,14 @@ import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshToken;
 import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -98,7 +102,7 @@ public class UserService {
         return deletedUser;
     }
 
-    public LoginResponse login(String id, String password) {
+    public LoginResponse login(String id, String password, HttpServletResponse response) {
         //TODO: 예외처리
         Users loginUser = userRepository.findByEmail(id)
                 .orElseThrow();
@@ -112,8 +116,7 @@ public class UserService {
         log.info("[getLogInResult] 패스워드 일치");
         log.info("[getLogInResult] LogInResponse 객체 생성");
         String accessToken = jwtTokenProvider.createAccessToken(
-                loginUser.getNickname(),
-                loginUser.getLoginType()
+                loginUser.getNickname()
         );
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
@@ -125,6 +128,10 @@ public class UserService {
 
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
+        var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
+        cookie1.setPath("/");
+        cookie1.setMaxAge(60 * 60);
+        response.addCookie(cookie1);
 
         refreshTokenRepository.save(new RefreshToken(String.valueOf(loginUser.getId()), refreshToken, accessToken));
         return loginResponse;

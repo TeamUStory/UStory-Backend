@@ -41,10 +41,10 @@ public class JwtTokenProvider {
         log.info("[init] JwtTokenProvider 내 SecretKey 초기화 완료");
     }
 
-    public String createAccessToken(String name, Users.LoginType loginType) {
+    public String createAccessToken(String name) {
         Claims claims = Jwts.claims().setSubject(name);
         Date now = new Date();
-        claims.put("loginType", loginType);
+        claims.put("nickname", name);
         log.info("[createAccessToken] access 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
