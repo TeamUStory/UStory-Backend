@@ -57,6 +57,7 @@ public class UserController {
         LoginResponse loginResponse = userService.login(id, password);
         log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
 
+        //TODO: 유저 정보 Cookie에 저장
         return ResponseEntity.ok().body(loginResponse);
     }
 }

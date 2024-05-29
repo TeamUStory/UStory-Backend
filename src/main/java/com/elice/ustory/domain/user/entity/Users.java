@@ -19,7 +19,7 @@ public class Users extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_type")
+    @Column(name = "login_type", columnDefinition = "varchar(255) default 'BASIC'")
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
@@ -49,8 +49,9 @@ public class Users extends BaseEntity {
     }
 
     @Builder(builderMethodName = "addUserBuilder")
-    public Users(String email, String name, String nickname, String password, String profileImg) {
+    public Users(String email, LoginType loginType, String name, String nickname, String password, String profileImg) {
         this.email = email;
+        this.loginType = loginType;
         this.name = name;
         this.nickname = nickname;
         this.password = password;

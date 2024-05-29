@@ -23,6 +23,7 @@ public class UserService {
     public Users signUp(SignUpRequest signUpRequest) {
 
         String email = signUpRequest.getEmail();
+        Users.LoginType loginType = Users.LoginType.BASIC;
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
         String password = signUpRequest.getPassword();
@@ -30,6 +31,7 @@ public class UserService {
 
         Users builtUser = Users.addUserBuilder()
                 .email(email)
+                .loginType(loginType)
                 .name(name)
                 .nickname(nickname)
                 .password(password)
