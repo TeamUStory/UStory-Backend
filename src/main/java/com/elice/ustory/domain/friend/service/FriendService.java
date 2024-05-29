@@ -12,6 +12,7 @@ import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.util.FriendRequestUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -31,10 +32,6 @@ public class FriendService {
     private final UserRepository userRepository;
     private final NoticeService noticeService;
 
-
-
-
-
     @Autowired
     public FriendService(FriendRepository friendRepository, UserRepository userRepository, @Lazy NoticeService noticeService, NoticeRepository noticeRepository) {
         this.friendRepository = friendRepository;
@@ -52,7 +49,6 @@ public class FriendService {
     public List<UserFriendDTO> getFriends(Long userId, String nickname) {
         return friendRepository.findFriends(userId, nickname);
     }
-
 
 
     /**
@@ -80,38 +76,20 @@ public class FriendService {
      * @param friendRequestDTO 친구 요청 정보
      */
     public void sendFriendRequest(FriendRequestDTO friendRequestDTO) {
-        Users sender = userRepository.findById(friendRequestDTO.getSenderId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid sender ID"));
-        Users receiver = userRepository.findById(friendRequestDTO.getReceiverId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid receiver ID"));
+        Users sender = FriendRequestUtils.getUserById(userRepository, friendRequestDTO.getSenderId());
+        Users receiver = FriendRequestUtils.getUserById(userRepository, friendRequestDTO.getReceiverId());
 
-        FriendId friendId = new FriendId(friendRequestDTO.getSenderId(), friendRequestDTO.getReceiverId());
+        FriendId friendId = FriendRequestUtils.createFriendId(sender.getId(), receiver.getId());
+        FriendRequestUtils.validateFriendRequestNotExists(friendRepository, friendId);
 
-        if (friendRepository.existsById(friendId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Friend request already exists");
-        }
-
-        Friend friend = Friend.builder()
-                .id(friendId)
-                .invitedAt(LocalDateTime.now())
-                .user(sender)
-                .friendUser(receiver)
-                .status(FriendStatus.PENDING)
-                .build();
+        Friend friend = FriendRequestUtils.createFriendEntity(sender, receiver, friendId, FriendStatus.PENDING, LocalDateTime.now(), null);
         friendRepository.save(friend);
 
-        FriendNoticeDTO noticeDTO = FriendNoticeDTO.builder()
-                .receiverId(friendRequestDTO.getReceiverId())
-                .senderId(friendRequestDTO.getSenderId())
-                .messageType(1)
-                .invitedAt(LocalDateTime.now())
-                .nickname(sender.getNickname())
-                .build();
-
-        System.out.println("FriendNoticeDTO before sending notice: " + noticeDTO);
-
+        FriendNoticeDTO noticeDTO = FriendRequestUtils.createFriendNoticeDTO(receiver.getId(), sender.getId(), 1, sender.getNickname(), LocalDateTime.now(), null);
         noticeService.sendNotice(noticeDTO);
     }
+
+
 
     /**
      * 특정 사용자가 받은 친구 요청 목록을 조회합니다.
@@ -133,49 +111,49 @@ public class FriendService {
      * @param accepted true이면 요청 수락, false이면 요청 거절
      */
     public void respondToFriendRequest(Long senderId, Long receiverId, boolean accepted) {
-        FriendId friendId = new FriendId(senderId, receiverId);
+        FriendId friendId = FriendRequestUtils.createFriendId(senderId, receiverId);
 
         Friend friend = friendRepository.findById(friendId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend request not found"));
 
         if (accepted) {
-            // 친구 요청을 수락하는 경우
-            friend.updateStatus(FriendStatus.ACCEPTED);
-            // 반대 방향 친구 관계도 추가
-            FriendId reverseFriendId = new FriendId(receiverId, senderId);
-            Friend reverseFriend = Friend.builder()
-                    .id(reverseFriendId)
-                    .invitedAt(friend.getInvitedAt())
-                    .acceptedAt(LocalDateTime.now())
-                    .user(friend.getFriendUser())
-                    .friendUser(friend.getUser())
-                    .status(FriendStatus.ACCEPTED)
-                    .build();
-            friendRepository.save(reverseFriend);
-
-            // 수락한 사람 (receiver)의 닉네임 조회
-            Users receiver = userRepository.findById(receiverId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid receiver ID"));
-            String receiverNickname = receiver.getNickname();
-
-            // 친구 수락 알림 전송
-            FriendNoticeDTO noticeDTO = FriendNoticeDTO.builder()
-                    .receiverId(senderId)
-                    .senderId(receiverId)
-                    .messageType(3)
-                    .acceptedAt(LocalDateTime.now())
-                    .nickname(receiverNickname)
-                    .build();
-            noticeService.sendNotice(noticeDTO);
+            processAcceptedFriendRequest(friend, senderId, receiverId);
         } else {
-            // 친구 요청을 거절하는 경우
             friendRepository.delete(friend);
         }
 
-        // 친구 요청 알림 삭제
         noticeService.deleteNoticeBySender(senderId, receiverId, 1);
     }
 
+
+    /**
+     * 친구 요청 수락 처리 로직
+     *
+     * @param friend Friend 객체 (기존 친구 관계 엔티티)
+     * @param senderId 친구 요청을 보낸 사용자의 ID
+     * @param receiverId 친구 요청을 받은 사용자의 ID
+     */
+    private void processAcceptedFriendRequest(Friend friend, Long senderId, Long receiverId) {
+        // 기존 친구 관계의 상태를 ACCEPTED로 업데이트
+        friend.updateStatus(FriendStatus.ACCEPTED);
+        // 반대 방향 친구 관계도 추가 (sender와 receiver를 반대로 설정)
+        Friend reverseFriend = FriendRequestUtils.createFriendEntity(
+                friend.getFriendUser(),
+                friend.getUser(),
+                FriendRequestUtils.createFriendId(receiverId, senderId),
+                FriendStatus.ACCEPTED,
+                friend.getInvitedAt(),
+                LocalDateTime.now()
+        );
+        friendRepository.save(reverseFriend);
+
+        // 수락한 사람 (receiver)의 닉네임 조회
+        String receiverNickname = FriendRequestUtils.getUserById(userRepository, receiverId).getNickname();
+        // 친구 수락 알림 전송
+        FriendNoticeDTO noticeDTO = FriendRequestUtils.createFriendNoticeDTO(senderId, receiverId, 3, receiverNickname, null, LocalDateTime.now());
+
+        noticeService.sendNotice(noticeDTO);
+    }
 
 
     /**
@@ -185,15 +163,13 @@ public class FriendService {
      * @param friendId 삭제할 친구의 ID
      */
     public void deleteFriendById(Long userId, Long friendId) {
-        FriendId id = new FriendId(userId, friendId);
-        FriendId reverseId = new FriendId(friendId, userId);
+        FriendId id = FriendRequestUtils.createFriendId(userId, friendId);
+        FriendId reverseId = FriendRequestUtils.createFriendId(friendId, userId);
 
-        // 친구 관계가 존재하지 않는 경우 예외를 던짐
         if (!friendRepository.existsById(id) && !friendRepository.existsById(reverseId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend relationship not found");
         }
 
-        // 친구 관계 삭제
         friendRepository.deleteById(id);
         friendRepository.deleteById(reverseId);
     }

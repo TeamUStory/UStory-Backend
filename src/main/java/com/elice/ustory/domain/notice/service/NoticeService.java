@@ -6,6 +6,7 @@ import com.elice.ustory.domain.notice.dto.NoticeDTO;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.paper.entity.Paper;
+import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.elice.ustory.global.util.NotificationUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -25,21 +27,16 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final UserRepository userRepository;
+    private final PaperRepository paperRepository;
     private FriendService friendService;
 
 
 
-    // 알림 메시지 상수
-    private static final String FRIEND_REQUEST_MESSAGE = "친구 요청이 있습니다.";
-    private static final String COMMENT_REQUEST_MESSAGE = "당신의 코멘트가 필요해요!";
-    private static final String FRIEND_ACCEPT_MESSAGE = "%s님이 친구를 수락하였습니다.";
-    private static final String PAPER_OPEN_MESSAGE = "페이퍼 오픈!";
-
-
     @Autowired
-    public NoticeService(NoticeRepository noticeRepository, UserRepository userRepository, @Lazy FriendService friendService) {
+    public NoticeService(NoticeRepository noticeRepository, UserRepository userRepository, PaperRepository paperRepository, @Lazy FriendService friendService) {
         this.noticeRepository = noticeRepository;
         this.userRepository = userRepository;
+        this.paperRepository = paperRepository;
         this.friendService = friendService;
     }
 
@@ -61,17 +58,12 @@ public class NoticeService {
      * @param noticeDTO 알림 DTO
      */
     public void sendNotice(NoticeDTO noticeDTO) {
-        String message = generateMessage(noticeDTO);
-        Long senderId = extractSenderId(noticeDTO);
-//        Paper paper = extractPaper(noticeDTO);
+        String message = NotificationUtils.generateMessage(noticeDTO);
+        Long senderId = NotificationUtils.extractSenderId(noticeDTO);
+//        Paper paper = NotificationUtils.extractPaper(noticeDTO, paperRepository);
 
-        Notice notice = Notice.builder()
-                .receiverId(noticeDTO.getReceiverId())
-                .senderId(senderId)
-//                .paper(paper)
-                .message(message)
-                .messageType(noticeDTO.getMessageType())
-                .build();
+        Notice notice = NotificationUtils.createNotice(noticeDTO, message, senderId);
+//        notice.setPaper(paper);
 
         // populateNotice 호출하여 필요한 값 설정
         noticeDTO.populateNotice(notice);
@@ -79,70 +71,10 @@ public class NoticeService {
         // 로그 추가
         System.out.println("Notice before save: " + notice);
 
+        // 알림 저장
         noticeRepository.save(notice);
     }
 
-    /**
-     * 알림 DTO에서 senderId를 추출합니다.
-     *
-     * @param noticeDTO 알림 DTO
-     * @return senderId
-     */
-    private Long extractSenderId(NoticeDTO noticeDTO) {
-        if (noticeDTO instanceof FriendNoticeDTO) {
-            return ((FriendNoticeDTO) noticeDTO).getSenderId();
-        }
-        return null;
-    }
-
-    /**
-     * 알림 DTO에서 Paper 객체를 추출합니다.
-     *
-     * @param noticeDTO 알림 DTO
-     * @return Paper 객체
-     */
-//    private Paper extractPaper(NoticeDTO noticeDTO) {
-//        if (noticeDTO instanceof PaperNoticeDTO) {
-//            Long paperId = ((PaperNoticeDTO) noticeDTO).getPaperId();
-//            return paperRepository.findById(paperId)
-//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found"));
-//        }
-//        return null;
-//    }
-
-
-
-
-
-
-    /**
-     * 메시지 생성 메서드
-     *
-     * @param noticeDTO 알림 DTO
-     * @return 생성된 메시지
-     */
-    private String generateMessage(NoticeDTO noticeDTO) {
-        int messageType = noticeDTO.getMessageType();
-
-        switch (messageType) {
-            case 1:
-                return FRIEND_REQUEST_MESSAGE;
-            case 2:
-//                PaperNoticeDTO paperNoticeDTO = (PaperNoticeDTO) noticeDTO;
-//                return String.format(COMMENT_REQUEST_MESSAGE, paperNoticeDTO.getPaperId(), paperNoticeDTO.getCreatedAt());
-            case 3:
-                return generateFriendAcceptMessage((FriendNoticeDTO) noticeDTO);
-            case 4:
-                return PAPER_OPEN_MESSAGE;
-            default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown message type");
-        }
-    }
-
-    private String generateFriendAcceptMessage(FriendNoticeDTO friendNoticeDTO) {
-        String receiverNickname = friendNoticeDTO.getNickname();
-        return String.format(FRIEND_ACCEPT_MESSAGE, receiverNickname);
-    }
 
 
     /**
@@ -155,7 +87,6 @@ public class NoticeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
         noticeRepository.delete(notice);
     }
-
 
     /**
      * 특정 조건으로 알림을 삭제합니다 (senderId 기준).
