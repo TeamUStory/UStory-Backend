@@ -23,15 +23,14 @@ public class UpdatePaperRequest {
     @Schema(description = "썸네일 URL", example = "https://~~~~~")
     private String thumbnailImageUrl;
 
+    @Schema(description = "이미지 URL 리스트", example = "[\"https://~\", \"https://~\"]")
     private List<String> imageUrls;
 
     @Schema(description = "방문 날짜", example = "2024-05-24")
     private LocalDate visitedAt;
 
-
     @Schema(description = "사용자 Id, 토큰 사용할 때 사라질 예정", example = "12345678")
     private Long userId;
-
 
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
