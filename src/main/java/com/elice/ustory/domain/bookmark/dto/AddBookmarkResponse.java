@@ -7,10 +7,10 @@ import lombok.Getter;
 @Getter
 public class AddBookmarkResponse {
 
-    @Schema(description = "북마크 Id", example = "12345678")
-    private Long bookmarkId;
+    @Schema(description = "paper Id", example = "12345678")
+    private Long paperId;
 
     public AddBookmarkResponse(Bookmark bookmark) {
-        this.bookmarkId = bookmark.getId();
+        this.paperId = bookmark.getPaper().getId();
     }
 }

@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.bookmark;
 
-import com.elice.ustory.domain.bookmark.dto.AddBookmarkResponse;
 import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
 import com.elice.ustory.domain.bookmark.entity.Bookmark;
 import com.elice.ustory.domain.paper.entity.Paper;
@@ -34,14 +33,14 @@ public class BookmarkController {
 
     @Operation(summary = "Create bookmark API", description = "북마크를 지정한다.")
     @PostMapping("/bookmark")
-    public ResponseEntity<AddBookmarkResponse> saveBookmark(@RequestParam Long userId,
-                                                            @RequestParam Long paperId) {
+    public ResponseEntity<Void> saveBookmark(@RequestParam Long userId,
+                                             @RequestParam Long paperId) {
 
         Users user = userService.findById(userId).orElseThrow();
         Paper paper = paperService.getPaperById(paperId);
-        Bookmark bookmark = bookmarkService.saveBookmark(user, paper);
+        bookmarkService.saveBookmark(user, paper);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AddBookmarkResponse(bookmark));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Bookmark Check API", description = "북마크된 Paper인지 확인한다.")
