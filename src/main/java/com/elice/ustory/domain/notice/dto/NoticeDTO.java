@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public abstract class NoticeDTO {
     private String message;
     private int messageType;
-    private  long receiverId;
+    private long receiverId;
 
     public abstract void populateNotice(Notice notice);
 }

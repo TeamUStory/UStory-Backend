@@ -5,8 +5,8 @@ import com.elice.ustory.domain.friend.service.FriendService;
 import com.elice.ustory.domain.notice.dto.NoticeDTO;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
+import com.elice.ustory.domain.paper.dto.PaperNoticeRequest;
 import com.elice.ustory.domain.paper.entity.Paper;
-import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -63,12 +62,12 @@ public class NoticeService {
     public void sendNotice(NoticeDTO noticeDTO) {
         String message = generateMessage(noticeDTO);
         Long senderId = extractSenderId(noticeDTO);
-//        Paper paper = extractPaper(noticeDTO);
+        Paper paper = extractPaper(noticeDTO);
 
         Notice notice = Notice.builder()
                 .receiverId(noticeDTO.getReceiverId())
                 .senderId(senderId)
-//                .paper(paper)
+                .paper(paper)
                 .message(message)
                 .messageType(noticeDTO.getMessageType())
                 .build();
@@ -101,14 +100,12 @@ public class NoticeService {
      * @param noticeDTO 알림 DTO
      * @return Paper 객체
      */
-//    private Paper extractPaper(NoticeDTO noticeDTO) {
-//        if (noticeDTO instanceof PaperNoticeDTO) {
-//            Long paperId = ((PaperNoticeDTO) noticeDTO).getPaperId();
-//            return paperRepository.findById(paperId)
-//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found"));
-//        }
-//        return null;
-//    }
+    private Paper extractPaper(NoticeDTO noticeDTO) {
+        if (noticeDTO instanceof PaperNoticeRequest) {
+            return ((PaperNoticeRequest) noticeDTO).getPaper();
+        }
+        return null;
+    }
 
 
 
@@ -128,8 +125,7 @@ public class NoticeService {
             case 1:
                 return FRIEND_REQUEST_MESSAGE;
             case 2:
-//                PaperNoticeDTO paperNoticeDTO = (PaperNoticeDTO) noticeDTO;
-//                return String.format(COMMENT_REQUEST_MESSAGE, paperNoticeDTO.getPaperId(), paperNoticeDTO.getCreatedAt());
+                return COMMENT_REQUEST_MESSAGE;
             case 3:
                 return generateFriendAcceptMessage((FriendNoticeDTO) noticeDTO);
             case 4:

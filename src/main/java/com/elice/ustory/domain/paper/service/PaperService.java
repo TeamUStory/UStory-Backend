@@ -1,13 +1,13 @@
 package com.elice.ustory.domain.paper.service;
 
+import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.paper.entity.Address;
 import com.elice.ustory.domain.paper.entity.Image;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
-import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.global.exception.ErrorCode;
-import com.elice.ustory.global.exception.GlobalExceptionHandler;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PaperService {
 
     private final PaperRepository paperRepository;
+    private final NoticeService noticeService;
 
     @Transactional
     public Paper createPaper(Paper paper, List<Image> images, Address address/*, Users writer, Diary diary*/) {
@@ -36,6 +39,9 @@ public class PaperService {
         savedPaper.updateImages(images);
 
         savedPaper.setAddress(address);
+
+        // TODO : 다이어리-유저테이블과 다이어리 테이블과 연결 되면, 주석 풀기
+//        needCommentNotice(diary, paper);
 
         return savedPaper;
     }
@@ -77,13 +83,67 @@ public class PaperService {
         return previousPaper;
     }
 
+    // 작성자를 제외한 멤버들에게 코멘트를 달아달라고 알림 전송
+    public void needCommentNotice(Diary diary, Paper paper) {
+//         TODO : 다이어리에 속한 멤버들 전체 다 가져오기
+//        List<Long> userIdsInDiary = diaryUserRepository.get~;
+//
+//         속한 멤버들 중 작성자 제거하기
+//        userIdsInDiary.remove(paper.getWriter().getId());
+//
+//        // 작성자를 제외한 남은 멤버가 들어가있는 다이어리-유저 리스트에다가 알림 보내기
+//        if (!userIdsInDiary.isEmpty()) {
+//            for (Long userId : userIdsInDiary) {
+//                PaperNoticeRequest paperNoticeRequest = PaperNoticeRequest.builder()
+//                        .receiverId(userId)
+//                        .sender(paper)
+//                        .messageType(2)
+//                        .build();
+//                noticeService.sendNotice(paperNoticeRequest);
+//            }
+//        }
+    }
+
+    // 준용아 DB에 저장 되고 호출해줘야한다?
+    public void noticeLocked(Diary diary, Paper paper) {
+        // 페이퍼가 존재하는지, 삭제되었는지에 대해서 체크 (예외처리 동시 진행), Q : 검증 완료된 상황 아닌가?
+//        Paper checkedPaper = checkPaperAndDeleted(paper.getId());
+
+        // 체크된 페이퍼에서 모든 코멘트를 불러온다.
+        List<Comment> comments = paper.getComments();
+
+        // Id 중복 체크를 위한 함수를 만든 뒤, 스트림으로 채워준다.
+        Set<Long> userIds = comments.stream()
+                .map(comment -> comment.getUser().getId())
+                .collect(Collectors.toSet());
+
+        // TODO : 다이어리에 속한 유저 List를 가져온다. 현재 다이어리에서 유저를 불러올 수 없기 때문에 주석 처리.
+//         List<Users> usersInDiary = diary.getUser();
+
+        // TODO : 다이어리에 속한 유저 List와 set 사이즈 비교 후, 일치하면 바꾸고 노티스 던진다. 현재 다이어리에서 유저를 불러올 수 없기 때문에 주석 처리.
+//        if (userIds.size() == usersInDiary.size()) {
+//            paper.unLock();
+//            if (userIds.iterator().hasNext()) {
+//                for (Long userId : userIds) {
+//                    PaperNoticeRequest paperNoticeRequest = PaperNoticeRequest.builder()
+//                            .receiverId(userId)
+//                            .sender(paper)
+//                            .messageType(4)
+//                            .build();
+//                    noticeService.sendNotice(paperNoticeRequest);
+//                }
+//            }
+//        }
+    }
+
     public void deleteById(Long Id) {
         Paper paper = paperRepository.findById(Id).orElseThrow(() -> new NotFoundException("해당 페이퍼를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
         paper.softDelete();
     }
 
     public Paper checkPaperAndDeleted(Long paperId) {
-        Paper checkedUser = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException("해당 페이퍼를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
+        Paper checkedUser = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException
+                ("해당 페이퍼를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
         if (checkedUser.getDeletedAt() != null) {
             throw new UnauthorizedException("해당 페이퍼에 접근 권한이 없습니다", ErrorCode.VALIDATION_EXCEPTION);
         }
