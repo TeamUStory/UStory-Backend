@@ -6,15 +6,23 @@ import com.elice.ustory.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Tag(name = "User", description = "User API")
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -49,12 +57,20 @@ public class UserController {
 
     @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다.")
     @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         String id = loginRequest.getLoginEmail();
         String password = loginRequest.getPassword();
-        LoginResponse loginResponse = userService.login(id, password);
+        LoginResponse loginResponse = userService.login(id, password, response);
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
 
         //TODO: 유저 정보 Cookie에 저장
         return ResponseEntity.ok().body(loginResponse);
     }
+
+//    @GetMapping("/get-member")
+//    public Long getCurrentMember(Authentication authentication){
+//        log.info("authentication.getName() : {}", authentication.getName());
+//        Users user = userService.readByNickname(authentication.getName());
+//        return user.getId();
+//    }
 }

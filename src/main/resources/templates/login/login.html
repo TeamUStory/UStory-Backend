@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Shopping Mall</title>
+  <!-- 아이콘 -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/elice-rabbit-favicon.png"/>
+  <!-- bulma css 관련 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"/>
+  <link rel="stylesheet" href="/css/login.css" />
+  <!-- 폰트 어썸: 아이콘 -->
+  <script defer src="https://kit.fontawesome.com/9daa42bcef.js" crossorigin="anonymous"></script>
+  <!-- 자바스크립트 -->
+  <script th:src="@{/js/login.js}" type="module" defer></script>
+</head>
+<body>
+<!-- 헤더 -->
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="container mt-3">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img th:src="@{/images/elice-rabbit.png}" width="30" height="30" />
+        <span class="has-text-link">Shopping Mall</span>
+      </a>
+
+      <a
+              role="button"
+              class="navbar-burger"
+              aria-label="menu"
+              aria-expanded="false"
+              data-target="navbarBasicExample"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-end breadcrumb my-auto" aria-label="breadcrumbs">
+        <ul id="navbar">
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<!-- 로그인 폼(Form) -->
+<div class="login-form-container">
+  <form class="box login-form-box" id="loginForm" th:action="@{/auth/login}" th:object="${login}" method="post">
+    <p class="title is-5 has-text-info">어서오세요!</p>
+    <div class="field">
+      <label class="label" for="emailInput">이메일</label>
+      <div class="control">
+        <input class="input" id="emailInput" type="email" placeholder="abc@example.com" autocomplete="on"/>
+        <p class="help is-danger" id="emailError"></p>
+      </div>
+    </div>
+
+    <div class="field mb-5">
+      <label class="label" for="passwordInput">비밀번호</label>
+      <div class="control">
+        <input class="input" id="passwordInput" type="password" placeholder="********" autocomplete="on"/>
+        <p class="help is-danger" id="passwordError"></p>
+      </div>
+    </div>
+
+    <button class="button is-info is-fullwidth" id="submitButton" type="submit">로그인하기</button>
+  </form>
+  <div class="text-center">
+    <a href="https://kauth.kakao.com/oauth/authorize"
+       th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
+      <img src="/images/kakao_login_medium_narrow.png">
+    </a>
+  </div>
+</div>
+</body>
+</html>
