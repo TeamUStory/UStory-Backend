@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.bookmark.dto;
 
-import com.elice.ustory.domain.bookmark.Bookmark;
+import com.elice.ustory.domain.bookmark.entity.Bookmark;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

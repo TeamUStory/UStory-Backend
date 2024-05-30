@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.bookmark;
+package com.elice.ustory.domain.bookmark.entity;
 
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.user.entity.Users;

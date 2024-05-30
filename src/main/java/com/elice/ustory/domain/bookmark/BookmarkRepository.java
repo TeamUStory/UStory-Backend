@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.bookmark;
 
+import com.elice.ustory.domain.bookmark.entity.Bookmark;
 import com.elice.ustory.domain.paper.entity.Paper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

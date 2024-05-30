@@ -2,6 +2,7 @@ package com.elice.ustory.domain.bookmark;
 
 import com.elice.ustory.domain.bookmark.dto.AddBookmarkResponse;
 import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
+import com.elice.ustory.domain.bookmark.entity.Bookmark;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.domain.user.entity.Users;
