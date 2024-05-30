@@ -1,10 +1,14 @@
 package com.elice.ustory.domain.comment.controller;
 
-import com.elice.ustory.domain.comment.dto.CommentDto;
+import com.elice.ustory.domain.comment.dto.AddCommentResponse;
+import com.elice.ustory.domain.comment.dto.AddCommentRequest;
+import com.elice.ustory.domain.comment.dto.UpdateCommentRequest;
+import com.elice.ustory.domain.comment.dto.UpdateCommentResponse;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +33,7 @@ public class CommentController {
     }
 
     @Operation(summary = "Get Comments API", description = "모든 댓글들을 불러옴")
-    @GetMapping("/paper/{paperId}/comment")   // 시험용이라 uri 더러운건 무시하셔도 됩니다.
+    @GetMapping("/paper/{paperId}")   // 시험용이라 uri 더러운건 무시하셔도 됩니다.
     public ResponseEntity<List<Comment>> getComments(@PathVariable Long paperId) {
         List<Comment> comments = commentService.getComments(paperId);
         return ResponseEntity.ok().body(comments);
@@ -37,18 +41,18 @@ public class CommentController {
 
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody CommentDto commentDto,
-                                                 @RequestParam Long paperId,
-                                                 Long userId) {
-        Comment comment = commentService.addComment(commentDto, paperId, userId);
-        return ResponseEntity.ok().body(comment);
+    public ResponseEntity<AddCommentResponse> createComment(@RequestParam Long paperId,
+                                                            @RequestParam Long userId,
+                                                            @RequestBody AddCommentRequest addCommentRequest) {
+        Comment comment = commentService.addComment(addCommentRequest, paperId, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AddCommentResponse(comment.getId(), paperId, userId, comment.getCreatedAt()));
     }
 
     @Operation(summary = "Update Comment API", description = "댓글을 수정함")
     @PutMapping("/{id}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Long id, @RequestBody CommentDto commentDto) {
-        Comment updatedComment = commentService.updateComment(id, commentDto);
-        return ResponseEntity.ok().body(updatedComment);
+    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable Long id, @RequestBody UpdateCommentRequest updateCommentRequest) {
+        Comment updatedComment = commentService.updateComment(id, updateCommentRequest);
+        return ResponseEntity.ok().body(new UpdateCommentResponse(id, updatedComment.getContent()));
     }
 
     @Operation(summary = "Delete Comment API", description = "댓글을 삭제함")

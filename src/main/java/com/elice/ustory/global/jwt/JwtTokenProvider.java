@@ -41,11 +41,11 @@ public class JwtTokenProvider {
         log.info("[init] JwtTokenProvider 내 SecretKey 초기화 완료");
     }
 
-    public String createAccessToken(String name, Users.LoginType loginType) {
+    public String createAccessToken(String name) {
         Claims claims = Jwts.claims().setSubject(name);
         Date now = new Date();
-        claims.put("loginType", loginType);
-        log.info("[createToken] 토큰 생성 완료");
+        claims.put("nickname", name);
+        log.info("[createAccessToken] access 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
@@ -54,10 +54,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(String name){
-        Claims claims = Jwts.claims().setSubject(name);
+    public String createRefreshToken(){
+        Claims claims = Jwts.claims();
         Date now = new Date();
-        log.info("[createRefreshToken] Refresh 토큰 생성 완료");
+        log.info("[createRefreshToken] refresh 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
