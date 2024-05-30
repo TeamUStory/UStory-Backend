@@ -1,6 +1,5 @@
 package com.elice.ustory.global.filter;
 
-import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,11 +20,9 @@ import java.util.Optional;
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
 
-    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider, UserService userService){
+    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider){
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
     }
 
     @Override
