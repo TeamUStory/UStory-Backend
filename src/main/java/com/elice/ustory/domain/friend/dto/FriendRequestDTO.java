@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendRequestDTO {
-    private Long senderId;
-    private Long receiverId;
     private LocalDateTime invitedAt;
     private String nickname;
     private String name;
     private String profileImg;
+    private String senderNickname;
+    private String receiverNickname;
 }

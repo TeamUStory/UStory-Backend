@@ -12,7 +12,7 @@ import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.global.util.FriendRequestUtils;
+import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -55,20 +55,18 @@ public class FriendService {
      * 닉네임으로 전체 사용자를 검색합니다.
      *
      * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록
+     * @return 검색된 사용자 목록 (옵셔널)
      */
-    public UserListDTO findAllUsersByNickname(String nickname) {
+    public Optional<UserListDTO> findUserByNickname(String nickname) {
         return Optional.ofNullable(nickname)
                 .filter(name -> !name.isEmpty())
-                .flatMap(name -> userRepository.findByNickname(name)
-                        .map(u -> UserListDTO.builder()
-                                .name(u.getName())
-                                .nickname(u.getNickname())
-                                .profileImg(u.getProfileImg())
-                                .build()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nickname cannot be null, empty, or not found"));
+                .flatMap(userRepository::findByNickname)
+                .map(u -> UserListDTO.builder()
+                        .name(u.getName())
+                        .nickname(u.getNickname())
+                        .profileImg(u.getProfileImg())
+                        .build());
     }
-
 
     /**
      * 친구 추가 요청을 보냅니다.
@@ -76,20 +74,23 @@ public class FriendService {
      * @param friendRequestDTO 친구 요청 정보
      */
     public void sendFriendRequest(FriendRequestDTO friendRequestDTO) {
-        Users sender = FriendRequestUtils.getUserById(userRepository, friendRequestDTO.getSenderId());
-        Users receiver = FriendRequestUtils.getUserById(userRepository, friendRequestDTO.getReceiverId());
+        String senderNickname = friendRequestDTO.getSenderNickname();
+        String receiverNickname = friendRequestDTO.getReceiverNickname();
 
-        FriendId friendId = FriendRequestUtils.createFriendId(sender.getId(), receiver.getId());
-        FriendRequestUtils.validateFriendRequestNotExists(friendRepository, friendId);
+        Users sender = userRepository.findByNickname(senderNickname)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+        Users receiver = userRepository.findByNickname(receiverNickname)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"));
 
-        Friend friend = FriendRequestUtils.createFriendEntity(sender, receiver, friendId, FriendStatus.PENDING, LocalDateTime.now(), null);
+        FriendId friendId = CommonUtils.createFriendId(sender.getId(), receiver.getId());
+        validateFriendRequestNotExists(friendId);
+
+        Friend friend = CommonUtils.createFriendEntity(sender, receiver, friendId, FriendStatus.PENDING, LocalDateTime.now(), null);
         friendRepository.save(friend);
 
-        FriendNoticeDTO noticeDTO = FriendRequestUtils.createFriendNoticeDTO(receiver.getId(), sender.getId(), 1, sender.getNickname(), LocalDateTime.now(), null);
+        FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(receiver.getId(), sender.getId(), 1, sender.getNickname(), LocalDateTime.now(), null);
         noticeService.sendNotice(noticeDTO);
     }
-
-
 
     /**
      * 특정 사용자가 받은 친구 요청 목록을 조회합니다.
@@ -101,28 +102,54 @@ public class FriendService {
         return friendRepository.findFriendRequests(userId);
     }
 
+    /**
+     * 친구 요청 존재 여부 확인
+     *
+     * @param friendId 친구 요청 ID
+     */
+    private void validateFriendRequestNotExists(FriendId friendId) {
+        if (friendRepository.existsById(friendId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Friend request already exists");
+        }
+    }
+
+    /**
+     * 사용자 조회
+     *
+     * @param userId 사용자 ID
+     * @return Users 객체
+     */
+    private Users getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID"));
+    }
 
 
     /**
      * 친구 요청에 응답합니다.
      *
-     * @param senderId 친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
+     * @param senderNickname 친구 요청을 보낸 사용자의 닉네임
+     * @param receiverNickname 친구 요청을 받은 사용자의 닉네임
      * @param accepted true이면 요청 수락, false이면 요청 거절
      */
-    public void respondToFriendRequest(Long senderId, Long receiverId, boolean accepted) {
-        FriendId friendId = FriendRequestUtils.createFriendId(senderId, receiverId);
+    public void respondToFriendRequest(String senderNickname, String receiverNickname, boolean accepted) {
+        Users sender = userRepository.findByNickname(senderNickname)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+        Users receiver = userRepository.findByNickname(receiverNickname)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"));
+
+        FriendId friendId = CommonUtils.createFriendId(sender.getId(), receiver.getId());
 
         Friend friend = friendRepository.findById(friendId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend request not found"));
 
         if (accepted) {
-            processAcceptedFriendRequest(friend, senderId, receiverId);
+            processAcceptedFriendRequest(friend, sender.getId(), receiver.getId());
         } else {
             friendRepository.delete(friend);
         }
 
-        noticeService.deleteNoticeBySender(senderId, receiverId, 1);
+        noticeService.deleteNoticeBySender(sender.getId(), receiver.getId(), 1);
     }
 
 
@@ -137,10 +164,10 @@ public class FriendService {
         // 기존 친구 관계의 상태를 ACCEPTED로 업데이트
         friend.updateStatus(FriendStatus.ACCEPTED);
         // 반대 방향 친구 관계도 추가 (sender와 receiver를 반대로 설정)
-        Friend reverseFriend = FriendRequestUtils.createFriendEntity(
+        Friend reverseFriend = CommonUtils.createFriendEntity(
                 friend.getFriendUser(),
                 friend.getUser(),
-                FriendRequestUtils.createFriendId(receiverId, senderId),
+                CommonUtils.createFriendId(receiverId, senderId),
                 FriendStatus.ACCEPTED,
                 friend.getInvitedAt(),
                 LocalDateTime.now()
@@ -148,10 +175,10 @@ public class FriendService {
         friendRepository.save(reverseFriend);
 
         // 수락한 사람 (receiver)의 닉네임 조회
-        String receiverNickname = FriendRequestUtils.getUserById(userRepository, receiverId).getNickname();
-        // 친구 수락 알림 전송
-        FriendNoticeDTO noticeDTO = FriendRequestUtils.createFriendNoticeDTO(senderId, receiverId, 3, receiverNickname, null, LocalDateTime.now());
+        String receiverNickname = getUserById(receiverId).getNickname();
 
+        // 친구 수락 알림 전송
+        FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(senderId, receiverId, 3, receiverNickname, null, LocalDateTime.now());
         noticeService.sendNotice(noticeDTO);
     }
 
@@ -163,8 +190,8 @@ public class FriendService {
      * @param friendId 삭제할 친구의 ID
      */
     public void deleteFriendById(Long userId, Long friendId) {
-        FriendId id = FriendRequestUtils.createFriendId(userId, friendId);
-        FriendId reverseId = FriendRequestUtils.createFriendId(friendId, userId);
+        FriendId id = CommonUtils.createFriendId(userId, friendId);
+        FriendId reverseId = CommonUtils.createFriendId(friendId, userId);
 
         if (!friendRepository.existsById(id) && !friendRepository.existsById(reverseId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend relationship not found");

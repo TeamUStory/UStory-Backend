@@ -29,7 +29,7 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
 
         BooleanExpression predicate = friend.id.userId.eq(userId);
         if (nickname != null && !nickname.isEmpty()) {
-            predicate = predicate.and(user.nickname.contains(nickname));
+            predicate = predicate.and(user.nickname.containsIgnoreCase(nickname));
         }
 
         return queryFactory.select(Projections.constructor(UserFriendDTO.class,
@@ -47,18 +47,20 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
     public List<FriendRequestDTO> findFriendRequests(Long userId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QFriend friend = QFriend.friend;
-        QUsers user = QUsers.users;
+        QUsers sender = new QUsers("sender");
+        QUsers receiver = new QUsers("receiver");
 
         return queryFactory.select(Projections.constructor(FriendRequestDTO.class,
-                friend.id.userId,
-                friend.id.friendId,
-                friend.invitedAt,
-                user.nickname,
-                user.name,
-                user.profileImg
-        ))
+                        friend.invitedAt,
+                        sender.nickname,
+                        sender.name,
+                        sender.profileImg,
+                        sender.nickname,
+                        receiver.nickname
+                ))
                 .from(friend)
-                .join(friend.user, user)
+                .join(friend.user, sender)
+                .join(friend.friendUser, receiver)
                 .where(friend.id.friendId.eq(userId)
                         .and(friend.status.eq(FriendStatus.PENDING)))
                 .fetch();
