@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.paper;
 
+import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperListResponse;
@@ -55,6 +56,7 @@ public class PaperController {
 
         List<Image> images = imageService.createImages(addPaperRequest.toImagesEntity());
 
+        // TODO : 검증 후, 파라미터에 작성자 정보, 다이어리 정보 넘기기
         Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), images, address);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new AddPaperResponse(paper.getId()));
@@ -66,8 +68,11 @@ public class PaperController {
                                                       @RequestBody UpdatePaperRequest updatePaperRequest) {
 
         // 다이어리 검증 메서드 (다이어리에 해당 페이지가 존재하는지 확인)
+        // Request로 다이어리 아이디를 받아서, paperId와 대조하는 건가요? 이거 어떻게 검증하는거지?
+
 
         // 사용자 검증 메서드 (사용자가 존재하는지, 다이어리에 포함되는지 확인)
+        // 토큰으로 userId 정보 불러오기 (해당 DTO userId 프로퍼티 삭제), 위의 다이어리 정보와 비교 대조?
 
         Paper paper = paperService.getPaperById(paperId);
 
@@ -97,7 +102,7 @@ public class PaperController {
                                                                       @RequestParam(name = "size", defaultValue = "20") int size) {
 
         // user 검증
-        // user 연관된 모든 page 불러오기
+        // user 연관된 모든 paper 불러오기
 
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
 
@@ -115,7 +120,7 @@ public class PaperController {
                                                                       @RequestParam(name = "size", defaultValue = "20") int size) {
 
         // diary 검증
-        // diary 연관된 모든 page 불러오기
+        // diary 연관된 모든 paper 불러오기
 
         List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size);
 
@@ -133,7 +138,7 @@ public class PaperController {
                                                                          @RequestParam(name = "size", defaultValue = "20") int size) {
 
         // user 검증
-        // user 연관된 모든 page 불러오기
+        // user 연관된 모든 paper 불러오기
 
         return ResponseEntity.ok(List.of(new AddPaperResponse()));
     }
