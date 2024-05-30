@@ -39,8 +39,6 @@ public class NoticeController {
 
 
 
-
-
     /**
      * 알림을 삭제합니다.
      *
