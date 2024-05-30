@@ -1,24 +1,20 @@
 package com.elice.ustory.domain.notice.service;
 
-import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
 import com.elice.ustory.domain.notice.dto.NoticeDTO;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
-import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
-import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import com.elice.ustory.global.util.NotificationUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -58,11 +54,11 @@ public class NoticeService {
      * @param noticeDTO 알림 DTO
      */
     public void sendNotice(NoticeDTO noticeDTO) {
-        String message = NotificationUtils.generateMessage(noticeDTO);
-        Long senderId = NotificationUtils.extractSenderId(noticeDTO);
+        String message = CommonUtils.generateMessage(noticeDTO);
+        Long senderId = CommonUtils.extractSenderId(noticeDTO);
 //        Paper paper = NotificationUtils.extractPaper(noticeDTO, paperRepository);
 
-        Notice notice = NotificationUtils.createNotice(noticeDTO, message, senderId);
+        Notice notice = CommonUtils.createNotice(noticeDTO, message, senderId);
 //        notice.setPaper(paper);
 
         // populateNotice 호출하여 필요한 값 설정
