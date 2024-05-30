@@ -18,6 +18,7 @@ public class PaperResponse {
     @Schema(description = "썸네일 URL", example = "https://~~~~~")
     private String thumbnailImageUrl;
 
+    @Schema(description = "이미지 URL 리스트", example = "[\"https://~\", \"https://~\"]")
     private List<String> imageUrls;
 
     @Schema(description = "방문 날짜", example = "2024-05-24")
