@@ -21,11 +21,11 @@ public class kakaoController {
     @GetMapping("/login")
     public String showLogInForm(Model model) {
         model.addAttribute("kakaoApiKey", kakaoOauth.getKakaoApiKey());
-        model.addAttribute("redirectUri", kakaoOauth.getKakaoRedirectUri());
+        model.addAttribute("redirectUri", kakaoOauth.getKakaoLoginRedirectUri());
         return "login/login";
     }
 
-    @RequestMapping("${kakao.redirect_shortUri}")
+    @RequestMapping("/login/oauth2/code/kakao")
     public void kakaoLogin(@RequestParam String code, HttpServletResponse response) {
         String accessToken = kakaoOauth.getKakaoAccessToken(code, response);
         Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(accessToken);

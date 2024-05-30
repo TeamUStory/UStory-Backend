@@ -27,20 +27,11 @@ public class KakaoOauth {
     @Value("${kakao.api_key}")
     private String kakaoApiKey;
 
-    @Value("${kakao.redirect_uri}")
-    private String kakaoRedirectUri;
-
-    @Value("${kakao.logoutRedirect_uri}")
-    private String kakaoLogoutRedirectUri;
-
-    @Value("${kakao.code_uri}")
-    private String kakaoTokenUri;
-
-    @Value("${kakao.userInfo_uri}")
-    private String userInfoUri;
-
-//    @Value("${kakao.expireKakaoToken_uri}")
-    private String expireKakaoTokenUri;
+    private final String kakaoLoginRedirectUri = "http://localhost:8080/login/oauth2/code/kakao";
+    private final String kakaoLogoutRedirectUri = "http://localhost:8080/auth/logout";
+    private final String kakaoTokenUri = "https://kauth.kakao.com/oauth/token";
+    private final String userInfoUri = "https://kapi.kakao.com/v2/user/me";
+    private final String expireKakaoTokenUri = "https://kapi.kakao.com/v1/user/logout";
 
     public String getKakaoAccessToken(String code, HttpServletResponse response) {
         String kakaoAccessToken = "";
@@ -57,7 +48,7 @@ public class KakaoOauth {
 
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=").append(kakaoApiKey);
-            sb.append("&redirect_uri=").append(kakaoRedirectUri);
+            sb.append("&redirect_uri=").append(kakaoLoginRedirectUri);
             sb.append("&code=").append(code);
 
             bw.write(sb.toString());
