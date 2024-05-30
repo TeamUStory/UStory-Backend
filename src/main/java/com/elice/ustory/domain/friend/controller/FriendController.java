@@ -8,6 +8,8 @@ import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,7 +65,7 @@ public class FriendController {
     @GetMapping("/search")
     public ResponseEntity<UserListDTO> searchUserByNickname(@RequestParam String nickname) {
         UserListDTO user = friendService.findUserByNickname(nickname)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with nickname: " + nickname));
+                .orElseThrow(() -> new NotFoundException("닉네임이 있는 사용자를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
         return ResponseEntity.ok(user);
     }
 
@@ -78,7 +80,7 @@ public class FriendController {
     @PostMapping("/request")
     public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
         friendService.sendFriendRequest(friendRequestDTO);
-        return ResponseEntity.ok("Friend request sent successfully.");
+        return ResponseEntity.ok("친구 요청이 성공적으로 전송되었습니다.");
     }
 
 
@@ -107,7 +109,7 @@ public class FriendController {
     @PostMapping("/respond")
     public ResponseEntity<String> respondToFriendRequest(@RequestParam String senderNickname, @RequestParam String receiverNickname, @RequestParam boolean accepted) {
         friendService.respondToFriendRequest(senderNickname, receiverNickname, accepted);
-        return ResponseEntity.ok("Friend request " + (accepted ? "accepted" : "rejected") + " successfully.");
+        return ResponseEntity.ok("친구요청 " + (accepted ? "수락" : "거절") + "이 되었습니다.");
     }
 
 

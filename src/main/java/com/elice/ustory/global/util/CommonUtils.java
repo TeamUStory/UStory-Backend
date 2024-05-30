@@ -7,9 +7,13 @@ import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.notice.dto.NoticeDTO;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.NotFoundException;
+import com.elice.ustory.global.exception.model.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.xml.bind.ValidationException;
 import java.time.LocalDateTime;
 
 public class CommonUtils {
@@ -40,7 +44,7 @@ public class CommonUtils {
             case 4:
                 return PAPER_OPEN_MESSAGE;
             default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown message type");
+                throw new UnauthorizedException("잘못된 메세지 타입입니다.", ErrorCode.VALIDATION_EXCEPTION);
         }
     }
 
@@ -111,27 +115,7 @@ public class CommonUtils {
         return new FriendId(senderId, receiverId);
     }
 
-    /**
-     * 친구 엔티티 생성
-     *
-     * @param sender    친구 요청을 보낸 사용자
-     * @param receiver  친구 요청을 받은 사용자
-     * @param friendId  친구 요청 ID
-     * @param status    친구 요청 상태
-     * @param invitedAt 친구 요청 시간
-     * @param acceptedAt 친구 수락 시간
-     * @return Friend 객체
-     */
-    public static Friend createFriendEntity(Users sender, Users receiver, FriendId friendId, FriendStatus status, LocalDateTime invitedAt, LocalDateTime acceptedAt) {
-        return Friend.builder()
-                .id(friendId)
-                .invitedAt(invitedAt)
-                .acceptedAt(acceptedAt)
-                .user(sender)
-                .friendUser(receiver)
-                .status(status)
-                .build();
-    }
+
 
 
     /**

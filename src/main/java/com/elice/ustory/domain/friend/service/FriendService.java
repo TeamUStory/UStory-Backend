@@ -12,6 +12,10 @@ import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.ConflictException;
+import com.elice.ustory.global.exception.model.NotFoundException;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,14 +82,14 @@ public class FriendService {
         String receiverNickname = friendRequestDTO.getReceiverNickname();
 
         Users sender = userRepository.findByNickname(senderNickname)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+                .orElseThrow(() -> new NotFoundException("Sender를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
         Users receiver = userRepository.findByNickname(receiverNickname)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"));
+                .orElseThrow(() -> new NotFoundException("Receiver를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
         FriendId friendId = CommonUtils.createFriendId(sender.getId(), receiver.getId());
         validateFriendRequestNotExists(friendId);
 
-        Friend friend = CommonUtils.createFriendEntity(sender, receiver, friendId, FriendStatus.PENDING, LocalDateTime.now(), null);
+        Friend friend = friendRequestDTO.toFriend(sender, receiver); // 변환 메서드 사용
         friendRepository.save(friend);
 
         FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(receiver.getId(), sender.getId(), 1, sender.getNickname(), LocalDateTime.now(), null);
@@ -109,7 +113,7 @@ public class FriendService {
      */
     private void validateFriendRequestNotExists(FriendId friendId) {
         if (friendRepository.existsById(friendId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Friend request already exists");
+            throw new ConflictException("친구 요청이 이미 있습니다.",ErrorCode.CONFLICT_EXCEPTION);
         }
     }
 
@@ -121,7 +125,7 @@ public class FriendService {
      */
     private Users getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID"));
+                .orElseThrow(() -> new ValidationException("잘못된 사용자 ID", ErrorCode.VALIDATION_EXCEPTION));
     }
 
 
@@ -134,14 +138,14 @@ public class FriendService {
      */
     public void respondToFriendRequest(String senderNickname, String receiverNickname, boolean accepted) {
         Users sender = userRepository.findByNickname(senderNickname)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+                .orElseThrow(() -> new NotFoundException("sender를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
         Users receiver = userRepository.findByNickname(receiverNickname)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"));
+                .orElseThrow(() -> new NotFoundException("receiver를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
         FriendId friendId = CommonUtils.createFriendId(sender.getId(), receiver.getId());
 
         Friend friend = friendRepository.findById(friendId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend request not found"));
+                .orElseThrow(() -> new NotFoundException("친구 요청을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
         if (accepted) {
             processAcceptedFriendRequest(friend, sender.getId(), receiver.getId());
@@ -163,16 +167,24 @@ public class FriendService {
     private void processAcceptedFriendRequest(Friend friend, Long senderId, Long receiverId) {
         // 기존 친구 관계의 상태를 ACCEPTED로 업데이트
         friend.updateStatus(FriendStatus.ACCEPTED);
+        friendRepository.save(friend);
+
+
         // 반대 방향 친구 관계도 추가 (sender와 receiver를 반대로 설정)
-        Friend reverseFriend = CommonUtils.createFriendEntity(
-                friend.getFriendUser(),
-                friend.getUser(),
-                CommonUtils.createFriendId(receiverId, senderId),
-                FriendStatus.ACCEPTED,
-                friend.getInvitedAt(),
-                LocalDateTime.now()
-        );
+        Users sender = getUserById(senderId);
+        Users receiver = getUserById(receiverId);
+        FriendId reverseFriendId = new FriendId(receiverId, senderId);
+
+        Friend reverseFriend = Friend.builder()
+                .id(reverseFriendId)
+                .invitedAt(friend.getInvitedAt())
+                .acceptedAt(LocalDateTime.now())
+                .user(receiver)
+                .friendUser(sender)
+                .status(FriendStatus.ACCEPTED)
+                .build();
         friendRepository.save(reverseFriend);
+
 
         // 수락한 사람 (receiver)의 닉네임 조회
         String receiverNickname = getUserById(receiverId).getNickname();
@@ -194,7 +206,7 @@ public class FriendService {
         FriendId reverseId = CommonUtils.createFriendId(friendId, userId);
 
         if (!friendRepository.existsById(id) && !friendRepository.existsById(reverseId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend relationship not found");
+            throw new NotFoundException("친구 관계를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION);
         }
 
         friendRepository.deleteById(id);

@@ -6,6 +6,8 @@ import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +82,7 @@ public class NoticeService {
      */
     public void deleteNoticeById(Long id) {
         Notice notice = noticeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
+                .orElseThrow(() -> new NotFoundException("알림을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
         noticeRepository.delete(notice);
     }
 
