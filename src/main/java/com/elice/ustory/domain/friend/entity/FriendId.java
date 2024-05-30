@@ -2,9 +2,7 @@ package com.elice.ustory.domain.friend.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -14,7 +12,7 @@ import java.io.Serializable;
  */
 @Getter
 @Embeddable
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 public class FriendId implements Serializable {
     @Column(nullable = false, name="user_id")

@@ -52,7 +52,6 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
 
         return queryFactory.select(Projections.constructor(FriendRequestDTO.class,
                         friend.invitedAt,
-                        sender.nickname,
                         sender.name,
                         sender.profileImg,
                         sender.nickname,

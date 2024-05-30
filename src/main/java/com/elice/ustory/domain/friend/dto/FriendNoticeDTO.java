@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
+@NoArgsConstructor
 public class FriendNoticeDTO extends NoticeDTO {
     private long senderId;
-    private  String nickname;
+    private String nickname;
     private LocalDateTime invitedAt;
     private LocalDateTime acceptedAt;
 
