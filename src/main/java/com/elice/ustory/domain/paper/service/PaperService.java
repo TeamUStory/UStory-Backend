@@ -25,13 +25,13 @@ public class PaperService {
     private final PaperRepository paperRepository;
 
     @Transactional
-    public Paper createPaper(Paper paper, List<Image> images, Address address/*, Users writer, Diary diary*/) {
+    public Paper createPaper(Paper paper, List<Image> images, Address address, Users writer, Diary diary) {
 
         Paper savedPaper = paperRepository.save(paper);
 
-//        savedPaper.updateWriter(writer);
-//
-//        savedPaper.updateDiary(diary);
+        savedPaper.updateWriter(writer);
+
+        savedPaper.updateDiary(diary);
 
         savedPaper.updateImages(images);
 
@@ -42,23 +42,28 @@ public class PaperService {
 
     public Paper getPaperById(long Id) {
         return checkPaperAndDeleted(Id);
-        }
+    }
 
-    /** 다이어리 내에 존재하는 Papers 최신순으로 페이지네이션 */
+    /**
+     * 다이어리 내에 존재하는 Papers 최신순으로 페이지네이션
+     */
     public List<Paper> getPapersByDiaryId(Long diaryId, int page, int size) {
         // TODO : 여기 deleted 체크 하고 싶은데, 그러면 리스트 for each 문이나 이터레이터로 돌면서 체크해야 하나요?
         return paperRepository.findByDiaryId(diaryId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "modifiedAt")));
     }
 
-    /** 작성한 Papers 최신순으로 페이지네이션 */
+    /**
+     * 작성한 Papers 최신순으로 페이지네이션
+     */
     public List<Paper> getPapersByWriterId(Long writerId, int page, int size) {
         checkPaperAndDeleted(writerId);
         return paperRepository.findByWriterId(writerId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "modifiedAt")));
     }
 
-    /** 북마크로 체크한 Papers 페이지네이션 */
+    /**
+     * 북마크로 체크한 Papers 페이지네이션
+     */
     // TODO: 작성해야함...
-
     @Transactional
     public Paper updatePaper(Long savedPaperId, Paper paper, List<Image> images, Address address) {
 

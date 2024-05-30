@@ -1,5 +1,7 @@
 package com.elice.ustory.domain.paper;
 
+import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.diary.service.DiaryService;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperListResponse;
@@ -12,6 +14,8 @@ import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.AddressService;
 import com.elice.ustory.domain.paper.service.ImageService;
 import com.elice.ustory.domain.paper.service.PaperService;
+import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +39,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaperController {
 
-//    private final UserService userService;
-//    private final DiaryService diaryService;
+    private final UserService userService;
+    private final DiaryService diaryService;
     private final AddressService addressService;
     private final PaperService paperService;
     private final ImageService imageService;
@@ -45,18 +49,15 @@ public class PaperController {
     @PostMapping("/paper")
     public ResponseEntity<AddPaperResponse> create(@RequestBody AddPaperRequest addPaperRequest) {
 
-        // 사용자 검증 메서드
-//        Users user = userService.findById(addPaperRequest.getUserId());
+        Users user = userService.findById(addPaperRequest.getUserId()).orElseThrow();
 
-        // 다이어리 검증 메서드
-//        Diary diary = diaryService.findById(addPaperRequest.getDiaryId());
+        Diary diary = diaryService.getDiaryById(addPaperRequest.getDiaryId());
 
         Address address = addressService.createAddress(addPaperRequest.toAddressEntity());
 
         List<Image> images = imageService.createImages(addPaperRequest.toImagesEntity());
 
-        // TODO : 검증 후, 파라미터에 작성자 정보, 다이어리 정보 넘기기
-        Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), images, address);
+        Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), images, address, user, diary);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new AddPaperResponse(paper.getId()));
     }
@@ -66,14 +67,9 @@ public class PaperController {
     public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long paperId,
                                                       @RequestBody UpdatePaperRequest updatePaperRequest) {
 
-        // 다이어리 검증 메서드 (다이어리에 해당 페이지가 존재하는지 확인)
-        // Request로 다이어리 아이디를 받아서, paperId와 대조하는 건가요? 이거 어떻게 검증하는거지?
-
-
-        // 사용자 검증 메서드 (사용자가 존재하는지, 다이어리에 포함되는지 확인)
-        // 토큰으로 userId 정보 불러오기 (해당 DTO userId 프로퍼티 삭제), 위의 다이어리 정보와 비교 대조?
-
         Paper paper = paperService.getPaperById(paperId);
+
+        diaryService.getDiaryById(paper.getDiary().getId());
 
         Address address = addressService.updateAddress(paper.getAddress().getId(), updatePaperRequest.toAddressEntity());
 
