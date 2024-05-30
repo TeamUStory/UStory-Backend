@@ -8,6 +8,8 @@ import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,27 +49,24 @@ public class FriendController {
      */
     @Operation(summary = "Get / Friends", description = "사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.")
     @GetMapping("/friends")
-    public ResponseEntity<List<UserFriendDTO>> getFriends(@RequestParam(required = false) Long userId,
-                                                          @RequestParam(required = false) String nickname) {
+    public ResponseEntity<List<UserFriendDTO>> getFriends(@RequestParam(required = false) Long userId, @RequestParam(required = false) String nickname) {
         List<UserFriendDTO> friends = friendService.getFriends(userId, nickname);
         return ResponseEntity.ok(friends);
     }
+
 
     /**
      * 닉네임으로 전체 사용자를 검색합니다.
      *
      * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록 (옵셔널)
+     * @return 검색된 사용자 목록
      */
-    public Optional<UserListDTO> findUserByNickname(String nickname) {
-        return Optional.ofNullable(nickname)
-                .filter(name -> !name.isEmpty())
-                .flatMap(userRepository::findByNickname)
-                .map(u -> UserListDTO.builder()
-                        .name(u.getName())
-                        .nickname(u.getNickname())
-                        .profileImg(u.getProfileImg())
-                        .build());
+    @Operation(summary = "Get / Search User by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
+    @GetMapping("/search")
+    public ResponseEntity<UserListDTO> searchUserByNickname(@RequestParam String nickname) {
+        UserListDTO user = friendService.findUserByNickname(nickname)
+                .orElseThrow(() -> new NotFoundException("닉네임이 있는 사용자를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
+        return ResponseEntity.ok(user);
     }
 
 
@@ -81,7 +80,7 @@ public class FriendController {
     @PostMapping("/request")
     public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
         friendService.sendFriendRequest(friendRequestDTO);
-        return ResponseEntity.ok("Friend request sent successfully.");
+        return ResponseEntity.ok("친구 요청이 성공적으로 전송되었습니다.");
     }
 
 
@@ -98,20 +97,19 @@ public class FriendController {
         return ResponseEntity.ok(friendRequests);
     }
 
-
     /**
      * 친구 요청에 응답합니다.
      *
-     * @param senderId 친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
+     * @param senderNickname 친구 요청을 보낸 사용자의 닉네임
+     * @param receiverNickname 친구 요청을 받은 사용자의 닉네임
      * @param accepted true이면 요청 수락, false이면 요청 거절
      * @return 응답 메시지
      */
     @Operation(summary = "Post / Friend Request Response", description = "친구 요청에 응답합니다.")
     @PostMapping("/respond")
-    public ResponseEntity<String> respondToFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId, @RequestParam boolean accepted) {
-        friendService.respondToFriendRequest(senderId, receiverId, accepted);
-        return ResponseEntity.ok("Friend request " + (accepted ? "accepted" : "rejected") + " successfully.");
+    public ResponseEntity<String> respondToFriendRequest(@RequestParam String senderNickname, @RequestParam String receiverNickname, @RequestParam boolean accepted) {
+        friendService.respondToFriendRequest(senderNickname, receiverNickname, accepted);
+        return ResponseEntity.ok("친구요청 " + (accepted ? "수락" : "거절") + "이 되었습니다.");
     }
 
 

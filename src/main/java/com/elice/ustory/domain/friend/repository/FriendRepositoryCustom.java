@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface FriendRepositoryCustom {
     List<UserFriendDTO> findFriends(Long userId, String nickname);
-
     List<FriendRequestDTO> findFriendRequests(Long userId);
 
 }
