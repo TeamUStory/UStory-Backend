@@ -19,11 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
 
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
     }
 
     @Bean
