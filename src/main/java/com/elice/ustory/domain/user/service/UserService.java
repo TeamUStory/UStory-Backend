@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+//TODO: uri를 설정파일 밖에 상수값으로 두기
+//TODO: 리프레시토큰 만료시. (에러코드 401?, 로컬에 저장된 액세스 토큰) 쿠키의 토큰을 서버가 지울 수 있나? - 쿠키가 삭제되면 토큰도 무효화
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class UserService {
                 .name(name)
                 .nickname(nickname)
                 .password(password)
-                .profileImg(profileImg)
+                .profileImgUrl(profileImg)
                 .build();
 
         Users newUser = userRepository.save(builtUser);
@@ -67,7 +69,7 @@ public class UserService {
             user.setPassword(password);
         }
         if(profileImg != null) {
-            user.setProfileImg(profileImg);
+            user.setProfileImgUrl(profileImg);
         }
 
         Users updatedUser = userRepository.save(user);
