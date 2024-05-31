@@ -7,16 +7,19 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DiaryListResponse {
+public class DiaryList {
     private Long id;
 
     private String name;
 
     private String imgUrl;
 
-    private String diaryCategory;
+    private DiaryCategory diaryCategory;
+    public DiaryListResponse toDiaryListResponse(){
+        return new DiaryListResponse(this.id,this.name,this.imgUrl, this.diaryCategory.getName());
+    }
 
-    public DiaryListResponse(Long id, String name, String imgUrl, String diaryCategory) {
+    public DiaryList(Long id, String name, String imgUrl, DiaryCategory diaryCategory) {
         this.id = id;
         this.name = name;
         this.imgUrl = imgUrl;
