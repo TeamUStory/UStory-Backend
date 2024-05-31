@@ -50,7 +50,7 @@ public class DiaryController {
     }
 
     @Operation(summary = "Get DiaryList limit 6", description = "홈 페이지 용 최신 다이어리 6개 불러오기")
-    @GetMapping("/home/diary")
+    @GetMapping("/diary/home")
     public ResponseEntity<List<DiaryListResponse>> getDiaryList(@RequestParam("userId") Long userId){
         List<DiaryListResponse> result = diaryService.getUserDiaryList(userId);
         return ResponseEntity.ok(result);
@@ -80,6 +80,13 @@ public class DiaryController {
         }
 
         return ResponseEntity.ok(diary);
+    }
+
+    @Operation(summary = "Get Diary Count", description = "유저가 속한 다이어리 개수 불러오기")
+    @GetMapping("/diary/{userId}/count")
+    public ResponseEntity<Long> getDiaryCount(@PathVariable("userId") Long userId){
+        Long count = diaryService.getDiaryCount(userId);
+        return ResponseEntity.ok(count);
     }
 
     @Operation(summary = "Delete Diary", description = "다이어리 삭제")

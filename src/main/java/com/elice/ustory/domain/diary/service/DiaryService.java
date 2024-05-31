@@ -53,6 +53,7 @@ public class DiaryService {
         updatedDiary.updateDiary(diary);
 
         // TODO : 이미 다이어리에 10명이 존재할 경우 & 기존 유저가 아닌 새로운 10명으로 보내졌을 경우(?)
+        // TODO : 기존 멤버가 제외된 리스트가 보내진 경우... & 친구가 아닌 유저가 온 경우...
 
         // 다이어리에 유저가 추가된 경우
         if (users.size() != diaryUserRepository.countUserByDiary(id)) {
@@ -61,7 +62,7 @@ public class DiaryService {
                 if (userList.contains(nickname)) continue;
 
                 Users user = userRepository.findByNickname(nickname).orElse(null);
-                // TODO : 부적절한 값 -> Exception
+                // TODO : null(존재하지 않는 유저) -> Exception
                 DiaryUserId diaryUserId = new DiaryUserId(updatedDiary, user);
                 diaryUserRepository.save(new DiaryUser(diaryUserId));
             }
@@ -87,6 +88,10 @@ public class DiaryService {
         return result.stream()
                 .map(DiaryList::toDiaryListResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Long getDiaryCount(Long userId){
+        return diaryUserRepository.countDiaryByUser(userId);
     }
 
     public void deleteDiary(Long id) {

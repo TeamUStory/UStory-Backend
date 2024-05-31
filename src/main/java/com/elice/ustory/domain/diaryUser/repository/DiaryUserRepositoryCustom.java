@@ -12,6 +12,8 @@ public interface DiaryUserRepositoryCustom {
 
     Long countUserByDiary(Long diaryId);
 
+    Long countDiaryByUser(Long userId);
+
     List<String> findUserByDiary(Long diaryId);
 
     Page<DiaryList> searchDiary(Long userId, Pageable pageable, DiaryCategory diaryCategory);
