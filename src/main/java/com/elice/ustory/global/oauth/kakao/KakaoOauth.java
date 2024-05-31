@@ -78,7 +78,7 @@ public class KakaoOauth {
             br.close();
             bw.close();
 
-            var cookie1 = new Cookie("kakao", URLEncoder.encode("Bearer " + kakaoAccessToken, StandardCharsets.UTF_8));
+            var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + kakaoAccessToken, StandardCharsets.UTF_8));
             cookie1.setPath("/");
             cookie1.setMaxAge(60 * 60);
             response.addCookie(cookie1);
