@@ -38,7 +38,7 @@ public class Users extends BaseEntity {
     @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
     private String profileImgUrl;
 
-    @Column(name = "profileDescription", columnDefinition = "TEXT")
+    @Column(name = "profileDescription", columnDefinition = "VARCHAR(150)")
     private String profileDescription;
 
     @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")

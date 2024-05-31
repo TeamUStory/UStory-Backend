@@ -138,4 +138,22 @@ public class UserService {
 //        log.info("redis안의 토큰: {}", foundTokenInfo.getRefreshToken());
         return loginResponse;
     }
+
+    public MyPageResponse showMyPage(Long userId) {
+        Users currentUser = userRepository.findById(userId)
+                .orElseThrow();
+        String nickname = currentUser.getNickname();
+        String name = currentUser.getName();
+        String profileDescription = currentUser.getProfileDescription();
+        String profileImgUrl = currentUser.getProfileImgUrl();
+
+        MyPageResponse myPageResponse = MyPageResponse.builder()
+                .nickname(nickname)
+                .name(name)
+                .profileDescription(profileDescription)
+                .profileImgUrl(profileImgUrl)
+                .build();
+
+        return myPageResponse;
+    }
 }

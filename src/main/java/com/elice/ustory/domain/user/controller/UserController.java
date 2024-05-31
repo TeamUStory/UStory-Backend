@@ -60,6 +60,13 @@ public class UserController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
+    @Operation(summary = "User MyPage API", description = "마이페이지에 필요한 정보를 조회한다.")
+    @GetMapping(value = "/my-page")
+    public ResponseEntity<MyPageResponse> showMyPage(@Valid @RequestParam("userId") Long userId) {
+        MyPageResponse myPageResponse = userService.showMyPage(userId);
+        return ResponseEntity.ok(myPageResponse);
+    }
+
 //    @GetMapping("/get-member")
 //    public Long getCurrentMember(Authentication authentication){
 //        log.info("authentication.getName() : {}", authentication.getName());
