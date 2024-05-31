@@ -18,22 +18,22 @@ import java.util.Map;
 public class kakaoController {
     private final KakaoOauth kakaoOauth;
 
-    @GetMapping("/login")
-    public String showLogInForm(Model model) {
-        model.addAttribute("kakaoApiKey", kakaoOauth.getKakaoApiKey());
-        model.addAttribute("redirectUri", kakaoOauth.getKakaoLoginRedirectUri());
-        return "login/login";
-    }
-
-    @RequestMapping("/login/oauth2/code/kakao")
-    public void kakaoLogin(@RequestParam String code, HttpServletResponse response) {
-        String accessToken = kakaoOauth.getKakaoAccessToken(code, response);
-        Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(accessToken);
-
-        String id = (String) userInfo.get("id");
-        String nickname = (String) userInfo.get("nickname");
-
-        log.info("[kakaoLogin] 카카오 닉네임: {}", nickname);
-        log.info("[kakaoLogin] 카카오 로그인 액세스 토큰: {}", accessToken);
-    }
+//    @GetMapping("/login")
+//    public String showLogInForm(Model model) {
+//        model.addAttribute("kakaoApiKey", kakaoOauth.getKakaoApiKey());
+//        model.addAttribute("redirectUri", kakaoOauth.getKakaoLoginRedirectUri());
+//        return "login/login";
+//    }
+//
+//    @RequestMapping("/login/oauth2/code/kakao")
+//    public void kakaoLogin(@RequestParam String code, HttpServletResponse response) {
+//        String accessToken = kakaoOauth.getKakaoAccessToken(code, response);
+//        Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(accessToken);
+//
+//        String id = (String) userInfo.get("id");
+//        String nickname = (String) userInfo.get("nickname");
+//
+//        log.info("[kakaoLogin] 카카오 닉네임: {}", nickname);
+//        log.info("[kakaoLogin] 카카오 로그인 액세스 토큰: {}", accessToken);
+//    }
 }

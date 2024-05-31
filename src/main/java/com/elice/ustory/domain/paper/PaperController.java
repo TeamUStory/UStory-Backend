@@ -108,25 +108,25 @@ public class PaperController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Read Papers By Diary API", description = "다이어리에 포함된 페이퍼 리스트를 불러온다.")
-    @GetMapping(value = "/papers/diary", params = "diaryId")
-    public ResponseEntity<List<PaperListResponse>> getAllPagesByDiary(@RequestParam(name = "diaryId") Long diaryId,
-                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                      @RequestParam(name = "size", defaultValue = "20") int size,
-                                                                      @RequestParam(name = "startDate", required = false) String startDate,
-                                                                      @RequestParam(name = "endDate", required = false) String endDate) {
-
-        // diary 검증
-        // diary 연관된 모든 paper 불러오기
-
-        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size);
-
-        List<PaperListResponse> result = papers.stream()
-                .map(PaperListResponse::new)
-                .toList();
-
-        return ResponseEntity.ok(result);
-    }
+//    @Operation(summary = "Read Papers By Diary API", description = "다이어리에 포함된 페이퍼 리스트를 불러온다.")
+//    @GetMapping(value = "/papers/diary", params = "diaryId")
+//    public ResponseEntity<List<PaperListResponse>> getAllPagesByDiary(@RequestParam(name = "diaryId") Long diaryId,
+//                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
+//                                                                      @RequestParam(name = "size", defaultValue = "20") int size,
+//                                                                      @RequestParam(name = "startDate", required = false) String startDate,
+//                                                                      @RequestParam(name = "endDate", required = false) String endDate) {
+//
+//        // diary 검증
+//        // diary 연관된 모든 paper 불러오기
+//
+//        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size);
+//
+//        List<PaperListResponse> result = papers.stream()
+//                .map(PaperListResponse::new)
+//                .toList();
+//
+//        return ResponseEntity.ok(result);
+//    }
 
     @Operation(summary = "Read Papers for Map API", description = "유저와 관련된 모든 리스트를 불러온다.")
     @GetMapping(value = "/papers/map", params = "userId")
