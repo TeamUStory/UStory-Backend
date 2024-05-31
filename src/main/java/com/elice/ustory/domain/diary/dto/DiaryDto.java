@@ -4,13 +4,14 @@ import com.elice.ustory.domain.diary.entity.Color;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.user.entity.Users;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DiaryDto {
     private String name;
 
