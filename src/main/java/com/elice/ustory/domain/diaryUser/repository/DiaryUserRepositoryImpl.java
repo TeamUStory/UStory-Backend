@@ -1,7 +1,11 @@
 package com.elice.ustory.domain.diaryUser.repository;
 
+import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.dto.DiaryListResponse;
+import com.elice.ustory.domain.diary.entity.DiaryCategory;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -10,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.elice.ustory.domain.diaryUser.entity.QDiaryUser.diaryUser;
 
@@ -21,11 +26,12 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
     }
 
     @Override
-    public Page<DiaryListResponse> searchDiary(Long userId, Pageable pageable) {
-        List<DiaryListResponse> result = queryFactory
+    public Page<DiaryList> searchDiary(Long userId, Pageable pageable, DiaryCategory diaryCategory) {
+
+        List<DiaryList> result = queryFactory
                 .select(
                         Projections.constructor(
-                                DiaryListResponse.class,
+                                DiaryList.class,
                                 diaryUser.id.diary.id,
                                 diaryUser.id.diary.name,
                                 diaryUser.id.diary.imgUrl,
@@ -33,7 +39,8 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
                         )
                 )
                 .from(diaryUser)
-                .where(diaryUser.id.users.id.eq(userId))
+                .where(diaryUser.id.users.id.eq(userId).and(categoryEq(diaryCategory)))
+                .orderBy(diaryUser.id.diary.updatedAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -47,10 +54,10 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
     }
 
     @Override
-    public List<DiaryListResponse> searchListDiary(Long userId) {
-        return queryFactory
+    public List<DiaryList> searchDiaryList(Long userId) {
+        List<DiaryList> result = queryFactory
                 .select(
-                        Projections.constructor(DiaryListResponse.class,
+                        Projections.constructor(DiaryList.class,
                                 diaryUser.id.diary.id,
                                 diaryUser.id.diary.name,
                                 diaryUser.id.diary.imgUrl,
@@ -62,6 +69,8 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
                 .orderBy(diaryUser.id.diary.updatedAt.desc())
                 .limit(6)
                 .fetch();
+
+        return result;
     }
 
     @Override
@@ -84,6 +93,10 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
                         diaryUser.id.diary.id.eq(diaryId)
                 )
                 .fetch();
+    }
+
+    private BooleanExpression categoryEq(DiaryCategory diaryCategory) {
+        return diaryCategory != null ? diaryUser.id.diary.diaryCategory.eq(diaryCategory) : null;
     }
 
 }
