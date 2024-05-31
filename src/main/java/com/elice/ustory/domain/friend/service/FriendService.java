@@ -68,7 +68,7 @@ public class FriendService {
                 .map(u -> UserListDTO.builder()
                         .name(u.getName())
                         .nickname(u.getNickname())
-                        .profileImg(u.getProfileImgUrl())
+                        .profileImgUrl(u.getProfileImgUrl())
                         .build());
     }
 
