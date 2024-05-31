@@ -1,9 +1,6 @@
 package com.elice.ustory.domain.comment.controller;
 
-import com.elice.ustory.domain.comment.dto.AddCommentResponse;
-import com.elice.ustory.domain.comment.dto.AddCommentRequest;
-import com.elice.ustory.domain.comment.dto.UpdateCommentRequest;
-import com.elice.ustory.domain.comment.dto.UpdateCommentResponse;
+import com.elice.ustory.domain.comment.dto.*;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,16 +25,20 @@ public class CommentController {
 
     @Operation(summary = "Get Comment API", description = "댓글 ID를 통해 불러옴.")
     @GetMapping("/paper/{paperId}/comment/{id}")  // 시험용이라 uri 더러운건 무시하셔도 됩니다.
-    public ResponseEntity<Comment> getComment(@PathVariable Long paperId, @PathVariable Long id) {
+    public ResponseEntity<CommentResponse> getComment(@PathVariable Long paperId, @PathVariable Long id) {
         Optional<Comment> comment = commentService.getComment(paperId, id);
-        return comment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        CommentResponse commentResponse = new CommentResponse(comment.orElseGet(Comment::new));
+        return ResponseEntity.ok().body(commentResponse);
     }
 
     @Operation(summary = "Get Comments API", description = "모든 댓글들을 불러옴")
     @GetMapping("/paper/{paperId}")   // 시험용이라 uri 더러운건 무시하셔도 됩니다.
-    public ResponseEntity<List<Comment>> getComments(@PathVariable Long paperId) {
+    public ResponseEntity<List<CommentListResponse>> getComments(@PathVariable Long paperId) {
         List<Comment> comments = commentService.getComments(paperId);
-        return ResponseEntity.ok().body(comments);
+        List<CommentListResponse> commentListResponses = comments.stream()
+                .map(CommentListResponse::new)
+                .toList();
+        return ResponseEntity.ok().body(commentListResponses);
     }
 
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
