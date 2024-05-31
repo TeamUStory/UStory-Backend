@@ -74,7 +74,7 @@ public class DiaryController {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        DiaryResponse diary = diaryService.getDiaryById(diaryId);
+        DiaryResponse diary = diaryService.getDiaryDetailById(diaryId);
         if (diary == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
