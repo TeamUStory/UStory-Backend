@@ -17,45 +17,37 @@ import java.util.List;
 @Getter
 public class UpdatePaperRequest {
 
-    @Schema(name = "타이틀")
+    @Schema(description = "타이틀", example = "우규")
     private String title;
 
-    @Schema(name = "썸네일 URL")
-    private String thumbnailImage;
+    @Schema(description = "썸네일 URL", example = "https://~~~~~")
+    private String thumbnailImageUrl;
 
-    @Schema(name = "이미지 URL")
-    private List<String> images;
+    @Schema(description = "이미지 URL 리스트", example = "[\"https://~\", \"https://~\"]")
+    private List<String> imageUrls;
 
-    @Schema(name = "방문 날짜")
+    @Schema(description = "방문 날짜", example = "2024-05-24")
     private LocalDate visitedAt;
 
+    @Schema(description = "사용자 Id, 토큰 사용할 때 사라질 예정", example = "12345678")
+    private Long userId;
 
-    @Schema(name = "다이어리 Id")
-    private Long diaryId;
-
-    @Schema(name = "사용자 Id", description = "우선 사용자 Id를 기입했지만, 토큰 사용할 때 사라질 예정")
-    private Long memberId;
-
-
-    @Schema(name = "도로 주소")
+    @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
     private String city;
 
-    @Schema(name = "상세 주소")
-    private String detail;
-
-    @Schema(name = "상호명")
+    @Schema(description = "상호명", example = "우규")
     private String store;
 
-    @Schema(name = "X좌표")
-    private float coordinateX;
+    @Schema(description = "X좌표", example = "37.5494")
+    private double coordinateX;
 
-    @Schema(name = "Y좌표")
-    private float coordinateY;
+    @Schema(description = "Y좌표", example = "126.9169")
+    private double coordinateY;
 
     public Paper toPageEntity() {
         return Paper.createBuilder()
                 .title(this.title)
-                .thumbnailImage(this.thumbnailImage)
+                .thumbnailImageUrl(this.thumbnailImageUrl)
                 .visitedAt(this.visitedAt)
                 .build();
     }
@@ -63,7 +55,6 @@ public class UpdatePaperRequest {
     public Address toAddressEntity() {
         return Address.createBuilder()
                 .city(this.city)
-                .detail(this.detail)
                 .store(this.store)
                 .coordinateX(this.coordinateX)
                 .coordinateY(this.coordinateY)
@@ -74,8 +65,9 @@ public class UpdatePaperRequest {
 
         List<Image> images = new ArrayList<>();
 
-        for (String imageUrl : this.images) {
-            images.add(new Image(imageUrl));
+        int count = 1;
+        for (String imageUrl : this.imageUrls) {
+            images.add(new Image(imageUrl, count++));
         }
 
         return images;

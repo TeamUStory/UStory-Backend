@@ -4,14 +4,19 @@ import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.dto.UserListDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
+import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,9 +32,12 @@ public class FriendController {
     private FriendService friendService;
     private NoticeService noticeService;
 
-    public FriendController(FriendService friendService, NoticeService noticeService) {
+    private UserRepository userRepository;
+
+    public FriendController(FriendService friendService, NoticeService noticeService, UserRepository userRepository) {
         this.friendService = friendService;
         this.noticeService = noticeService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -46,19 +54,20 @@ public class FriendController {
         return ResponseEntity.ok(friends);
     }
 
+
     /**
      * 닉네임으로 전체 사용자를 검색합니다.
      *
      * @param nickname 검색할 닉네임
      * @return 검색된 사용자 목록
      */
-    @Operation(summary = "Get / Search Users by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
-    @GetMapping("/search-users")
-    public ResponseEntity<List<UserListDTO>> findAllUsersByNickname(@RequestParam String nickname) {
-        List<UserListDTO> users = friendService.findAllUsersByNickname(nickname);
-        return ResponseEntity.ok(users);
+    @Operation(summary = "Get / Search User by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
+    @GetMapping("/search")
+    public ResponseEntity<UserListDTO> searchUserByNickname(@RequestParam String nickname) {
+        UserListDTO user = friendService.findUserByNickname(nickname)
+                .orElseThrow(() -> new NotFoundException("닉네임이 있는 사용자를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
+        return ResponseEntity.ok(user);
     }
-
 
 
     /**
@@ -71,22 +80,36 @@ public class FriendController {
     @PostMapping("/request")
     public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
         friendService.sendFriendRequest(friendRequestDTO);
-        return ResponseEntity.ok("Friend request sent successfully.");
+        return ResponseEntity.ok("친구 요청이 성공적으로 전송되었습니다.");
     }
 
 
     /**
-     * 친구 요청에 응답합니다.(친구 요청에 대한 응답 처리)
+     * 특정 사용자가 받은 친구 요청 목록을 조회합니다.
      *
-     * @param noticeId 알람 ID
+     * @param userId 사용자의 ID
+     * @return 친구 요청 목록
+     */
+    @Operation(summary = "Get / Friend Requests", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
+    @GetMapping("/requests/{userId}")
+    public ResponseEntity<List<FriendRequestDTO>> getFriendRequests(@PathVariable Long userId) {
+        List<FriendRequestDTO> friendRequests = friendService.getFriendRequests(userId);
+        return ResponseEntity.ok(friendRequests);
+    }
+
+    /**
+     * 친구 요청에 응답합니다.
+     *
+     * @param senderNickname 친구 요청을 보낸 사용자의 닉네임
+     * @param receiverNickname 친구 요청을 받은 사용자의 닉네임
      * @param accepted true이면 요청 수락, false이면 요청 거절
-     * @return 요청 성공 여부
+     * @return 응답 메시지
      */
     @Operation(summary = "Post / Friend Request Response", description = "친구 요청에 응답합니다.")
     @PostMapping("/respond")
-    public ResponseEntity<String> respondToFriendRequest(@RequestParam Long noticeId, @RequestParam boolean accepted) {
-        friendService.respondToFriendRequest(noticeId, accepted);
-        return ResponseEntity.ok("Friend request " + (accepted ? "accepted" : "rejected") + " successfully.");
+    public ResponseEntity<String> respondToFriendRequest(@RequestParam String senderNickname, @RequestParam String receiverNickname, @RequestParam boolean accepted) {
+        friendService.respondToFriendRequest(senderNickname, receiverNickname, accepted);
+        return ResponseEntity.ok("친구요청 " + (accepted ? "수락" : "거절") + "이 되었습니다.");
     }
 
 

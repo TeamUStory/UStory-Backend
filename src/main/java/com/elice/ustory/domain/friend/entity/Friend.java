@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="friend")
 public class Friend {

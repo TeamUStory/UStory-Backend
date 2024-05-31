@@ -1,6 +1,5 @@
 package com.elice.ustory.global.filter;
 
-import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,11 +20,9 @@ import java.util.Optional;
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
 
-    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider, UserService userService){
+    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider){
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
     }
 
     @Override
@@ -50,11 +47,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        String refreshToken = getTokenFromRequest(request, "Refresh");
+        String refreshToken = getTokenFromRequest(request, "Refresh"); // TODO: Redis RefreshToken에 맞게 수정 1
         if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
             log.info("[refreshToken] RefreshToken으로 AccessToken 재발급 시작");
-            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken),
-                    userService.readByNickname(jwtTokenProvider.getUserPk(refreshToken)).getLoginType());
+            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken));
             Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             Cookie cookie = new Cookie("Authorization", accessToken);
@@ -65,7 +61,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
         }
-    }
+    } // TODO: Redis RefreshToken에 맞게 수정 2
 
     private String getTokenFromRequest(HttpServletRequest request, String tokenName) throws UnsupportedEncodingException {
         if (request.getCookies() != null) {

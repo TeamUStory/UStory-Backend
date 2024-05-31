@@ -10,12 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class UserFriendDTO {
-    private final Long userId;
-    private final Long friendId;
-    private final String email;
     private final String name;
     private final String nickname;
     private final String profileImg;
-    private final LocalDateTime invitedAt;
-    private final LocalDateTime acceptedAt;
 }
