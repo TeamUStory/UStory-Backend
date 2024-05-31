@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.friend.service;
 
+import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.dto.UserListDTO;
@@ -67,7 +68,7 @@ public class FriendService {
                 .map(u -> UserListDTO.builder()
                         .name(u.getName())
                         .nickname(u.getNickname())
-                        .profileImg(u.getProfileImg())
+                        .profileImg(u.getProfileImgUrl())
                         .build());
     }
 

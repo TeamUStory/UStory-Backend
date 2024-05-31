@@ -44,7 +44,7 @@ public class UserService {
                 .name(name)
                 .nickname(nickname)
                 .password(password)
-                .profileImg(profileImg)
+                .profileImgUrl(profileImg)
                 .build();
 
         Users newUser = userRepository.save(builtUser);
@@ -81,7 +81,7 @@ public class UserService {
             user.setPassword(password);
         }
         if(profileImg != null) {
-            user.setProfileImg(profileImg);
+            user.setProfileImgUrl(profileImg);
         }
 
         Users updatedUser = userRepository.save(user);
