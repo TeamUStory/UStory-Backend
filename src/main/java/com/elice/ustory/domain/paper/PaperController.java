@@ -128,18 +128,6 @@ public class PaperController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Read Papers By Bookmark API", description = "유저가 북마크한 페이퍼 리스트를 불러온다.")
-    @GetMapping(value = "/papers/bookmark", params = "userId")
-    public ResponseEntity<?> getAllPapersByBookmark(@RequestParam(name = "userId") Long userId,
-                                                    @RequestParam(name = "page", defaultValue = "1") int page,
-                                                    @RequestParam(name = "size", defaultValue = "20") int size) {
-
-        // user 검증
-        // user 연관된 모든 paper 불러오기
-
-        return ResponseEntity.ok(new Object());
-    }
-
     @Operation(summary = "Read Papers for Map API", description = "유저와 관련된 모든 리스트를 불러온다.")
     @GetMapping(value = "/papers/map", params = "userId")
     public ResponseEntity<List<PaperMapListResponse>> getAllPapersForMap(@RequestParam(name = "userId") Long userId) {
