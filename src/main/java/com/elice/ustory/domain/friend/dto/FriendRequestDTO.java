@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 public class FriendRequestDTO {
     private LocalDateTime invitedAt;
     private String name;
-    private String profileImg;
+    private String profileImgUrl;
     private String senderNickname;
     private String receiverNickname;
 
-    public FriendRequestDTO(LocalDateTime invitedAt, String name, String profileImg, String senderNickname, String receiverNickname) {
+    public FriendRequestDTO(LocalDateTime invitedAt, String name, String profileImgUrl, String senderNickname, String receiverNickname) {
         this.invitedAt = invitedAt;
         this.name = name;
-        this.profileImg = profileImg;
+        this.profileImgUrl = profileImgUrl;
         this.senderNickname = senderNickname;
         this.receiverNickname = receiverNickname;
     }
