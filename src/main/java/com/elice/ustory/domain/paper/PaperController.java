@@ -50,7 +50,7 @@ public class PaperController {
     @PostMapping("/paper")
     public ResponseEntity<AddPaperResponse> create(@RequestBody AddPaperRequest addPaperRequest) {
 
-        Users user = userService.findById(addPaperRequest.getUserId()).orElseThrow();
+        Users user = userService.findById(addPaperRequest.getUserId());
 
         Diary diary = diaryService.getDiaryById(addPaperRequest.getDiaryId());
 

@@ -25,8 +25,8 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 //    private final RefreshTokenRepository refreshTokenRepository;
 
-    public Optional<Users> findById(Long userId){
-        return userRepository.findById(userId);
+    public Users findById(Long userId){
+        return userRepository.findById(userId).orElseThrow();
     }
 
     public Users signUp(SignUpRequest signUpRequest) {
@@ -37,6 +37,7 @@ public class UserService {
         String nickname = signUpRequest.getNickname();
         String password = signUpRequest.getPassword();
         String profileImg = signUpRequest.getProfileImgUrl();
+        String profileDescription = signUpRequest.getProfileDescription();
 
         Users builtUser = Users.addUserBuilder()
                 .email(email)
@@ -45,18 +46,11 @@ public class UserService {
                 .nickname(nickname)
                 .password(password)
                 .profileImgUrl(profileImg)
+                .profileDescription(profileDescription)
                 .build();
 
         Users newUser = userRepository.save(builtUser);
         return newUser;
-    }
-
-    public Users readByNickname(String nickname) {
-
-        //TODO: Optional 예외처리
-        Users foundUser = userRepository.findByNickname(nickname).orElseThrow(() -> new IllegalArgumentException("no such data"));
-
-        return foundUser;
     }
 
     public Users updateUser(UpdateRequest updateRequest) {
@@ -70,6 +64,7 @@ public class UserService {
         String nickname = updateRequest.getNickname();
         String password = updateRequest.getPassword();
         String profileImg = updateRequest.getProfileImgUrl();
+        String profileDescription = updateRequest.getProfileDescription();
 
         if(name != null) {
             user.setName(name);
@@ -82,6 +77,9 @@ public class UserService {
         }
         if(profileImg != null) {
             user.setProfileImgUrl(profileImg);
+        }
+        if(profileDescription != null) {
+            user.setProfileDescription(profileDescription);
         }
 
         Users updatedUser = userRepository.save(user);
@@ -139,5 +137,23 @@ public class UserService {
 //                .orElseThrow();
 //        log.info("redis안의 토큰: {}", foundTokenInfo.getRefreshToken());
         return loginResponse;
+    }
+
+    public MyPageResponse showMyPage(Long userId) {
+        Users currentUser = userRepository.findById(userId)
+                .orElseThrow();
+        String nickname = currentUser.getNickname();
+        String name = currentUser.getName();
+        String profileDescription = currentUser.getProfileDescription();
+        String profileImgUrl = currentUser.getProfileImgUrl();
+
+        MyPageResponse myPageResponse = MyPageResponse.builder()
+                .nickname(nickname)
+                .name(name)
+                .profileDescription(profileDescription)
+                .profileImgUrl(profileImgUrl)
+                .build();
+
+        return myPageResponse;
     }
 }
