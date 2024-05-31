@@ -42,7 +42,7 @@ public class CommentService {
         Comment comment = Comment.addCommentBuilder()
                 .content(addCommentRequest.getContent())
                 .paper(paperService.getPaperById(paperId))
-                .user(userService.findById(userId).orElseThrow())
+                .user(userService.findById(userId))
                 .build();
         return commentRepository.save(comment);
     }

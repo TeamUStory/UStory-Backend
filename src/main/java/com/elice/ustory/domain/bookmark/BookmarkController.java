@@ -36,7 +36,7 @@ public class BookmarkController {
     public ResponseEntity<Void> saveBookmark(@RequestParam Long userId,
                                              @RequestParam Long paperId) {
 
-        Users user = userService.findById(userId).orElseThrow();
+        Users user = userService.findById(userId);
         Paper paper = paperService.getPaperById(paperId);
         bookmarkService.saveBookmark(user, paper);
 
