@@ -160,4 +160,11 @@ public class PaperController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @Operation(summary = "Count Write Paper By Specific User API", description = "특정 유저가 작성한 모든 페이퍼의 갯수를 불러온다.")
+    @GetMapping("/paper/count/{userId}")
+    public ResponseEntity<Integer> countPaper(@PathVariable(name = "userId") Long userId) {
+        Integer count = paperService.countPapersByWriterId(userId);
+        return ResponseEntity.ok(count);
+    }
 }

@@ -7,6 +7,8 @@ import com.elice.ustory.domain.paper.entity.Address;
 import com.elice.ustory.domain.paper.entity.Image;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
+import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class PaperService {
 
     private final PaperRepository paperRepository;
+    private final UserService userService;
     private final NoticeService noticeService;
 
     @Transactional
@@ -102,6 +106,12 @@ public class PaperService {
 //                noticeService.sendNotice(paperNoticeRequest);
 //            }
 //        }
+    }
+
+    // TODO : writer 아이디가 안들어가 있음 (현재 페이퍼 생성중에)
+    public Integer countPapersByWriterId(Long userId) {
+        List<Paper> findByWriterId = paperRepository.findByWriterId(userId);
+        return findByWriterId.size();
     }
 
     // 준용아 DB에 저장 되고 호출해줘야한다?
