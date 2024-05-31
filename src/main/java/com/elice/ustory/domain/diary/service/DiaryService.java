@@ -43,9 +43,13 @@ public class DiaryService {
         return DiaryResponse.toDiaryResponse(savedDiary);
     }
 
-    public DiaryResponse getDiaryById(Long id) {
+    public DiaryResponse getDiaryDetailById(Long id) {
         Diary diary = diaryRepository.findById(id).orElse(null);
         return diary != null ? DiaryResponse.toDiaryResponse(diary) : null;
+    }
+
+    public Diary getDiaryById(Long id) {
+        return diaryRepository.findById(id).orElse(null);
     }
 
     @Transactional
