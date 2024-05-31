@@ -67,6 +67,12 @@ public class UserController {
         return ResponseEntity.ok(myPageResponse);
     }
 
+    @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
+    @PostMapping(value = "/validate-nickname")
+    public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
+        ValidateNicknameResponse validateNicknameResponse = userService.isValid(validateNicknameRequest);
+        return ResponseEntity.ok(validateNicknameResponse);
+    }
 //    @GetMapping("/get-member")
 //    public Long getCurrentMember(Authentication authentication){
 //        log.info("authentication.getName() : {}", authentication.getName());

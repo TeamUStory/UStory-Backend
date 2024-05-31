@@ -156,4 +156,23 @@ public class UserService {
 
         return myPageResponse;
     }
+
+    public ValidateNicknameResponse isValid(ValidateNicknameRequest validateNicknameRequest) {
+        String nickname = validateNicknameRequest.getNickname();
+
+        // 중복 여부 확인(false면 합격)
+        Boolean isDuplicate = userRepository.findByNickname(nickname).isPresent();
+
+        // 조건 불일치 여부 확인(false면 합격)
+        String regex = "[a-zA-Z가-힣]{2,10}";
+        Boolean isInappropriate = !nickname.matches(regex);
+
+        // 최종, 닉네임 유효 여부 반환
+        ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
+                .isDuplicate(isDuplicate)
+                .isInappropriate(isInappropriate)
+                .build();
+
+        return validateNicknameResponse;
+    }
 }
