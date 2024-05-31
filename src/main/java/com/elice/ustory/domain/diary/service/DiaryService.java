@@ -2,6 +2,7 @@ package com.elice.ustory.domain.diary.service;
 
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.dto.DiaryListResponse;
+import com.elice.ustory.domain.diary.dto.DiaryResponse;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
@@ -29,7 +30,7 @@ public class DiaryService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Diary createDiary(Diary diary, List<String> users) {
+    public DiaryResponse createDiary(Diary diary, List<String> users) {
         Diary savedDiary = diaryRepository.save(diary);
         for (String nickname : users) {
             Users user = userRepository.findByNickname(nickname).orElse(null);
@@ -39,15 +40,16 @@ public class DiaryService {
             diaryUserRepository.save(new DiaryUser(diaryUserId));
         }
 
-        return savedDiary;
+        return DiaryResponse.toDiaryResponse(savedDiary);
     }
 
-    public Diary getDiaryById(Long id) {
-        return id != null ? diaryRepository.findById(id).orElse(null) : null;
+    public DiaryResponse getDiaryById(Long id) {
+        Diary diary = diaryRepository.findById(id).orElse(null);
+        return diary != null ? DiaryResponse.toDiaryResponse(diary) : null;
     }
 
     @Transactional
-    public Diary updateDiary(Long id, Diary diary, List<String> users) {
+    public DiaryResponse updateDiary(Long id, Diary diary, List<String> users) {
         Diary updatedDiary = diaryRepository.findById(id).orElse(null);
         if (updatedDiary == null) return null;
         updatedDiary.updateDiary(diary);
@@ -67,7 +69,7 @@ public class DiaryService {
                 diaryUserRepository.save(new DiaryUser(diaryUserId));
             }
         }
-        return updatedDiary;
+        return DiaryResponse.toDiaryResponse(updatedDiary);
     }
 
     public Page<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory) {
@@ -80,17 +82,17 @@ public class DiaryService {
                 .map(DiaryList::toDiaryListResponse)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(result,diaryList.getPageable(),diaryList.getTotalElements());
+        return new PageImpl<>(result, diaryList.getPageable(), diaryList.getTotalElements());
     }
 
-    public List<DiaryListResponse> getUserDiaryList(Long userId){
+    public List<DiaryListResponse> getUserDiaryList(Long userId) {
         List<DiaryList> result = diaryUserRepository.searchDiaryList(userId);
         return result.stream()
                 .map(DiaryList::toDiaryListResponse)
                 .collect(Collectors.toList());
     }
 
-    public Long getDiaryCount(Long userId){
+    public Long getDiaryCount(Long userId) {
         return diaryUserRepository.countDiaryByUser(userId);
     }
 
