@@ -85,6 +85,17 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
     }
 
     @Override
+    public Long countDiaryByUser(Long userId) {
+        return queryFactory
+                .select(diaryUser.count())
+                .from(diaryUser)
+                .where(
+                        diaryUser.id.users.id.eq(userId)
+                )
+                .fetchOne();
+    }
+
+    @Override
     public List<String> findUserByDiary(Long diaryId) {
         return queryFactory
                 .select(diaryUser.id.users.name)

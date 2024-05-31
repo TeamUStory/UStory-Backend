@@ -2,7 +2,7 @@ package com.elice.ustory.domain.diary.controller;
 
 import com.elice.ustory.domain.diary.dto.DiaryDto;
 import com.elice.ustory.domain.diary.dto.DiaryListResponse;
-import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.diary.dto.DiaryResponse;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +26,8 @@ public class DiaryController {
 
     @Operation(summary = "Create Diary API", description = "다이어리 생성 및 링크 테이블에 등록")
     @PostMapping("/diary")
-    public ResponseEntity<Diary> createDiary(@RequestBody DiaryDto diaryDto) {
-        Diary diary = diaryService.createDiary(diaryDto.toDiary(), diaryDto.getUsers());
+    public ResponseEntity<DiaryResponse> createDiary(@RequestBody DiaryDto diaryDto) {
+        DiaryResponse diary = diaryService.createDiary(diaryDto.toDiary(), diaryDto.getUsers());
         if (diary == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -50,36 +50,43 @@ public class DiaryController {
     }
 
     @Operation(summary = "Get DiaryList limit 6", description = "홈 페이지 용 최신 다이어리 6개 불러오기")
-    @GetMapping("/home/diary")
-    public ResponseEntity<List<DiaryListResponse>> getDiaryList(@RequestParam("userId") Long userId){
+    @GetMapping("/diary/home")
+    public ResponseEntity<List<DiaryListResponse>> getDiaryList(@RequestParam("userId") Long userId) {
         List<DiaryListResponse> result = diaryService.getUserDiaryList(userId);
         return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
     @PutMapping("/diary/{diaryId}")
-    public ResponseEntity<Diary> updateDiary(@PathVariable("diaryId") Long diaryId, @RequestBody DiaryDto diaryDto) {
+    public ResponseEntity<DiaryResponse> updateDiary(@PathVariable("diaryId") Long diaryId, @RequestBody DiaryDto diaryDto) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Diary diary = diaryService.updateDiary(diaryId, diaryDto.toDiary(), diaryDto.getUsers());
+        DiaryResponse diaryResponse = diaryService.updateDiary(diaryId, diaryDto.toDiary(), diaryDto.getUsers());
         // TODO : 인원 수 변동 확인
 
-        return ResponseEntity.ok(diary);
+        return ResponseEntity.ok(diaryResponse);
     }
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
     @GetMapping("/diary/{diaryId}")
-    public ResponseEntity<Diary> getDiaryByID(@PathVariable("diaryId") Long diaryId) {
+    public ResponseEntity<DiaryResponse> getDiaryByID(@PathVariable("diaryId") Long diaryId) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Diary diary = diaryService.getDiaryById(diaryId);
+        DiaryResponse diary = diaryService.getDiaryById(diaryId);
         if (diary == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         return ResponseEntity.ok(diary);
+    }
+
+    @Operation(summary = "Get Diary Count", description = "유저가 속한 다이어리 개수 불러오기")
+    @GetMapping("/diary/{userId}/count")
+    public ResponseEntity<Long> getDiaryCount(@PathVariable("userId") Long userId) {
+        Long count = diaryService.getDiaryCount(userId);
+        return ResponseEntity.ok(count);
     }
 
     @Operation(summary = "Delete Diary", description = "다이어리 삭제")
@@ -90,5 +97,5 @@ public class DiaryController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO : 다이어리 나가기, 초대하기
+    // TODO : 다이어리 나가기
 }
