@@ -25,8 +25,8 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 //    private final RefreshTokenRepository refreshTokenRepository;
 
-    public Optional<Users> findById(Long userId){
-        return userRepository.findById(userId);
+    public Users findById(Long userId){
+        return userRepository.findById(userId).orElseThrow();
     }
 
     public Users signUp(SignUpRequest signUpRequest) {
