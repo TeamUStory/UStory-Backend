@@ -49,7 +49,7 @@ public class PaperService {
      */
     public List<Paper> getPapersByDiaryId(Long diaryId, int page, int size) {
         // TODO : 여기 deleted 체크 하고 싶은데, 그러면 리스트 for each 문이나 이터레이터로 돌면서 체크해야 하나요?
-        return paperRepository.findByDiaryId(diaryId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "modifiedAt")));
+        return paperRepository.findByDiaryId(diaryId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
     }
 
     /**
@@ -57,13 +57,16 @@ public class PaperService {
      */
     public List<Paper> getPapersByWriterId(Long writerId, int page, int size) {
         checkPaperAndDeleted(writerId);
-        return paperRepository.findByWriterId(writerId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "modifiedAt")));
+        return paperRepository.findByWriterId(writerId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
     }
 
     /**
-     * 북마크로 체크한 Papers 페이지네이션
+     * 사용자가 속해있는 다이어리의 모든 Paper 불러오기
      */
-    // TODO: 작성해야함...
+    public List<Paper> getPapersByUserId(Long userId) {
+        return paperRepository.findAllPapersByUserId(userId);
+    }
+
     @Transactional
     public Paper updatePaper(Long savedPaperId, Paper paper, List<Image> images, Address address) {
 
