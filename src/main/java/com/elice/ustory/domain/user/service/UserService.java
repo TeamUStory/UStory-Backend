@@ -36,7 +36,7 @@ public class UserService {
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
         String password = signUpRequest.getPassword();
-        String profileImg = signUpRequest.getProfileImg();
+        String profileImg = signUpRequest.getProfileImgUrl();
 
         Users builtUser = Users.addUserBuilder()
                 .email(email)
@@ -69,7 +69,7 @@ public class UserService {
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
         String password = updateRequest.getPassword();
-        String profileImg = updateRequest.getProfileImg();
+        String profileImg = updateRequest.getProfileImgUrl();
 
         if(name != null) {
             user.setName(name);
