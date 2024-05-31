@@ -19,26 +19,29 @@ public class Users extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_type", columnDefinition = "varchar(255) default 'BASIC'")
+    @Column(name = "login_type", columnDefinition = "VARCHAR(255) DEFAULT 'BASIC'")
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
-    @Column(unique = true, name = "email", length = 20)
+    @Column(name = "email", columnDefinition = "VARCHAR(20) UNIQUE")
     private String email;
 
-    @Column(name = "name", length = 10)
+    @Column(name = "name", columnDefinition = "VARCHAR(10)")
     private String name;
 
-    @Column(unique = true, name = "nickname", length = 10)
+    @Column(unique = true, columnDefinition = "VARCHAR(10) UNIQUE")
     private String nickname;
 
-    @Column(name = "password", length = 100)
+    @Column(name = "password", columnDefinition = "VARCHAR(100)")
     private String password;
 
-    @Column(name = "profile_img_url", length = 255)
+    @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
     private String profileImgUrl;
 
-    @Column(name = "deleted_at")
+    @Column(name = "profileDescription", columnDefinition = "TEXT")
+    private String profileDescription;
+
+    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime deletedAt;
 
     public enum LoginType {
@@ -49,12 +52,13 @@ public class Users extends BaseEntity {
     }
 
     @Builder(builderMethodName = "addUserBuilder")
-    public Users(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl) {
+    public Users(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl, String profileDescription) {
         this.email = email;
         this.loginType = loginType;
         this.name = name;
         this.nickname = nickname;
         this.password = password;
         this.profileImgUrl = profileImgUrl;
+        this.profileDescription = profileDescription;
     }
 }

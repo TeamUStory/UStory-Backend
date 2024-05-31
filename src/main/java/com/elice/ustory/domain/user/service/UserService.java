@@ -37,6 +37,7 @@ public class UserService {
         String nickname = signUpRequest.getNickname();
         String password = signUpRequest.getPassword();
         String profileImg = signUpRequest.getProfileImgUrl();
+        String profileDescription = signUpRequest.getProfileDescription();
 
         Users builtUser = Users.addUserBuilder()
                 .email(email)
@@ -45,6 +46,7 @@ public class UserService {
                 .nickname(nickname)
                 .password(password)
                 .profileImgUrl(profileImg)
+                .profileDescription(profileDescription)
                 .build();
 
         Users newUser = userRepository.save(builtUser);
@@ -62,6 +64,7 @@ public class UserService {
         String nickname = updateRequest.getNickname();
         String password = updateRequest.getPassword();
         String profileImg = updateRequest.getProfileImgUrl();
+        String profileDescription = updateRequest.getProfileDescription();
 
         if(name != null) {
             user.setName(name);
@@ -74,6 +77,9 @@ public class UserService {
         }
         if(profileImg != null) {
             user.setProfileImgUrl(profileImg);
+        }
+        if(profileDescription != null) {
+            user.setProfileDescription(profileDescription);
         }
 
         Users updatedUser = userRepository.save(user);

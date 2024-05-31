@@ -13,4 +13,5 @@ public class SignUpRequest {
     private String nickname;
     private String password;
     private String profileImgUrl;
+    private String profileDescription;
 }
