@@ -34,13 +34,6 @@ public class UserController {
         return ResponseEntity.ok().body(newUser);
     }
 
-    @Operation(summary = "Read User API", description = "닉네임이 일치하는 유저를 조회한다.")
-    @GetMapping
-    public ResponseEntity<Users> readByNickname(@Parameter @Valid @RequestParam("nickname") String nickname) {
-        Users user = userService.readByNickname(nickname);
-        return ResponseEntity.ok().body(user);
-    }
-
     @Operation(summary = "Update User API", description = "로그인한 회원의 정보를 수정한다.")
     @PutMapping
     public ResponseEntity<Users> updateCurrentUser(@Valid @RequestBody UpdateRequest updateRequest) {

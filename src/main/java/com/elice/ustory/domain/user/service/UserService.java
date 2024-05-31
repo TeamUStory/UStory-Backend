@@ -51,14 +51,6 @@ public class UserService {
         return newUser;
     }
 
-    public Users readByNickname(String nickname) {
-
-        //TODO: Optional 예외처리
-        Users foundUser = userRepository.findByNickname(nickname).orElseThrow(() -> new IllegalArgumentException("no such data"));
-
-        return foundUser;
-    }
-
     public Users updateUser(UpdateRequest updateRequest) {
         //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
         //TODO: Optional 예외처리
