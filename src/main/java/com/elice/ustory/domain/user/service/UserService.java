@@ -4,8 +4,8 @@ import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
-import com.elice.ustory.global.redis.refresh.RefreshToken;
-import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
+//import com.elice.ustory.global.redis.refresh.RefreshToken;
+//import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+//    private final RefreshTokenRepository refreshTokenRepository;
 
     public Optional<Users> findById(Long userId){
         return userRepository.findById(userId);
@@ -44,7 +44,7 @@ public class UserService {
                 .name(name)
                 .nickname(nickname)
                 .password(password)
-                .profileImg(profileImg)
+                .profileImgUrl(profileImg)
                 .build();
 
         Users newUser = userRepository.save(builtUser);
@@ -60,7 +60,7 @@ public class UserService {
     }
 
     public Users updateUser(UpdateRequest updateRequest) {
-
+        //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
         //TODO: Optional 예외처리
         Users user = userRepository
                 .findById(updateRequest.getUserId())
@@ -81,7 +81,7 @@ public class UserService {
             user.setPassword(password);
         }
         if(profileImg != null) {
-            user.setProfileImg(profileImg);
+            user.setProfileImgUrl(profileImg);
         }
 
         Users updatedUser = userRepository.save(user);
@@ -133,7 +133,11 @@ public class UserService {
         cookie1.setMaxAge(60 * 60);
         response.addCookie(cookie1);
 
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(loginUser.getId()), refreshToken, accessToken));
+//        RefreshToken refreshToken1 = new RefreshToken(String.valueOf(loginUser.getId()), refreshToken, accessToken);
+//        refreshTokenRepository.save(refreshToken1);
+//        RefreshToken foundTokenInfo = refreshTokenRepository.findByAccessToken(accessToken)
+//                .orElseThrow();
+//        log.info("redis안의 토큰: {}", foundTokenInfo.getRefreshToken());
         return loginResponse;
     }
 }

@@ -35,7 +35,7 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
         return queryFactory.select(Projections.constructor(UserFriendDTO.class,
                         user.name,
                         user.nickname,
-                        user.profileImg
+                        user.profileImgUrl
                 ))
                 .from(friend)
                 .join(friend.friendUser, user)
@@ -53,7 +53,7 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
         return queryFactory.select(Projections.constructor(FriendRequestDTO.class,
                         friend.invitedAt,
                         sender.name,
-                        sender.profileImg,
+                        sender.profileImgUrl,
                         sender.nickname,
                         receiver.nickname
                 ))

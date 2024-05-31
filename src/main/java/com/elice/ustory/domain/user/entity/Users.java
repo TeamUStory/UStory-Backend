@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +35,8 @@ public class Users extends BaseEntity {
     @Column(name = "password", length = 100)
     private String password;
 
-    @Column(name = "profile_img", length = 255)
-    private String profileImg;
+    @Column(name = "profile_img_url", length = 255)
+    private String profileImgUrl;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -49,12 +49,12 @@ public class Users extends BaseEntity {
     }
 
     @Builder(builderMethodName = "addUserBuilder")
-    public Users(String email, LoginType loginType, String name, String nickname, String password, String profileImg) {
+    public Users(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl) {
         this.email = email;
         this.loginType = loginType;
         this.name = name;
         this.nickname = nickname;
         this.password = password;
-        this.profileImg = profileImg;
+        this.profileImgUrl = profileImgUrl;
     }
 }

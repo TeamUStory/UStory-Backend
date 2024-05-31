@@ -2,15 +2,16 @@ package com.elice.ustory.domain.diary.entity;
 
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "diary")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Diary extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,20 +20,43 @@ public class Diary extends BaseEntity {
     @Column(name = "name", columnDefinition = "varchar(10) not null")
     private String name;
 
-    @Column(name = "diary_img", columnDefinition = "varchar(255) not null")
-    private String diaryImg;
+    @Column(name = "img_url", columnDefinition = "varchar(255) not null")
+    private String imgUrl;
 
-    @Column(name = "diary_category", columnDefinition = "varchar(10) not null")
+    @Column(name = "diary_category", nullable = false)
     @Enumerated(EnumType.STRING)
     private DiaryCategory diaryCategory;
 
     @Column(name = "description", columnDefinition = "varchar(255)")
     private String description;
 
-    public Diary(String name, String diaryImg, DiaryCategory diaryCategory, String description) {
+    @Column(name = "color", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Color color;
+
+    public Diary(String name, String imgUrl, DiaryCategory diaryCategory, String description, Color color) {
         this.name = name;
-        this.diaryImg = diaryImg;
+        this.imgUrl = imgUrl;
         this.diaryCategory = diaryCategory;
         this.description = description;
+        this.color = color;
+    }
+
+    public void updateDiary(Diary diary) {
+        if (hasText(diary.getName())) {
+            this.name = diary.getName();
+        }
+        if (hasText(diary.getImgUrl())) {
+            this.imgUrl = diary.getImgUrl();
+        }
+        if (diary.diaryCategory != null) {
+            this.diaryCategory = diary.diaryCategory;
+        }
+        if (hasText(diary.getDescription())) {
+            this.description = diary.getDescription();
+        }
+        if (diary.getColor() != null) {
+            this.color = diary.getColor();
+        }
     }
 }

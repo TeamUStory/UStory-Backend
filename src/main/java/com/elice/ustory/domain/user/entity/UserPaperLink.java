@@ -3,11 +3,11 @@ package com.elice.ustory.domain.user.entity;
 import com.elice.ustory.global.entity.BaseEntity;
 import com.elice.ustory.domain.paper.entity.Paper;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_paper_link")
 public class UserPaperLink extends BaseEntity {
 
