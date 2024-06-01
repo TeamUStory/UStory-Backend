@@ -4,6 +4,7 @@ import com.elice.ustory.domain.friend.service.FriendService;
 import com.elice.ustory.domain.notice.dto.NoticeDTO;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
+import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.ErrorCode;
@@ -55,13 +56,14 @@ public class NoticeService {
      *
      * @param noticeDTO 알림 DTO
      */
+    @Transactional
     public void sendNotice(NoticeDTO noticeDTO) {
         String message = CommonUtils.generateMessage(noticeDTO);
         Long senderId = CommonUtils.extractSenderId(noticeDTO);
-//        Paper paper = NotificationUtils.extractPaper(noticeDTO, paperRepository);
+        Paper paper = CommonUtils.extractPaper(noticeDTO);
 
         Notice notice = CommonUtils.createNotice(noticeDTO, message, senderId);
-//        notice.setPaper(paper);
+        notice.setPaper(paper);
 
         // populateNotice 호출하여 필요한 값 설정
         noticeDTO.populateNotice(notice);
