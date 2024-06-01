@@ -1,7 +1,5 @@
 package com.elice.ustory.global.jwt;
 
-import com.elice.ustory.domain.user.entity.Users;
-import com.elice.ustory.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -10,9 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -24,11 +19,6 @@ import java.util.Date;
 public class JwtTokenProvider {
     private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
-    private final CustomUserDetailsService customUserDetailsService;
-
-    public JwtTokenProvider(CustomUserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
-    }
 
     @Value("${key.salt}")
     private String salt;
@@ -64,13 +54,6 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESHTOKEN_VALID_MILISECOND))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    public Authentication getAuthentication(String token) {
-        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getUserPk(token));
-        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}", userDetails.getUsername());
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String getUserPk(String token) {
