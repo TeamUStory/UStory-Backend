@@ -1,9 +1,7 @@
 package com.elice.ustory.domain.diaryUser.repository;
 
 import com.elice.ustory.domain.diary.dto.DiaryList;
-import com.elice.ustory.domain.diary.dto.DiaryListResponse;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
-import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -14,11 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.elice.ustory.domain.diaryUser.entity.QDiaryUser.diaryUser;
 
-public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
+public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
     private final JPAQueryFactory queryFactory;
 
     public DiaryUserRepositoryImpl(EntityManager em) {
