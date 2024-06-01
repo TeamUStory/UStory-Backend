@@ -98,7 +98,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserRepositoryCustom {
     @Override
     public List<String> findUserByDiary(Long diaryId) {
         return queryFactory
-                .select(diaryUser.id.users.name)
+                .select(diaryUser.id.users.nickname)
                 .from(diaryUser)
                 .where(
                         diaryUser.id.diary.id.eq(diaryId)

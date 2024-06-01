@@ -64,8 +64,9 @@ public class Paper extends BaseEntity {
     private LocalDateTime deletedAt;
 
     // TODO: 개발의 편의를 위해 Nullable 가능하도록 바꿈 추후 false 재설정 필요
-    @Column(nullable = true, length = 10)
-    private String locked;
+    @Column(name = "unlocked_at", nullable = true, length = 10)
+    @Setter
+    private LocalDateTime unLockedAt;
 
     // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
@@ -90,6 +91,16 @@ public class Paper extends BaseEntity {
         }
 
         deletedAt = LocalDateTime.now();
+        return true;
+    }
+
+    public boolean unLock() {
+
+        if (unLockedAt != null) {
+            return false;
+        }
+
+        unLockedAt = LocalDateTime.now();
         return true;
     }
 
