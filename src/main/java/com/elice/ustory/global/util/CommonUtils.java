@@ -5,7 +5,9 @@ import com.elice.ustory.domain.friend.entity.Friend;
 import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.notice.dto.NoticeDTO;
+import com.elice.ustory.domain.notice.dto.PaperNoticeRequest;
 import com.elice.ustory.domain.notice.entity.Notice;
+import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
@@ -68,6 +70,8 @@ public class CommonUtils {
     public static Long extractSenderId(NoticeDTO noticeDTO) {
         if (noticeDTO instanceof FriendNoticeDTO) {
             return ((FriendNoticeDTO) noticeDTO).getSenderId();
+        } else if (noticeDTO instanceof PaperNoticeRequest){
+            return ((PaperNoticeRequest) noticeDTO).getPaper().getId();
         }
         return null;
     }
@@ -80,9 +84,12 @@ public class CommonUtils {
      * @param
      * @return Paper 객체
      */
-//    public static Paper extractPaper(NoticeDTO noticeDTO) {
-//
-//    }
+    public static Paper extractPaper(NoticeDTO noticeDTO) {
+        if (noticeDTO instanceof PaperNoticeRequest) {
+            return ((PaperNoticeRequest) noticeDTO).getPaper();
+        }
+        return null;
+    }
 
 
 
