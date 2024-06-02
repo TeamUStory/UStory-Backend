@@ -1,7 +1,7 @@
 package com.elice.ustory.domain.paper.dto;
 
-import com.elice.ustory.domain.paper.entity.Address;
-import com.elice.ustory.domain.paper.entity.Image;
+import com.elice.ustory.domain.address.Address;
+import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.paper.entity.Paper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

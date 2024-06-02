@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
 public class UserFriendDTO {
     private final String name;
     private final String nickname;
-    private final String profileImg;
+    private final String profileImgUrl;
 }

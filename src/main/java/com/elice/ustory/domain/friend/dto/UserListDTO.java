@@ -10,5 +10,5 @@ import lombok.Getter;
 public class UserListDTO {
     private final String name;
     private final String nickname;
-    private final String profileImg;
+    private final String profileImgUrl;
 }

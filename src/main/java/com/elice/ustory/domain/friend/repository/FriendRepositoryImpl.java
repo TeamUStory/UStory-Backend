@@ -27,7 +27,8 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
         QFriend friend = QFriend.friend;
         QUsers user = QUsers.users;
 
-        BooleanExpression predicate = friend.id.userId.eq(userId);
+        BooleanExpression predicate = friend.id.userId.eq(userId)
+                .and(friend.status.eq(FriendStatus.ACCEPTED));
         if (nickname != null && !nickname.isEmpty()) {
             predicate = predicate.and(user.nickname.containsIgnoreCase(nickname));
         }

@@ -1,13 +1,13 @@
 package com.elice.ustory.domain.paper.entity;
 
+import com.elice.ustory.domain.address.Address;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -64,10 +64,10 @@ public class Paper extends BaseEntity {
     private LocalDateTime deletedAt;
 
     // TODO: 개발의 편의를 위해 Nullable 가능하도록 바꿈 추후 false 재설정 필요
-    @Column(nullable = true, length = 10)
-    private String locked;
+    @Column(name = "unlocked_at", nullable = true, length = 10)
+    @Setter
+    private LocalDateTime unLockedAt;
 
-    // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
     public Paper(String title, String thumbnailImageUrl, LocalDate visitedAt) {
         this.title = title;
@@ -93,8 +93,26 @@ public class Paper extends BaseEntity {
         return true;
     }
 
-    // TODO: 최초 생성시에만 등록되기 때문에 방안 모색
-    public void updateWriter(Users writer) {
+    public boolean isDeleted() {
+
+        if (deletedAt != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean unLock() {
+
+        if (unLockedAt != null) {
+            return false;
+        }
+
+        unLockedAt = LocalDateTime.now();
+        return true;
+    }
+
+    public void addWriter(Users writer) {
 
         if (this.writer != null) {
             return;
@@ -103,42 +121,13 @@ public class Paper extends BaseEntity {
         this.writer = writer;
     }
 
-    // TODO: 최초 생성시에만 등록되기 때문에 방안 모색
-    public void updateDiary(Diary diary) {
+    public void addDiary(Diary diary) {
 
         if (this.diary != null) {
             return;
         }
 
         this.diary = diary;
-    }
-
-    /**
-     * Paper 생성 및 업데이트에 사용
-     *
-     * @param images 생성되거나 업데이트된 Image List
-     */
-    public void updateImages(List<Image> images) {
-
-        // 이미지 개수가 동일하면 CascadeType.PERSIST 로 인해 추가할 필요가 없음
-        if (this.images.size() == images.size()) {
-            return;
-        }
-
-        // 이미지 개수가 늘어나 포함되지 않은 이미지 추가하는 로직
-        for (Image image : images) {
-            if (!this.images.contains(image)) {
-                addImage(image);
-            }
-        }
-    }
-
-    private void addImage(Image image) {
-        this.images.add(image);
-
-        if (image.getPaper() != this) {
-            image.setPaper(this);
-        }
     }
 
     public void setAddress(Address address) {
