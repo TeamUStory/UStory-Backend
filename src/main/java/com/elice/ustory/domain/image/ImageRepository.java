@@ -1,6 +1,5 @@
-package com.elice.ustory.domain.paper.repository;
+package com.elice.ustory.domain.image;
 
-import com.elice.ustory.domain.paper.entity.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
