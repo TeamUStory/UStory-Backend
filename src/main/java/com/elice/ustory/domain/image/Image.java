@@ -1,5 +1,6 @@
-package com.elice.ustory.domain.paper.entity;
+package com.elice.ustory.domain.image;
 
+import com.elice.ustory.domain.paper.entity.Paper;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;

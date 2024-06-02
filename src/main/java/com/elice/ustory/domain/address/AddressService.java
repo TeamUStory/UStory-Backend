@@ -1,7 +1,5 @@
-package com.elice.ustory.domain.paper.service;
+package com.elice.ustory.domain.address;
 
-import com.elice.ustory.domain.paper.entity.Address;
-import com.elice.ustory.domain.paper.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
