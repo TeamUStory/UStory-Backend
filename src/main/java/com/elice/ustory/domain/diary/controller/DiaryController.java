@@ -7,6 +7,7 @@ import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,7 @@ public class DiaryController {
 
     @Operation(summary = "Create Diary API", description = "다이어리 생성 및 링크 테이블에 등록")
     @PostMapping("/diary")
-    public ResponseEntity<DiaryResponse> createDiary(@RequestBody DiaryDto diaryDto) {
+    public ResponseEntity<DiaryResponse> createDiary(@Valid @RequestBody DiaryDto diaryDto) {
         DiaryResponse diary = diaryService.createDiary(diaryDto.toDiary(), diaryDto.getUsers());
         if (diary == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -58,7 +59,7 @@ public class DiaryController {
 
     @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
     @PutMapping("/diary/{diaryId}")
-    public ResponseEntity<DiaryResponse> updateDiary(@PathVariable("diaryId") Long diaryId, @RequestBody DiaryDto diaryDto) {
+    public ResponseEntity<DiaryResponse> updateDiary(@PathVariable("diaryId") Long diaryId, @Valid @RequestBody DiaryDto diaryDto) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
