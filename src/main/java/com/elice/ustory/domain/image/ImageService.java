@@ -1,10 +1,9 @@
 package com.elice.ustory.domain.image;
 
+import com.elice.ustory.domain.paper.entity.Paper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,52 +12,32 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
 
-    @Transactional
-    public Image createImage(Image image) {
+    public void createImages(List<Image> images, Paper paper) {
+        for (Image image : images) {
+            createImage(image, paper);
+        }
+    }
+
+    private Image createImage(Image image, Paper paper) {
+        image.setPaper(paper);
         return imageRepository.save(image);
     }
 
-    public List<Image> createImages(List<Image> images) {
-        List<Image> result = new ArrayList<>();
+    public void updateImages(Paper paper, List<Image> images) {
+        List<Image> savedImages = findImagesByPaperId(paper.getId());
 
-        for (Image image : images) {
-            result.add(createImage(image));
+        updateExistingImages(savedImages, images);
+
+        if (savedImages.size() < images.size()) {
+            updateNewImages(savedImages.size(), images,  paper);
         }
-
-        return result;
     }
 
-    // TODO: 과연 단일 image 업데이트 메서드가 필요한가?
-//    @Transactional
-//    public Image updateImage(Long paperId, Image image) {
-//        Image savedImage = imageRepository.findByPaperIdAndSequence(image.getPaper().getId(), image.getSequence()).orElse(null);
-//
-//        if (savedImage != null) {
-//            return savedImage.update(image.getImageUrl());
-//        }
-//
-//        return imageRepository.save(image);
-//    }
-
-    public List<Image> findImagesByPaperId(Long paperId) {
+    private List<Image> findImagesByPaperId(Long paperId) {
         return imageRepository.findByPaperIdOrderBySequenceAsc(paperId);
     }
 
-    @Transactional
-    public List<Image> updateImages(Long paperId, List<Image> images) {
-        List<Image> savedImages = findImagesByPaperId(paperId);
-        List<Image> result = new ArrayList<>();
-
-        updateExistingImages(savedImages, images, result);
-
-        if (savedImages.size() < images.size()) {
-            updateNewImages(savedImages.size(), images, result);
-        }
-
-        return result;
-    }
-
-    private void updateExistingImages(List<Image> savedImages, List<Image> newImages, List<Image> result) {
+    private void updateExistingImages(List<Image> savedImages, List<Image> newImages) {
         for (int i = 0; i < savedImages.size(); i++) {
             Image savedImage = savedImages.get(i);
 
@@ -67,14 +46,14 @@ public class ImageService {
                 continue;
             }
 
-            result.add(savedImage.update(newImages.get(i).getImageUrl()));
+            savedImage.update(newImages.get(i).getImageUrl());
         }
     }
 
-    private void updateNewImages(int savedImageSize, List<Image> newImages, List<Image> result) {
+    private void updateNewImages(int savedImageSize, List<Image> newImages, Paper paper) {
         for (int i = savedImageSize; i < newImages.size(); i++) {
             Image newImage = newImages.get(i);
-            result.add(imageRepository.save(newImage));
+            createImage(newImage, paper);
         }
     }
 }
