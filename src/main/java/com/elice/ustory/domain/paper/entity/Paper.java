@@ -68,7 +68,6 @@ public class Paper extends BaseEntity {
     @Setter
     private LocalDateTime unLockedAt;
 
-    // TODO: 우선 간단하게 제목, 썸네일, 방문 날짜만 가지고 객체 생성
     @Builder(builderMethodName = "createBuilder")
     public Paper(String title, String thumbnailImageUrl, LocalDate visitedAt) {
         this.title = title;
@@ -94,6 +93,15 @@ public class Paper extends BaseEntity {
         return true;
     }
 
+    public boolean isDeleted() {
+
+        if (deletedAt != null) {
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean unLock() {
 
         if (unLockedAt != null) {
@@ -104,8 +112,7 @@ public class Paper extends BaseEntity {
         return true;
     }
 
-    // TODO: 최초 생성시에만 등록되기 때문에 방안 모색
-    public void updateWriter(Users writer) {
+    public void addWriter(Users writer) {
 
         if (this.writer != null) {
             return;
@@ -114,42 +121,13 @@ public class Paper extends BaseEntity {
         this.writer = writer;
     }
 
-    // TODO: 최초 생성시에만 등록되기 때문에 방안 모색
-    public void updateDiary(Diary diary) {
+    public void addDiary(Diary diary) {
 
         if (this.diary != null) {
             return;
         }
 
         this.diary = diary;
-    }
-
-    /**
-     * Paper 생성 및 업데이트에 사용
-     *
-     * @param images 생성되거나 업데이트된 Image List
-     */
-    public void updateImages(List<Image> images) {
-
-        // 이미지 개수가 동일하면 CascadeType.PERSIST 로 인해 추가할 필요가 없음
-        if (this.images.size() == images.size()) {
-            return;
-        }
-
-        // 이미지 개수가 늘어나 포함되지 않은 이미지 추가하는 로직
-        for (Image image : images) {
-            if (!this.images.contains(image)) {
-                addImage(image);
-            }
-        }
-    }
-
-    private void addImage(Image image) {
-        this.images.add(image);
-
-        if (image.getPaper() != this) {
-            image.setPaper(this);
-        }
     }
 
     public void setAddress(Address address) {
