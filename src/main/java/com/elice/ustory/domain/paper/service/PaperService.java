@@ -6,15 +6,11 @@ import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.notice.dto.PaperNoticeRequest;
 import com.elice.ustory.domain.notice.service.NoticeService;
-import com.elice.ustory.domain.address.Address;
-import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +29,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PaperService {
 
+    private static final String NOT_FOUND_PAPER_MESSAGE = "%d: 해당하는 페이퍼가 존재하지 않습니다.";
     private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
+    private static final String NOT_FOUND_USER_MESSAGE = "%d: 해당하는 사용자가 존재하지 않습니다.";
+    private static final String ORDER_BY_UPDATED_AT = "updatedAt";
 
     private final PaperRepository paperRepository;
     private final NoticeService noticeService;
@@ -42,17 +41,17 @@ public class PaperService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Paper createPaper(Paper paper, List<Image> images, Address address, Users writer, Diary diary) {
+    public Paper createPaper(Paper paper, Long writerId, Long diaryId) {
+
+        Users writer = userRepository.findById(writerId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_MESSAGE, writerId)));
+        paper.addWriter(writer);
+
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId)));
+        paper.addDiary(diary);
 
         Paper savedPaper = paperRepository.save(paper);
-
-        savedPaper.updateWriter(writer);
-
-        savedPaper.updateDiary(diary);
-
-        savedPaper.updateImages(images);
-
-        savedPaper.setAddress(address);
 
         needCommentNotice(diary, paper);
 
@@ -60,7 +59,7 @@ public class PaperService {
     }
 
     public Paper getPaperById(long Id) {
-        return checkPaperAndDeleted(Id);
+        return validatePaper(Id);
     }
 
     /**
@@ -79,7 +78,8 @@ public class PaperService {
      * 작성한 Papers 최신순으로 페이지네이션
      */
     public List<Paper> getPapersByWriterId(Long writerId, int page, int size) {
-        return paperRepository.findByWriterId(writerId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
+        return paperRepository.findByWriterId(writerId, PageRequest.of(page - 1, size,
+                Sort.by(Sort.Direction.DESC, ORDER_BY_UPDATED_AT)));
     }
 
     /**
@@ -90,9 +90,9 @@ public class PaperService {
     }
 
     @Transactional
-    public Paper updatePaper(Long savedPaperId, Paper paper, List<Image> images, Address address) {
+    public Paper updatePaper(Long paperId, Paper paper) {
 
-        Paper previousPaper = checkPaperAndDeleted(savedPaperId);
+        Paper previousPaper = validatePaper(paperId);
 
         previousPaper.update(
                 paper.getTitle(),
@@ -100,24 +100,24 @@ public class PaperService {
                 paper.getVisitedAt()
         );
 
-        previousPaper.updateImages(images);
-
-        previousPaper.setAddress(address);
-
         return previousPaper;
     }
 
-    public void deleteById(Long Id) {
-        Paper paper = paperRepository.findById(Id).orElseThrow(() -> new NotFoundException("해당 페이퍼를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
-        paper.softDelete();
+    public void deleteById(Long paperId) {
+        paperRepository.findById(paperId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId)))
+                .softDelete();
     }
 
-    public Paper checkPaperAndDeleted(Long paperId) {
-        Paper checkedUser = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException("해당 페이퍼를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
-        if (checkedUser.getDeletedAt() != null) {
-            throw new UnauthorizedException("해당 페이퍼에 접근 권한이 없습니다", ErrorCode.VALIDATION_EXCEPTION);
+    public Paper validatePaper(Long paperId) {
+        Paper paper = paperRepository.findById(paperId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId)));
+
+        if (paper.isDeleted()) {
+            throw new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId));
         }
-        return checkedUser;
+
+        return paper;
     }
 
     public Integer countPapersByWriterId(Long userId) {
@@ -150,7 +150,7 @@ public class PaperService {
     @Transactional
     public void noticeLocked(Diary diary, Paper paper) {
         // 페이퍼가 존재하는지, 삭제되었는지에 대해서 체크 (예외처리 동시 진행), Q : 검증 완료된 상황 아닌가?
-        Paper checkedPaper = checkPaperAndDeleted(paper.getId());
+        Paper checkedPaper = validatePaper(paper.getId());
 
         // 체크된 페이퍼에서 모든 코멘트를 불러온다.
         List<Comment> comments = paper.getComments();
