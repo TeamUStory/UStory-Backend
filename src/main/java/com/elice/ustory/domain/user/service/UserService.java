@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 //    private final RefreshTokenRepository refreshTokenRepository;
 
     public Users findById(Long userId){
@@ -35,7 +37,8 @@ public class UserService {
         Users.LoginType loginType = Users.LoginType.BASIC;
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
-        String password = signUpRequest.getPassword();
+        String rawPassword = signUpRequest.getPassword();
+        String encodedPassword = passwordEncoder.encode(rawPassword);
         String profileImg = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
 
@@ -44,7 +47,7 @@ public class UserService {
                 .loginType(loginType)
                 .name(name)
                 .nickname(nickname)
-                .password(password)
+                .password(encodedPassword)
                 .profileImgUrl(profileImg)
                 .profileDescription(profileDescription)
                 .build();
@@ -100,17 +103,23 @@ public class UserService {
         return deletedUser;
     }
 
-    public LoginResponse login(String id, String password, HttpServletResponse response) {
+    public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
+        LoginResponse loginResponse = new LoginResponse();
+
         //TODO: 예외처리
         Users loginUser = userRepository.findByEmail(id)
                 .orElseThrow();
+        String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
-        if (!loginUser.getPassword().equals(password)) {
-            //TODO: 비밀번호 오류 예외처리
-            return null;
+        if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            loginResponse.builder()
+                    //TODO: 틀릴 경우엔 어떤 에러를 보낼까
+                    .accessToken(null)
+                    .refreshToken(null)
+                    .build();
+            return loginResponse;
         }
-
         log.info("[getLogInResult] 패스워드 일치");
         log.info("[getLogInResult] LogInResponse 객체 생성");
         String accessToken = jwtTokenProvider.createAccessToken(
@@ -119,7 +128,7 @@ public class UserService {
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
-        LoginResponse loginResponse = LoginResponse.builder()
+        loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

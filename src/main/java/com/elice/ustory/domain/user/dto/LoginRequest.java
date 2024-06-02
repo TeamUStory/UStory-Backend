@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 public class LoginRequest {
-
     private String loginEmail;
     private String password;
 }

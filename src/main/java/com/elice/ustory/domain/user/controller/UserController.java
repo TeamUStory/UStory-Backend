@@ -2,21 +2,17 @@ package com.elice.ustory.domain.user.controller;
 
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
+import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @Tag(name = "User", description = "User API")
 @RestController
@@ -26,10 +22,12 @@ import java.nio.charset.StandardCharsets;
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
 
     @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다.")
     @PostMapping
     public ResponseEntity<Users> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
+        // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
         Users newUser = userService.signUp(signUpRequest);
         return ResponseEntity.ok().body(newUser);
     }
@@ -73,6 +71,14 @@ public class UserController {
         ValidateNicknameResponse validateNicknameResponse = userService.isValid(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
+
+    @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
+    @PostMapping("/send-validate")
+    public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
+        ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
+        return ResponseEntity.ok(validateEmailResponse);
+    }
+    // TODO: 인증코드 검증
 //    @GetMapping("/get-member")
 //    public Long getCurrentMember(Authentication authentication){
 //        log.info("authentication.getName() : {}", authentication.getName());
