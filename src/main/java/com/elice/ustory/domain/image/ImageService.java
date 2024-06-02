@@ -1,7 +1,5 @@
-package com.elice.ustory.domain.paper.service;
+package com.elice.ustory.domain.image;
 
-import com.elice.ustory.domain.paper.entity.Image;
-import com.elice.ustory.domain.paper.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

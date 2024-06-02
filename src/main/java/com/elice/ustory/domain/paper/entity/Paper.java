@@ -1,13 +1,13 @@
 package com.elice.ustory.domain.paper.entity;
 
+import com.elice.ustory.domain.address.Address;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
