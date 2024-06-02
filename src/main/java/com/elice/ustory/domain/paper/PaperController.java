@@ -20,6 +20,8 @@ import com.elice.ustory.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "Paper API")
@@ -96,9 +99,6 @@ public class PaperController {
                                                                       @RequestParam(name = "page", defaultValue = "1") int page,
                                                                       @RequestParam(name = "size", defaultValue = "20") int size) {
 
-        // user 검증
-        // user 연관된 모든 paper 불러오기
-
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
 
         List<PaperListResponse> result = papers.stream()
@@ -110,22 +110,19 @@ public class PaperController {
 
     @Operation(summary = "Read Papers By Diary API", description = "다이어리에 포함된 페이퍼 리스트를 불러온다.")
     @GetMapping(value = "/papers/diary", params = "diaryId")
-    public ResponseEntity<List<PaperListResponse>> getAllPagesByDiary(@RequestParam(name = "diaryId") Long diaryId,
-                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                      @RequestParam(name = "size", defaultValue = "20") int size,
-                                                                      @RequestParam(name = "startDate", required = false) String startDate,
-                                                                      @RequestParam(name = "endDate", required = false) String endDate) {
+    public ResponseEntity<Slice<PaperListResponse>> getAllPagesByDiary(
+            @RequestParam(name = "diaryId") Long diaryId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size,
+            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate
+    ) {
 
-        // diary 검증
-        // diary 연관된 모든 paper 불러오기
+        Slice<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate);
 
-        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size);
+        Slice<PaperListResponse> response = papers.map(PaperListResponse::new);
 
-        List<PaperListResponse> result = papers.stream()
-                .map(PaperListResponse::new)
-                .toList();
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Read Papers for Map API", description = "유저와 관련된 모든 리스트를 불러온다.")

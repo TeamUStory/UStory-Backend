@@ -2,6 +2,7 @@ package com.elice.ustory.domain.paper.service;
 
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.notice.dto.PaperNoticeRequest;
 import com.elice.ustory.domain.notice.service.NoticeService;
@@ -17,10 +18,12 @@ import com.elice.ustory.global.exception.model.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,8 +33,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PaperService {
 
+    private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
+
     private final PaperRepository paperRepository;
     private final NoticeService noticeService;
+    private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
     private final UserRepository userRepository;
 
@@ -60,9 +66,13 @@ public class PaperService {
     /**
      * 다이어리 내에 존재하는 Papers 최신순으로 페이지네이션
      */
-    public List<Paper> getPapersByDiaryId(Long diaryId, int page, int size) {
-        // TODO : 여기 deleted 체크 하고 싶은데, 그러면 리스트 for each 문이나 이터레이터로 돌면서 체크해야 하나요?
-        return paperRepository.findByDiaryId(diaryId, PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
+    public Slice<Paper> getPapersByDiaryId(Long diaryId, int page, int size, LocalDate startDate, LocalDate endDate) {
+
+        // 다이어리 검증
+        diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId)));
+
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        return paperRepository.findAllByDiaryIdAndDateRange(diaryId, startDate, endDate, pageRequest);
     }
 
     /**
@@ -127,7 +137,7 @@ public class PaperService {
         if (!userFindByDiary.isEmpty()) {
             for (String nickName : userFindByDiary) {
                 PaperNoticeRequest paperNoticeRequest = PaperNoticeRequest.builder()
-                        .receiverId(userRepository.findByNickname(nickName).orElseThrow(()->new NotFoundException("해당 유저를 찾을 수 없습니다.")).getId())
+                        .receiverId(userRepository.findByNickname(nickName).orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다.")).getId())
                         .paper(paper)
                         .messageType(2)
                         .build();
