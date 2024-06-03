@@ -39,11 +39,17 @@ public class CommentService {
 
     @Transactional
     public Comment addComment(AddCommentRequest addCommentRequest, Long paperId, Long userId) {
+
+        Paper paper = paperService.getPaperById(paperId);
+
         Comment comment = Comment.addCommentBuilder()
                 .content(addCommentRequest.getContent())
-                .paper(paperService.getPaperById(paperId))
+                .paper(paper)
                 .user(userService.findById(userId))
                 .build();
+
+        paperService.noticeLocked(paper.getDiary(), paper);
+
         return commentRepository.save(comment);
     }
 
