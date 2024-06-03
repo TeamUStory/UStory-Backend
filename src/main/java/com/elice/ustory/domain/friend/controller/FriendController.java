@@ -2,26 +2,13 @@ package com.elice.ustory.domain.friend.controller;
 
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
-import com.elice.ustory.domain.friend.dto.UserListDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
-import com.elice.ustory.domain.notice.entity.Notice;
-import com.elice.ustory.domain.notice.service.NoticeService;
-import com.elice.ustory.domain.user.entity.Users;
-import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.global.exception.ErrorCode;
-import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Tag(name = "friend", description = "Friend API")
@@ -30,14 +17,9 @@ import java.util.Optional;
 public class FriendController {
 
     private FriendService friendService;
-    private NoticeService noticeService;
 
-    private UserRepository userRepository;
-
-    public FriendController(FriendService friendService, NoticeService noticeService, UserRepository userRepository) {
+    public FriendController(FriendService friendService) {
         this.friendService = friendService;
-        this.noticeService = noticeService;
-        this.userRepository = userRepository;
     }
 
     /**
@@ -55,19 +37,7 @@ public class FriendController {
     }
 
 
-    /**
-     * 닉네임으로 전체 사용자를 검색합니다.
-     *
-     * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록
-     */
-    @Operation(summary = "Get / Search User by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
-    @GetMapping("/search")
-    public ResponseEntity<UserListDTO> searchUserByNickname(@RequestParam String nickname) {
-        UserListDTO user = friendService.findUserByNickname(nickname)
-                .orElseThrow(() -> new NotFoundException("닉네임이 있는 사용자를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
-        return ResponseEntity.ok(user);
-    }
+
 
 
     /**
