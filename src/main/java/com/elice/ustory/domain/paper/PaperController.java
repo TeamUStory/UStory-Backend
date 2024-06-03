@@ -1,9 +1,6 @@
 package com.elice.ustory.domain.paper;
 
 import com.elice.ustory.domain.bookmark.BookmarkService;
-import com.elice.ustory.domain.bookmark.dto.AddBookmarkRequest;
-import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
-import com.elice.ustory.domain.bookmark.dto.BookmarkResponse;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperCountResponse;
@@ -16,7 +13,6 @@ import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.address.AddressService;
 import com.elice.ustory.domain.image.ImageService;
 import com.elice.ustory.domain.paper.service.PaperService;
-import com.elice.ustory.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
