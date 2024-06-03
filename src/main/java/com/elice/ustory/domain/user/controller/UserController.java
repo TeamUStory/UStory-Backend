@@ -4,6 +4,7 @@ import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -48,9 +49,11 @@ public class UserController {
 
     @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다.")
     @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response,
+                                                    @JwtAuthorization Long userId) {
         String id = loginRequest.getLoginEmail();
         String password = loginRequest.getPassword();
+        log.info("[Argument Resolver UserInfo]: {}", userId);
         LoginResponse loginResponse = userService.login(id, password, response);
         log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
 
