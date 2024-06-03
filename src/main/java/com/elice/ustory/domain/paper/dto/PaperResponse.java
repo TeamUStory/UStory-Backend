@@ -32,6 +32,9 @@ public class PaperResponse {
     @Schema(description = "상호명", example = "우규")
     private String store;
 
+    @Schema(description = "다이어리명", example = "껌냥이들")
+    private String diaryName;
+
     @Schema(description =
             "저장 여부 <br>" +
             "0을 반환하는 경우 미저장 상태이다. <br>" +
@@ -47,14 +50,24 @@ public class PaperResponse {
     private Integer unlocked;
 
     public PaperResponse(Paper paper, Boolean bookmarked) {
-
+        setDefault(paper);
         setBookmarked(bookmarked);
 
         if (paper.isUnlocked()) {
-            unlockedStatus(paper);
-        } else {
-            lockStatus(paper);
+            this.imageUrls = paper.getImages().stream()
+                    .map(Image::getImageUrl)
+                    .collect(Collectors.toList());
         }
+    }
+
+    private void setDefault(Paper paper) {
+        this.title = paper.getTitle();
+        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
+        this.visitedAt = paper.getVisitedAt();
+        this.city = paper.getAddress().getCity();
+        this.store = paper.getAddress().getStore();
+        this.unlocked = paper.getUnLocked();
+        this.diaryName = paper.getDiary().getName();
     }
 
     private void setBookmarked(Boolean bookmarked) {
@@ -64,26 +77,5 @@ public class PaperResponse {
         }
 
         this.bookmarked = 0;
-    }
-
-    private void unlockedStatus(Paper paper) {
-        this.title = paper.getTitle();
-        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
-        this.imageUrls = paper.getImages().stream()
-                .map(Image::getImageUrl)
-                .collect(Collectors.toList());
-        this.visitedAt = paper.getVisitedAt();
-        this.city = paper.getAddress().getCity();
-        this.store = paper.getAddress().getStore();
-        this.unlocked = paper.getUnLocked();
-    }
-
-    private void lockStatus(Paper paper) {
-        this.title = paper.getTitle();
-        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
-        this.visitedAt = paper.getVisitedAt();
-        this.city = paper.getAddress().getCity();
-        this.store = paper.getAddress().getStore();
-        this.unlocked = paper.getUnLocked();
     }
 }
