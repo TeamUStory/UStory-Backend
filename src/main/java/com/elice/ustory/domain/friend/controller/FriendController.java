@@ -30,14 +30,9 @@ import java.util.Optional;
 public class FriendController {
 
     private FriendService friendService;
-    private NoticeService noticeService;
 
-    private UserRepository userRepository;
-
-    public FriendController(FriendService friendService, NoticeService noticeService, UserRepository userRepository) {
+    public FriendController(FriendService friendService) {
         this.friendService = friendService;
-        this.noticeService = noticeService;
-        this.userRepository = userRepository;
     }
 
     /**
