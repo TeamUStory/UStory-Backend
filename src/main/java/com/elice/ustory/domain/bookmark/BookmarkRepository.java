@@ -3,6 +3,7 @@ package com.elice.ustory.domain.bookmark;
 import com.elice.ustory.domain.bookmark.entity.Bookmark;
 import com.elice.ustory.domain.bookmark.entity.BookmarkId;
 import com.elice.ustory.domain.paper.entity.Paper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,5 +23,5 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkId> 
 
     /** userId에 해당하는 Bookmark 들의 Paper List 가져오기 */
     @Query("SELECT b.paper FROM Bookmark b WHERE b.user.id = :userId")
-    List<Paper> findPapersByUserId(@Param("userId") Long userId);
+    List<Paper> findPapersByUserId(@Param("userId") Long userId, Pageable pageable);
 }
