@@ -106,11 +106,11 @@ public class Paper extends BaseEntity {
     public boolean unLock() {
 
         if (this.unLocked == 0) {
-            return false;
+            this.unLocked = 1;
+            return true;
         }
 
-        this.unLocked = 1;
-        return true;
+        return false;
     }
 
     public boolean isUnlocked() {
