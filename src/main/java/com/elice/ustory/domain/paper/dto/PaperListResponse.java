@@ -31,7 +31,7 @@ public class PaperListResponse {
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
         this.visitedAt = paper.getVisitedAt();
-        this.diaryName = "다이어리 이름"; //page.getDiary().getTitle();
+        this.diaryName = paper.getDiary().getName();
         this.store = paper.getAddress().getStore();
         this.paperId = paper.getId();
     }
