@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.friend.dto;
+package com.elice.ustory.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

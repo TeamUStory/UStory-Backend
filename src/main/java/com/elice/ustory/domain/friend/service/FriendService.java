@@ -2,7 +2,6 @@ package com.elice.ustory.domain.friend.service;
 
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
-import com.elice.ustory.domain.friend.dto.UserListDTO;
 import com.elice.ustory.domain.friend.entity.Friend;
 import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -52,23 +50,6 @@ public class FriendService {
         return friendRepository.findFriends(userId, nickname);
     }
 
-
-    /**
-     * 닉네임으로 전체 사용자를 검색합니다.
-     *
-     * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록 (옵셔널)
-     */
-    public Optional<UserListDTO> findUserByNickname(String nickname) {
-        return Optional.ofNullable(nickname)
-                .filter(name -> !name.isEmpty())
-                .flatMap(userRepository::findByNickname)
-                .map(u -> UserListDTO.builder()
-                        .name(u.getName())
-                        .nickname(u.getNickname())
-                        .profileImgUrl(u.getProfileImgUrl())
-                        .build());
-    }
 
     /**
      * 친구 추가 요청을 보냅니다.
