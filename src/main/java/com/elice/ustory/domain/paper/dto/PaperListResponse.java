@@ -15,9 +15,6 @@ public class PaperListResponse {
     @Schema(description = "썸네일 이미지", example = "https://~~~~~~")
     private String thumbnailImageUrl;
 
-    @Schema(description = "방문일", example = "2024-05-30")
-    private LocalDate visitedAt;
-
     @Schema(description = "다이어리 이름", example = "꽁냥껑냥")
     private String diaryName;
 
@@ -30,8 +27,7 @@ public class PaperListResponse {
     public PaperListResponse(Paper paper) {
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
-        this.visitedAt = paper.getVisitedAt();
-        this.diaryName = "다이어리 이름"; //page.getDiary().getTitle();
+        this.diaryName = paper.getDiary().getName();
         this.store = paper.getAddress().getStore();
         this.paperId = paper.getId();
     }
