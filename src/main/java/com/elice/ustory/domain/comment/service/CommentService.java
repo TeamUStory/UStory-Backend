@@ -48,9 +48,11 @@ public class CommentService {
                 .user(userService.findById(userId))
                 .build();
 
+        Comment savedComment = commentRepository.save(comment);
+
         paperService.noticeLocked(paper.getDiary(), paper);
 
-        return commentRepository.save(comment);
+        return savedComment;
     }
 
     @Transactional
