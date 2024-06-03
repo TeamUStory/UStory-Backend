@@ -113,6 +113,15 @@ public class Paper extends BaseEntity {
         return true;
     }
 
+    public boolean isUnlocked() {
+
+        if (this.unLocked == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
     public void addWriter(Users writer) {
 
         if (this.writer != null) {
