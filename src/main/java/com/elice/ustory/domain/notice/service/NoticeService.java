@@ -2,15 +2,18 @@ package com.elice.ustory.domain.notice.service;
 
 import com.elice.ustory.domain.friend.service.FriendService;
 import com.elice.ustory.domain.notice.dto.NoticeDTO;
+import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
+import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@Slf4j
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
@@ -46,7 +50,7 @@ public class NoticeService {
      * @return 알림 목록
      */
     public List<Notice> getAllNoticesByUserId(Long userId) {
-        return noticeRepository.findByReceiverId(userId);
+        return noticeRepository.findByResponseId(userId);
     }
 
 
@@ -54,24 +58,39 @@ public class NoticeService {
     /**
      * 공통 알림 전송 메서드
      *
-     * @param noticeDTO 알림 DTO
+//     * @param noticeDTO 알림 DTO
      */
     @Transactional
-    public void sendNotice(NoticeDTO noticeDTO) {
-        String message = CommonUtils.generateMessage(noticeDTO);
-        Long senderId = CommonUtils.extractSenderId(noticeDTO);
-        Paper paper = CommonUtils.extractPaper(noticeDTO);
+    public void sendNotice(NoticeRequest noticeRequest) {
+        String message;
+        Long requestId;
 
-        Notice notice = CommonUtils.createNotice(noticeDTO, message, senderId);
-        notice.setPaper(paper);
+        if (noticeRequest.getMessageType() == 3) {
+            Users findUser = userRepository.findById(noticeRequest.getSenderId()).orElseThrow(() -> new NotFoundException("해당 유저 없음"));
+            message = CommonUtils.generateMessage(noticeRequest, findUser.getNickname());
+            Long senderId = noticeRequest.getSenderId();
+            requestId = senderId;
+        } else if (noticeRequest.getMessageType() == 1) {
+            message = CommonUtils.generateMessage(noticeRequest);
+            Long senderId = noticeRequest.getSenderId();
+            requestId =senderId;
+        } else {
+            message = CommonUtils.generateMessage(noticeRequest);
+            Long paperId = noticeRequest.getPaperId();
+            requestId = paperId;
+        }
 
-        // populateNotice 호출하여 필요한 값 설정
-        noticeDTO.populateNotice(notice);
+        Notice notice = Notice.builder()
+                .requestId(requestId)
+                .responseId(noticeRequest.getResponseId())
+                .message(message)
+                .messageType(noticeRequest.getMessageType())
+                .build();
 
-        // 로그 추가
+//        // 로그 추가
         System.out.println("Notice before save: " + notice);
-
-        // 알림 저장
+//
+//        // 알림 저장
         noticeRepository.save(notice);
     }
 
@@ -91,29 +110,12 @@ public class NoticeService {
     /**
      * 특정 조건으로 알림을 삭제합니다 (senderId 기준).
      *
-     * @param senderId 알림을 보낸 사용자의 ID
-     * @param receiverId 알림을 받은 사용자의 ID
+//     * @param senderId 알림을 보낸 사용자의 ID
+//     * @param receiverId 알림을 받은 사용자의 ID
      * @param messageType 알림의 유형
      */
-    public void deleteNoticeBySender(Long senderId, Long receiverId, int messageType) {
-        Optional<Notice> noticeOptional = noticeRepository.findBySenderIdAndReceiverIdAndMessageType(senderId, receiverId, messageType);
+    public void deleteNoticeBySender(Long requestId, Long responseId, int messageType) {
+        Optional<Notice> noticeOptional = noticeRepository.findByRequestIdAndResponseIdAndMessageType(requestId, responseId, messageType);
         noticeOptional.ifPresent(noticeRepository::delete);
     }
-
-    /**
-     * 특정 조건으로 알림을 삭제합니다 (paperId 기준).
-     *
-     * @param paperId 알림과 관련된 페이퍼 ID
-     * @param receiverId 알림을 받은 사용자의 ID
-     * @param messageType 알림의 유형
-     */
-    public void deleteNoticeByPaper(Long paperId, Long receiverId, int messageType) {
-        Optional<Notice> noticeOptional = noticeRepository.findByPaperIdAndReceiverIdAndMessageType(paperId, receiverId, messageType);
-        noticeOptional.ifPresent(noticeRepository::delete);
-    }
-
-
-
-
-
 }

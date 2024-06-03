@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.friend.service;
 
-import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
+//import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.dto.UserListDTO;
@@ -8,6 +8,7 @@ import com.elice.ustory.domain.friend.entity.Friend;
 import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.repository.FriendRepository;
+import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
@@ -92,8 +93,13 @@ public class FriendService {
         Friend friend = friendRequestDTO.toFriend(sender, receiver); // 변환 메서드 사용
         friendRepository.save(friend);
 
-        FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(receiver.getId(), sender.getId(), 1, sender.getNickname(), LocalDateTime.now(), null);
-        noticeService.sendNotice(noticeDTO);
+        NoticeRequest noticeRequest = NoticeRequest.builder()
+                .responseId(receiver.getId())
+                .senderId(sender.getId())
+                .messageType(1)
+                .build();
+
+        noticeService.sendNotice(noticeRequest);
     }
 
     /**
@@ -189,9 +195,14 @@ public class FriendService {
         // 수락한 사람 (receiver)의 닉네임 조회
         String receiverNickname = getUserById(receiverId).getNickname();
 
-        // 친구 수락 알림 전송
-        FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(senderId, receiverId, 3, receiverNickname, null, LocalDateTime.now());
-        noticeService.sendNotice(noticeDTO);
+        NoticeRequest noticeRequest = NoticeRequest.builder()
+                .responseId(receiverId)
+                .senderId(senderId)
+                .messageType(3)
+                .build();
+
+        noticeService.sendNotice(noticeRequest);
+
     }
 
 
