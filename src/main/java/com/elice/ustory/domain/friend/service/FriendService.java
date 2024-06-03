@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.friend.service;
 
-import com.elice.ustory.domain.friend.dto.FriendNoticeDTO;
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.dto.UserListDTO;
@@ -8,6 +7,7 @@ import com.elice.ustory.domain.friend.entity.Friend;
 import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.repository.FriendRepository;
+import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
@@ -20,9 +20,7 @@ import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,8 +90,13 @@ public class FriendService {
         Friend friend = friendRequestDTO.toFriend(sender, receiver); // 변환 메서드 사용
         friendRepository.save(friend);
 
-        FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(receiver.getId(), sender.getId(), 1, sender.getNickname(), LocalDateTime.now(), null);
-        noticeService.sendNotice(noticeDTO);
+        NoticeRequest noticeRequest = NoticeRequest.builder()
+                .responseId(receiver.getId())
+                .senderId(sender.getId())
+                .messageType(1)
+                .build();
+
+        noticeService.sendNotice(noticeRequest);
     }
 
     /**
@@ -113,7 +116,7 @@ public class FriendService {
      */
     private void validateFriendRequestNotExists(FriendId friendId) {
         if (friendRepository.existsById(friendId)) {
-            throw new ConflictException("친구 요청이 이미 있습니다.",ErrorCode.CONFLICT_EXCEPTION);
+            throw new ConflictException("친구 요청이 이미 있습니다.", ErrorCode.CONFLICT_EXCEPTION);
         }
     }
 
@@ -185,13 +188,14 @@ public class FriendService {
                 .build();
         friendRepository.save(reverseFriend);
 
+        NoticeRequest noticeRequest = NoticeRequest.builder()
+                .responseId(senderId)
+                .senderId(receiverId)
+                .messageType(3)
+                .build();
 
-        // 수락한 사람 (receiver)의 닉네임 조회
-        String receiverNickname = getUserById(receiverId).getNickname();
+        noticeService.sendNotice(noticeRequest);
 
-        // 친구 수락 알림 전송
-        FriendNoticeDTO noticeDTO = CommonUtils.createFriendNoticeDTO(senderId, receiverId, 3, receiverNickname, null, LocalDateTime.now());
-        noticeService.sendNotice(noticeDTO);
     }
 
 

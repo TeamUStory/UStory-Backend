@@ -4,7 +4,7 @@ import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
-import com.elice.ustory.domain.notice.dto.PaperNoticeRequest;
+import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
@@ -12,7 +12,6 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -26,7 +25,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class PaperService {
 
     private static final String NOT_FOUND_PAPER_MESSAGE = "%d: 해당하는 페이퍼가 존재하지 않습니다.";
@@ -129,19 +127,19 @@ public class PaperService {
     public void needCommentNotice(Diary diary, Paper paper) {
 //         TODO : 다이어리에 속한 멤버들 전체 다 가져오기
         List<String> userFindByDiary = diaryUserRepository.findUserByDiary(diary.getId());
-//
+
 //         속한 멤버들 중 작성자 제거하기
         userFindByDiary.remove(paper.getWriter().getNickname());
-//
-//        // 작성자를 제외한 남은 멤버가 들어가있는 다이어리-유저 리스트에다가 알림 보내기
+
+        // 작성자를 제외한 남은 멤버가 들어가있는 다이어리-유저 리스트에다가 알림 보내기
         if (!userFindByDiary.isEmpty()) {
             for (String nickName : userFindByDiary) {
-                PaperNoticeRequest paperNoticeRequest = PaperNoticeRequest.builder()
-                        .receiverId(userRepository.findByNickname(nickName).orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다.")).getId())
-                        .paper(paper)
+                NoticeRequest noticeRequest = NoticeRequest.builder()
+                        .responseId(userRepository.findByNickname(nickName).orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다.")).getId())
+                        .paperId(paper.getId())
                         .messageType(2)
                         .build();
-                noticeService.sendNotice(paperNoticeRequest);
+                noticeService.sendNotice(noticeRequest);
             }
         }
     }
@@ -168,12 +166,12 @@ public class PaperService {
             paper.unLock();
             if (userIds.iterator().hasNext()) {
                 for (Long userId : userIds) {
-                    PaperNoticeRequest paperNoticeRequest = PaperNoticeRequest.builder()
-                            .receiverId(userId)
-                            .paper(paper)
+                    NoticeRequest noticeRequest = NoticeRequest.builder()
+                            .responseId(userId)
+                            .paperId(paper.getId())
                             .messageType(4)
                             .build();
-                    noticeService.sendNotice(paperNoticeRequest);
+                    noticeService.sendNotice(noticeRequest);
                 }
             }
         }
