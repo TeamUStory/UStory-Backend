@@ -64,15 +64,16 @@ public class Paper extends BaseEntity {
     private LocalDateTime deletedAt;
 
     // TODO: 개발의 편의를 위해 Nullable 가능하도록 바꿈 추후 false 재설정 필요
-    @Column(name = "unlocked_at", nullable = true, length = 10)
+    @Column(name = "unlocked", nullable = false, columnDefinition = "tinyint")
     @Setter
-    private LocalDateTime unLockedAt;
+    private int unLocked;
 
     @Builder(builderMethodName = "createBuilder")
     public Paper(String title, String thumbnailImageUrl, LocalDate visitedAt) {
         this.title = title;
         this.thumbnailImageUrl = thumbnailImageUrl;
         this.visitedAt = visitedAt;
+        this.unLocked = 0;
     }
 
     public Paper update(String title, String thumbnailImageUrl, LocalDate visitedAt) {
@@ -104,11 +105,11 @@ public class Paper extends BaseEntity {
 
     public boolean unLock() {
 
-        if (unLockedAt != null) {
+        if (this.unLocked == 0) {
             return false;
         }
 
-        unLockedAt = LocalDateTime.now();
+        this.unLocked = 1;
         return true;
     }
 
