@@ -31,10 +31,10 @@ public class JwtTokenProvider {
         log.info("[init] JwtTokenProvider 내 SecretKey 초기화 완료");
     }
 
-    public String createAccessToken(String name) {
-        Claims claims = Jwts.claims().setSubject(name);
+    public String createAccessToken(Long userId) {
+        Claims claims = Jwts.claims();
         Date now = new Date();
-        claims.put("nickname", name);
+        claims.put("userId", userId); //TODO: 유저 ID? 닉네임?
         log.info("[createAccessToken] access 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
@@ -56,14 +56,15 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getUserPk(String token) {
+    public Long getUserPk(String token) {
         log.info("[getUserPk] 토큰 기반 회원 구별 정보 추출");
-        return Jwts.parserBuilder().setSigningKey(secretKey).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(token).getBody().get("userId").toString());
     }
 
     public boolean validateToken(String jwtToken) {
         log.info("[validateToken] 토큰 유효 체크 시작 ");
+        log.info("[USER_PK] 토큰 내의 유저ID: {}", getUserPk(jwtToken));
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
                     .parseClaimsJws(jwtToken);
