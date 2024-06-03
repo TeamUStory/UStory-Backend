@@ -5,6 +5,7 @@ import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;

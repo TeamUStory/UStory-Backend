@@ -61,9 +61,7 @@ public class NoticeService {
                 case 4 -> {
                     noticeResponse.setType("기록");
                     noticeResponse.setPaperId(notice.getRequestId());
-                    noticeResponse.setTime(paperRepository.findById(noticeResponse.getPaperId())
-                            .orElseThrow(() -> new NotFoundException("유저 못찾음"))
-                            .getUnLockedAt());
+                    noticeResponse.setTime(notice.getCreatedAt());
                 }
             }
             noticeResponses.add(noticeResponse);
