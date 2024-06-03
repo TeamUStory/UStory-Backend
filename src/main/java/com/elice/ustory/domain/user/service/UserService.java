@@ -141,7 +141,7 @@ public class UserService {
         log.info("[getLogInResult] 패스워드 일치");
         log.info("[getLogInResult] LogInResponse 객체 생성");
         String accessToken = jwtTokenProvider.createAccessToken(
-                loginUser.getNickname()
+                loginUser.getId()
         );
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
