@@ -30,7 +30,17 @@ public class PaperResponse {
     @Schema(description = "상호명", example = "우규")
     private String store;
 
+    private Integer unlocked;
+
     public PaperResponse(Paper paper) {
+        if (paper.isUnlocked()) {
+            unlockedStatus(paper);
+        } else {
+            lockStatus(paper);
+        }
+    }
+
+    private void unlockedStatus(Paper paper) {
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
         this.imageUrls = paper.getImages().stream()
@@ -39,5 +49,15 @@ public class PaperResponse {
         this.visitedAt = paper.getVisitedAt();
         this.city = paper.getAddress().getCity();
         this.store = paper.getAddress().getStore();
+        this.unlocked = paper.getUnLocked();
+    }
+
+    private void lockStatus(Paper paper) {
+        this.title = paper.getTitle();
+        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
+        this.visitedAt = paper.getVisitedAt();
+        this.city = paper.getAddress().getCity();
+        this.store = paper.getAddress().getStore();
+        this.unlocked = paper.getUnLocked();
     }
 }
