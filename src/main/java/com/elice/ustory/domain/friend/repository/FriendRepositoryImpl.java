@@ -2,21 +2,18 @@ package com.elice.ustory.domain.friend.repository;
 
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
-import com.elice.ustory.domain.friend.dto.UserListDTO;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.entity.QFriend;
 import com.elice.ustory.domain.user.entity.QUsers;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-public class FriendRepositoryImpl implements FriendRepositoryCustom {
+public class FriendRepositoryImpl implements FriendQueryDslRepository {
 
     @PersistenceContext
     private EntityManager entityManager;

@@ -1,10 +1,12 @@
 package com.elice.ustory.domain.user.controller;
 
+import com.elice.ustory.domain.user.dto.UserListDTO;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
-import com.elice.ustory.global.jwt.JwtAuthorization;
+import com.elice.ustory.global.exception.ErrorCode;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -60,6 +62,21 @@ public class UserController {
         //TODO: 유저 정보 Cookie에 저장
         return ResponseEntity.ok().body(loginResponse);
     }
+
+    /**
+     * 닉네임으로 전체 사용자를 검색합니다.
+     *
+     * @param nickname 검색할 닉네임
+     * @return 검색된 사용자 목록
+     */
+    @Operation(summary = "Get / Search User by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
+    @GetMapping("/search")
+    public ResponseEntity<UserListDTO> searchUserByNickname(@RequestParam String nickname) {
+        UserListDTO user = userService.findUserByNickname(nickname)
+                .orElseThrow(() -> new NotFoundException("닉네임이 있는 사용자를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
+        return ResponseEntity.ok(user);
+    }
+
 
     @Operation(summary = "User MyPage API", description = "마이페이지에 필요한 정보를 조회한다.")
     @GetMapping(value = "/my-page")

@@ -14,49 +14,36 @@ public class Notice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, name = "receiver_id")
-    private long receiverId;
+    @Column(nullable = false, name = "response_id")
+    private long responseId;
 
     @Column(nullable = false)
     private String message;
 
-    @Column(name = "sender_id")
-    private long senderId;
+    @Setter
+    @Column(nullable = false, name = "request_id")
+    private long requestId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "paper_id")
-    private Paper paper;
-
-    @Column(nullable = false, name = "message_type")
-    private int messageType; // `tinyint`로 설정
+    @Column(nullable = false, name = "message_type", columnDefinition = "tinyint")
+    private int messageType;
 
 
     @Builder
-    public Notice(Long receiverId, Long senderId, Paper paper, String message, int messageType) {
-        this.receiverId = receiverId;
-        this.senderId = senderId;
-        this.paper = paper;
+    public Notice(Long responseId, Long requestId, String message, int messageType) {
+        this.responseId = responseId;
+        this.requestId = requestId;
         this.message = message;
         this.messageType = messageType;
-    }
-
-    public void setSenderId(Long senderId) {
-        this.senderId = senderId;
-    }
-
-    public void setPaper(Paper paper) {
-        this.paper = paper;
     }
 
     // toString 메서드 추가 (디버깅 용도)
     @Override
     public String toString() {
-        return "Notice{" +
+        return "Notice {" +
                 "id=" + id +
-                ", receiverId=" + receiverId +
+                ", responseId=" + responseId +
                 ", message='" + message + '\'' +
-                ", senderId=" + senderId +
-                ", paper=" + paper +
+                ", requestId=" + requestId +
                 ", messageType=" + messageType +
                 '}';
     }

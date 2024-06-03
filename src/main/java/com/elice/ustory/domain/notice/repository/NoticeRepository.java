@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    Optional<Notice> findBySenderIdAndReceiverIdAndMessageType(Long senderId, Long receiverId, int messageType);
-    Optional<Notice> findByPaperIdAndReceiverIdAndMessageType(Long paperId, Long receiverId, int messageType);
-    List<Notice> findByReceiverId(Long receiverId);
+    Optional<Notice> findByRequestIdAndResponseIdAndMessageType(Long requestId, Long responseId, int messageType);
+    List<Notice> findByResponseId(Long responseId);
 }
