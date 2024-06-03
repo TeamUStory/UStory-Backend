@@ -33,7 +33,7 @@ import java.util.List;
 
 @Tag(name = "Paper API")
 @RestController
-@RequestMapping("/api")
+@RequestMapping
 @RequiredArgsConstructor
 public class PaperController {
 
@@ -68,6 +68,16 @@ public class PaperController {
         return ResponseEntity.ok(new UpdatePaperResponse(paper.getId()));
     }
 
+    @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
+    @DeleteMapping("/paper/{paperId}")
+    public ResponseEntity<Void> delete(@PathVariable Long paperId) {
+
+        // paperId에 해당하는 paper 삭제
+        paperService.deleteById(paperId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @Operation(summary = "Read Paper API", description = "페이퍼를 불러온다.")
     @GetMapping("/paper/{paperId}")
     public ResponseEntity<PaperResponse> getPaper(@PathVariable Long paperId) {
@@ -78,10 +88,10 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Papers By User API", description = "유저가 작성한 페이퍼 리스트를 불러온다.")
-    @GetMapping(value = "/papers/user", params = "userId")
+    @GetMapping("/papers/user")
     public ResponseEntity<List<PaperListResponse>> getPapersByUser(@RequestParam(name = "userId") Long userId,
-                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                      @RequestParam(name = "size", defaultValue = "20") int size) {
+                                                                   @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                   @RequestParam(name = "size", defaultValue = "20") int size) {
 
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
 
@@ -93,7 +103,7 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Papers By Diary API", description = "다이어리에 포함된 페이퍼 리스트를 불러온다.")
-    @GetMapping(value = "/papers/diary", params = "diaryId")
+    @GetMapping("/papers/diary")
     public ResponseEntity<Slice<PaperListResponse>> getPapersByDiary(
             @RequestParam(name = "diaryId") Long diaryId,
             @RequestParam(name = "page", defaultValue = "1") int page,
@@ -110,7 +120,7 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Papers for Map API", description = "유저와 관련된 모든 리스트를 불러온다.")
-    @GetMapping(value = "/papers/map", params = "userId")
+    @GetMapping("/papers/map")
     public ResponseEntity<List<PaperMapListResponse>> getPapersByUserForMap(@RequestParam(name = "userId") Long userId) {
 
         List<Paper> papers = paperService.getPapersByUserId(userId);
@@ -122,19 +132,9 @@ public class PaperController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
-    @DeleteMapping("/paper/{paperId}")
-    public ResponseEntity<Void> delete(@PathVariable Long paperId) {
-
-        // paperId에 해당하는 paper 삭제
-        paperService.deleteById(paperId);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
     @Operation(summary = "Count Write Paper By Specific User API", description = "특정 유저가 작성한 모든 페이퍼의 갯수를 불러온다.")
-    @GetMapping(value = "/paper/count", params = "userId")
-    public ResponseEntity<Integer> countPaper(@RequestParam(name = "userId") Long userId) {
+    @GetMapping("/papers/count")
+    public ResponseEntity<Integer> countPapersByUser(@RequestParam(name = "userId") Long userId) {
         Integer count = paperService.countPapersByWriterId(userId);
         return ResponseEntity.ok(count);
     }
