@@ -32,10 +32,18 @@ public class Comment extends BaseEntity {
         this.content = content;
         this.paper = paper;
         this.user = user;
+
+        setPaper();
     }
 
     public Comment update(String content) {
         this.content = content;
         return this;
+    }
+
+    private void setPaper() {
+        if (paper.getComments().contains(this)) {
+            paper.getComments().add(this);
+        }
     }
 }

@@ -149,8 +149,6 @@ public class PaperService {
     // 준용아 DB에 저장 되고 호출해줘야한다?
     @Transactional
     public void noticeLocked(Diary diary, Paper paper) {
-        // 페이퍼가 존재하는지, 삭제되었는지에 대해서 체크 (예외처리 동시 진행), Q : 검증 완료된 상황 아닌가?
-        Paper checkedPaper = validatePaper(paper.getId());
 
         // 체크된 페이퍼에서 모든 코멘트를 불러온다.
         List<Comment> comments = paper.getComments();
