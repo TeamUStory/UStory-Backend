@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.user.service;
 
+import com.elice.ustory.domain.user.dto.UserListDTO;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
@@ -29,6 +30,23 @@ public class UserService {
 
     public Users findById(Long userId){
         return userRepository.findById(userId).orElseThrow();
+    }
+
+    /**
+     * 닉네임으로 전체 사용자를 검색합니다.
+     *
+     * @param nickname 검색할 닉네임
+     * @return 검색된 사용자 목록 (옵셔널)
+     */
+    public Optional<UserListDTO> findUserByNickname(String nickname) {
+        return Optional.ofNullable(nickname)
+                .filter(name -> !name.isEmpty())
+                .flatMap(userRepository::findByNickname)
+                .map(u -> UserListDTO.builder()
+                        .name(u.getName())
+                        .nickname(u.getNickname())
+                        .profileImgUrl(u.getProfileImgUrl())
+                        .build());
     }
 
     public Users signUp(SignUpRequest signUpRequest) {
