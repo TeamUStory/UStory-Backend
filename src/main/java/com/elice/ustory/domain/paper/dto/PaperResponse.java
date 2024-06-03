@@ -2,6 +2,7 @@ package com.elice.ustory.domain.paper.dto;
 
 import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.paper.entity.Paper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -21,7 +22,8 @@ public class PaperResponse {
     @Schema(description = "이미지 URL 리스트", example = "[\"https://~\", \"https://~\"]")
     private List<String> imageUrls;
 
-    @Schema(description = "방문 날짜", example = "2024-05-24")
+    @Schema(description = "방문 날짜", example = "2024.05.23 (목)")
+    @JsonSerialize(using = LocalDateConverter.class)
     private LocalDate visitedAt;
 
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21")
@@ -30,14 +32,38 @@ public class PaperResponse {
     @Schema(description = "상호명", example = "우규")
     private String store;
 
+    @Schema(description =
+            "저장 여부 <br>" +
+            "0을 반환하는 경우 미저장 상태이다. <br>" +
+            "1을 반환하는 경우 저장 상태이다.",
+            example = "1")
+    private Integer bookmarked;
+
+    @Schema(description =
+            "잠김 여부 <br>" +
+            "0을 반환하는 경우 잠금 상태이며, 필수적인 필드의 값만 반환한다. <br>" +
+            "1을 반환하는 경우 해금 상태이며, 모든 필드 값을 반환한다.",
+            example = "1")
     private Integer unlocked;
 
-    public PaperResponse(Paper paper) {
+    public PaperResponse(Paper paper, Boolean bookmarked) {
+
+        setBookmarked(bookmarked);
+
         if (paper.isUnlocked()) {
             unlockedStatus(paper);
         } else {
             lockStatus(paper);
         }
+    }
+
+    private void setBookmarked(Boolean bookmarked) {
+        if (bookmarked) {
+            this.bookmarked = 1;
+            return;
+        }
+
+        this.bookmarked = 0;
     }
 
     private void unlockedStatus(Paper paper) {
