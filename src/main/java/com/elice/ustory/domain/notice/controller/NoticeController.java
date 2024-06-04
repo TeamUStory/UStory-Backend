@@ -1,8 +1,7 @@
 package com.elice.ustory.domain.notice.controller;
 
-import com.elice.ustory.domain.friend.service.FriendService;
 import com.elice.ustory.domain.notice.dto.NoticeResponse;
-import com.elice.ustory.domain.notice.entity.Notice;
+import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
