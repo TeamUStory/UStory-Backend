@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.elice.ustory.domain.user.entity.QUsers.users;
@@ -33,15 +35,21 @@ public class DiaryService {
     private final UserRepository userRepository;
 
     @Transactional
-    public DiaryResponse createDiary(Diary diary, List<String> users) {
+    public DiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
         Diary savedDiary = diaryRepository.save(diary);
-        for (String nickname : users) {
-            Users user = userRepository.findByNickname(nickname).orElse(null);
-            // TODO : user가 null 인 경우 Exception
 
-            DiaryUserId diaryUserId = new DiaryUserId(savedDiary, user);
+        List<Users> friendList = diaryUserRepository.findFriendUsersByList(userId, userList);
+        if(friendList.size()!=userList.size()){
+            // TODO : throws Exception
+        }
+
+        for (Users friend : friendList) {
+            DiaryUserId diaryUserId = new DiaryUserId(savedDiary, friend);
             diaryUserRepository.save(new DiaryUser(diaryUserId));
         }
+        Users user = userRepository.findById(userId).orElse(null);
+        DiaryUserId diaryUserId = new DiaryUserId(savedDiary, user);
+        diaryUserRepository.save(new DiaryUser(diaryUserId));
 
         return DiaryResponse.toDiaryResponse(savedDiary);
     }
@@ -85,17 +93,17 @@ public class DiaryService {
         return DiaryResponse.toDiaryResponse(updatedDiary);
     }
 
-    public Page<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory) {
+    public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime) {
         if (userId == null) {
             // TODO : EXCEPTION 처리
             return null;
         }
-        Page<DiaryList> diaryList = diaryUserRepository.searchDiary(userId, pageable, diaryCategory);
-        List<DiaryListResponse> result = diaryList.getContent().stream()
+        List<DiaryList> diaryList = diaryUserRepository.searchDiary(userId, pageable, diaryCategory, dateTime);
+        List<DiaryListResponse> result = diaryList.stream()
                 .map(DiaryList::toDiaryListResponse)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(result, diaryList.getPageable(), diaryList.getTotalElements());
+        return result;
     }
 
     public List<DiaryListResponse> getUserDiaryList(Long userId) {
