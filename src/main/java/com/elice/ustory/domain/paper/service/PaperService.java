@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.paper.service;
 
 import com.elice.ustory.domain.comment.entity.Comment;
+import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
@@ -37,9 +38,10 @@ public class PaperService {
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
-    public Paper createPaper(Paper paper, Long writerId, Long diaryId) {
+    public Paper createPaper(Paper paper, Long writerId, Long diaryId, String comment) {
 
         Users writer = userRepository.findById(writerId)
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_MESSAGE, writerId)));
@@ -50,6 +52,14 @@ public class PaperService {
         paper.addDiary(diary);
 
         Paper savedPaper = paperRepository.save(paper);
+
+        Comment commentEntity = Comment.addCommentBuilder()
+                .paper(savedPaper)
+                .content(comment)
+                .user(writer)
+                .build();
+
+        commentRepository.save(commentEntity);
 
         needCommentNotice(diary, paper);
 
@@ -144,9 +154,12 @@ public class PaperService {
         }
     }
 
-    // 준용아 DB에 저장 되고 호출해줘야한다?
     @Transactional
     public void noticeLocked(Diary diary, Paper paper) {
+
+        if (paper.isUnlocked()) {
+            return;
+        }
 
         // 체크된 페이퍼에서 모든 코멘트를 불러온다.
         List<Comment> comments = paper.getComments();

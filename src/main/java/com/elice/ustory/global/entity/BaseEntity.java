@@ -22,4 +22,8 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    public void setUpdatedAt(LocalDateTime time){
+        updatedAt=time;
+    }
 }
