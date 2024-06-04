@@ -9,12 +9,10 @@ import org.springframework.stereotype.Service;
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
-    public void saveTokenInfo(Long userId, String refreshToken, String accessToken) {
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(userId), refreshToken, accessToken));
+    public void saveTokenInfo(Long userId, String refreshToken, String accessToken, int remainingTTL) {
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(userId), refreshToken, accessToken, remainingTTL));
     }
 
-    @Transactional
     public void removeTokenInfo(String accessToken) {
         refreshTokenRepository.findByAccessToken(accessToken)
                 .ifPresent(refreshTokenRepository::delete);
