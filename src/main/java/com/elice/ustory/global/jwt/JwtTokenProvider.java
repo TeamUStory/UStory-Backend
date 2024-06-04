@@ -17,8 +17,8 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
-    private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
+    private final long ACCESSTOKEN_VALID_MILISECOND = System.currentTimeMillis() + 1000L * 60 * 30;
+    private final long REFRESHTOKEN_VALID_MILISECOND = System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7;
 
     @Value("${key.salt}")
     private String salt;
@@ -34,12 +34,12 @@ public class JwtTokenProvider {
     public String createAccessToken(Long userId) {
         Claims claims = Jwts.claims();
         Date now = new Date();
-        claims.put("userId", userId); //TODO: 유저 ID? 닉네임?
+        claims.put("userId", userId);
         log.info("[createAccessToken] access 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALID_MILISECOND))
+                .setExpiration(new Date(ACCESSTOKEN_VALID_MILISECOND))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -51,7 +51,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESHTOKEN_VALID_MILISECOND))
+                .setExpiration(new Date(REFRESHTOKEN_VALID_MILISECOND))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -64,7 +64,6 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String jwtToken) {
         log.info("[validateToken] 토큰 유효 체크 시작 ");
-        log.info("[USER_PK] 토큰 내의 유저ID: {}", getUserPk(jwtToken));
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
                     .parseClaimsJws(jwtToken);
@@ -73,5 +72,14 @@ public class JwtTokenProvider {
             log.info("[validateToken] 토큰 유효 체크 예외 발생");
             return false;
         }
+    }
+
+    public long getRemainingTTL(String jwtToken) {
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(jwtToken);
+        Date expiration = claims.getBody().getExpiration();
+        Date now = new Date();
+        long remainingMillis = expiration.getTime() - now.getTime();
+        return Math.max(remainingMillis, 0) / 1000;
     }
 }
