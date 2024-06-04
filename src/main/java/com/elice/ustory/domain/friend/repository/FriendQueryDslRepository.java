@@ -8,5 +8,5 @@ import java.util.List;
 public interface FriendQueryDslRepository {
     List<UserFriendDTO> findFriends(Long userId, String nickname);
     List<FriendRequestDTO> findFriendRequests(Long userId);
-
+    boolean existsByReceiverAndSender(Long receiverId, Long senderId);
 }
