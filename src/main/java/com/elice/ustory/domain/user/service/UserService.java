@@ -206,7 +206,7 @@ public class UserService {
         return myPageResponse;
     }
 
-    public ValidateNicknameResponse isValid(ValidateNicknameRequest validateNicknameRequest) {
+    public ValidateNicknameResponse isValidNickname(ValidateNicknameRequest validateNicknameRequest) {
         String nickname = validateNicknameRequest.getNickname();
 
         // 중복 여부 확인(false면 합격)
