@@ -4,6 +4,7 @@ import com.elice.ustory.domain.bookmark.dto.AddBookmarkRequest;
 import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
 import com.elice.ustory.domain.bookmark.dto.BookmarkResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
+import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class BookmarkController {
     @Operation(summary = "Create bookmark API", description = "북마크를 지정한다.")
     @PostMapping("/{paperId}/bookmark")
     public ResponseEntity<Void> saveBookmark(@PathVariable Long paperId,
-                                             @RequestParam Long userId) {
+                                             @JwtAuthorization Long userId) {
 
         bookmarkService.saveBookmark(userId, paperId);
 
@@ -40,7 +41,7 @@ public class BookmarkController {
     @Operation(summary = "Read Papers Bookmarked API", description = "북마크된 Paper 리스트를 불러온다.")
     @GetMapping("/bookmarks")
     public ResponseEntity<List<BookmarkListResponse>> getBookmarkedPapersByUserId(
-            @RequestParam Long userId,
+            @JwtAuthorization Long userId,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
 
@@ -59,7 +60,7 @@ public class BookmarkController {
                     "isBookmarked가 1인 경우 북마크로 지정되어 있음을 의미한다.")
     @GetMapping("/{paperId}/bookmark")
     public ResponseEntity<BookmarkResponse> isPaperBookmarked(@PathVariable Long paperId,
-                                                              @RequestParam Long userId) {
+                                                              @JwtAuthorization Long userId) {
 
         boolean isBookmarked = bookmarkService.isPaperBookmarkedByUser(paperId, userId);
 
@@ -69,7 +70,7 @@ public class BookmarkController {
     @Operation(summary = "Delete Bookmark API", description = "북마크를 해제한다.")
     @DeleteMapping("/{paperId}/bookmark")
     public ResponseEntity<Void> deleteBookmark(@PathVariable Long paperId,
-                                               @RequestParam Long userId) {
+                                               @JwtAuthorization Long userId) {
 
         bookmarkService.deleteBookmark(userId, paperId);
 
