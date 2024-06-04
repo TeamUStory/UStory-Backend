@@ -15,6 +15,7 @@ import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.address.AddressService;
 import com.elice.ustory.domain.image.ImageService;
 import com.elice.ustory.domain.paper.service.PaperService;
+import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Paper API")
@@ -47,7 +49,7 @@ public class PaperController {
 
     @Operation(summary = "Create Paper API", description = "페이퍼를 생성한다.")
     @PostMapping
-    public ResponseEntity<AddPaperResponse> create(@RequestParam Long userId,
+    public ResponseEntity<AddPaperResponse> create(@JwtAuthorization Long userId,
                                                    @RequestBody AddPaperRequest addPaperRequest) {
 
         Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), userId, addPaperRequest.getDiaryId(), addPaperRequest.getWriterComment());
@@ -62,7 +64,7 @@ public class PaperController {
     @Operation(summary = "Update Paper API", description = "페이퍼를 수정한다.")
     @PutMapping("/{paperId}")
     public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long paperId,
-                                                      @RequestParam Long userId,
+                                                      @JwtAuthorization Long userId,
                                                       @RequestBody UpdatePaperRequest updatePaperRequest) {
 
         Paper paper = paperService.updatePaper(paperId, updatePaperRequest.toPageEntity());
@@ -77,7 +79,7 @@ public class PaperController {
     @Operation(summary = "Read Paper API", description = "페이퍼를 불러온다.")
     @GetMapping("/{paperId}")
     public ResponseEntity<PaperResponse> getPaper(@PathVariable Long paperId,
-                                                  @RequestParam Long userId) {
+                                                  @JwtAuthorization Long userId) {
 
         Paper paper = paperService.getPaperById(paperId);
         Boolean bookmarked = bookmarkService.isPaperBookmarkedByUser(paperId, userId);
@@ -88,7 +90,7 @@ public class PaperController {
     @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
     @DeleteMapping("/{paperId}")
     public ResponseEntity<Void> delete(@PathVariable Long paperId,
-                                       @RequestParam Long userId) {
+                                       @JwtAuthorization Long userId) {
 
         // paperId에 해당하는 paper 삭제
         paperService.deleteById(paperId);
@@ -98,9 +100,10 @@ public class PaperController {
 
     @Operation(summary = "Read Papers By User API", description = "유저가 작성한 페이퍼 리스트를 불러온다.")
     @GetMapping("/written")
-    public ResponseEntity<List<PaperListResponse>> getPapersByUser(@RequestParam(name = "userId") Long userId,
+    public ResponseEntity<List<PaperListResponse>> getPapersByUser(@JwtAuthorization Long userId,
                                                                    @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                   @RequestParam(name = "size", defaultValue = "20") int size) {
+                                                                   @RequestParam(name = "size", defaultValue = "20") int size,
+                                                                   @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
 
@@ -118,7 +121,8 @@ public class PaperController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size,
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate,
+            @RequestParam(name = "requestTime") LocalDateTime requestTime
     ) {
 
         List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate).stream().toList();
@@ -130,7 +134,7 @@ public class PaperController {
 
     @Operation(summary = "Read Papers for Map API", description = "유저와 관련된 모든 리스트를 불러온다.")
     @GetMapping("/map")
-    public ResponseEntity<List<PaperMapListResponse>> getPapersByUserForMap(@RequestParam(name = "userId") Long userId) {
+    public ResponseEntity<List<PaperMapListResponse>> getPapersByUserForMap(@JwtAuthorization Long userId) {
 
         List<Paper> papers = paperService.getPapersByUserId(userId);
 
@@ -143,7 +147,7 @@ public class PaperController {
 
     @Operation(summary = "Count Write Paper By Specific User API", description = "특정 유저가 작성한 모든 페이퍼의 갯수를 불러온다.")
     @GetMapping("/count")
-    public ResponseEntity<PaperCountResponse> countPapersByUser(@RequestParam(name = "userId") Long userId) {
+    public ResponseEntity<PaperCountResponse> countPapersByUser(@JwtAuthorization Long userId) {
         int count = paperService.countPapersByWriterId(userId);
         return ResponseEntity.ok(new PaperCountResponse(count));
     }

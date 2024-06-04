@@ -51,9 +51,14 @@ public class DiaryService {
         return DiaryResponse.toDiaryResponse(savedDiary);
     }
 
-    public DiaryResponse getDiaryDetailById(Long id) {
-        Diary diary = diaryRepository.findById(id).orElse(null);
-        return diary != null ? DiaryResponse.toDiaryResponse(diary) : null;
+    public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
+        Diary diary = diaryUserRepository.findDiaryUserById(userId,diaryId).getId().getDiary();
+        if(diary==null){
+            // TODO : throws Exception
+            return null;
+        }
+
+        return DiaryResponse.toDiaryResponse(diary);
     }
 
     public Diary getDiaryById(Long id) {
