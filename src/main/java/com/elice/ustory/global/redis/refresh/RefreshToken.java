@@ -2,11 +2,13 @@ package com.elice.ustory.global.redis.refresh;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
-@RedisHash(value = "jwtToken", timeToLive = 60 * 60 * 24 * 3)
+@RedisHash(value = "jwtToken")
 @AllArgsConstructor
 @Getter
 public class RefreshToken {
@@ -17,4 +19,7 @@ public class RefreshToken {
 
     @Indexed
     private String accessToken;
+
+    @TimeToLive
+    private Integer expiration;
 }

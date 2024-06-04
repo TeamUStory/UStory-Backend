@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +41,9 @@ public class NoticeService {
             noticeResponse.setMessage(notice.getMessage());
 
             switch (notice.getMessageType()) {
-                case 1 -> {
-                    // 여기에는 친구 노티스의 요청 시간이 시간으로만 셋이 되면 된다. 리퀘스트 ID
+                case 1, 3 -> {
                     noticeResponse.setType("친구");
-                    noticeResponse.setTime(LocalDateTime.of(1111, 1, 1, 1, 11, 11));
+                    noticeResponse.setTime(notice.getCreatedAt());
                 }
                 case 2 -> {
                     noticeResponse.setType("코멘트");
@@ -54,17 +52,10 @@ public class NoticeService {
                             .orElseThrow(() -> new NotFoundException("유저 못찾음"))
                             .getCreatedAt());
                 }
-                case 3 -> {
-                    // 여기에는 친구 노티스의 수락 시간이 셋이 되야 한다. 리스판스 ID
-                    noticeResponse.setType("친구");
-                    noticeResponse.setTime(LocalDateTime.of(3333, 3, 3, 3, 33, 33));
-                }
                 case 4 -> {
                     noticeResponse.setType("기록");
                     noticeResponse.setPaperId(notice.getRequestId());
-                    noticeResponse.setTime(paperRepository.findById(noticeResponse.getPaperId())
-                            .orElseThrow(() -> new NotFoundException("유저 못찾음"))
-                            .getUnLockedAt());
+                    noticeResponse.setTime(notice.getCreatedAt());
                 }
             }
             noticeResponses.add(noticeResponse);

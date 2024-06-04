@@ -22,7 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtInterceptor(jwtTokenProvider, jwtUtil))
-                .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/**")
+                .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/**", "/papers/**")
                 .addPathPatterns("/**");
 
         //TODO: 로그인 관련 엔드포인트는 제외시켜야함
