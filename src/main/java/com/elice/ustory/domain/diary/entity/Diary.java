@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.util.StringUtils.hasText;
 
 @Getter
@@ -17,7 +19,7 @@ public class Diary extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", columnDefinition = "varchar(10) not null")
+    @Column(name = "name", columnDefinition = "varchar(20) not null")
     private String name;
 
     @Column(name = "img_url", columnDefinition = "varchar(255) not null")
@@ -58,5 +60,10 @@ public class Diary extends BaseEntity {
         if (diary.getColor() != null) {
             this.color = diary.getColor();
         }
+    }
+
+    public void updateTime(){
+        LocalDateTime now = LocalDateTime.now();
+        setUpdatedAt(now);
     }
 }
