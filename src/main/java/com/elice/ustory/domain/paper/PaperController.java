@@ -1,6 +1,8 @@
 package com.elice.ustory.domain.paper;
 
 import com.elice.ustory.domain.bookmark.BookmarkService;
+import com.elice.ustory.domain.comment.dto.AddCommentRequest;
+import com.elice.ustory.domain.comment.service.CommentService;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperCountResponse;
@@ -48,7 +50,7 @@ public class PaperController {
     public ResponseEntity<AddPaperResponse> create(@RequestParam Long userId,
                                                    @RequestBody AddPaperRequest addPaperRequest) {
 
-        Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), userId, addPaperRequest.getDiaryId());
+        Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), userId, addPaperRequest.getDiaryId(), addPaperRequest.getWriterComment());
 
         addressService.create(addPaperRequest.toAddressEntity(), paper);
 
