@@ -2,6 +2,8 @@ package com.elice.ustory.domain.diaryUser.repository;
 
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
+import com.elice.ustory.domain.user.entity.Users;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -13,7 +15,10 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.elice.ustory.domain.diary.entity.QDiary.diary;
 import static com.elice.ustory.domain.diaryUser.entity.QDiaryUser.diaryUser;
+import static com.elice.ustory.domain.friend.entity.QFriend.friend;
+import static com.elice.ustory.domain.user.entity.QUsers.users;
 
 public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
     private final JPAQueryFactory queryFactory;
@@ -101,6 +106,28 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                         diaryUser.id.diary.id.eq(diaryId)
                 )
                 .fetch();
+    }
+
+    @Override
+    public List<Tuple> findUsersByDiary(Long userId,Long diaryId, List<String> userList){
+        return queryFactory
+                    .select(friend.friendUser.as(users),
+                            diaryUser.id.diary.id.as(diary.id))
+                    .from(friend)
+                    .leftJoin(diaryUser)
+                    .on(friend.friendUser.id.eq(diaryUser.id.users.id))
+                    .where(
+                            friend.user.id.eq(userId)
+                            .and(
+                                    friend.friendUser.nickname.in(userList)
+                            )
+                            .and(
+                                    diaryUser.id.diary.id.eq(diaryId)
+                                            .or(diaryUser.id.diary.id.isNull())
+                            )
+                    )
+                    .fetch();
+
     }
 
     private BooleanExpression categoryEq(DiaryCategory diaryCategory) {

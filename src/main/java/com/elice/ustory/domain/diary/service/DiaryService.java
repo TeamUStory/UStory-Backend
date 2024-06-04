@@ -5,22 +5,25 @@ import com.elice.ustory.domain.diary.dto.DiaryListResponse;
 import com.elice.ustory.domain.diary.dto.DiaryResponse;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
+import com.elice.ustory.domain.diary.entity.QDiary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.elice.ustory.domain.user.entity.QUsers.users;
 
 @Service
 @RequiredArgsConstructor
@@ -53,26 +56,32 @@ public class DiaryService {
     }
 
     @Transactional
-    public DiaryResponse updateDiary(Long id, Diary diary, List<String> users) {
-        Diary updatedDiary = diaryRepository.findById(id).orElse(null);
+    public DiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
+        Diary updatedDiary = diaryRepository.findById(diaryId).orElse(null);
         if (updatedDiary == null) return null;
         updatedDiary.updateDiary(diary);
 
-        // TODO : 이미 다이어리에 10명이 존재할 경우 & 기존 유저가 아닌 새로운 10명으로 보내졌을 경우(?)
-        // TODO : 기존 멤버가 제외된 리스트가 보내진 경우... & 친구가 아닌 유저가 온 경우...
-
         // 다이어리에 유저가 추가된 경우
-        if (users.size() != diaryUserRepository.countUserByDiary(id)) {
-            List<String> userList = diaryUserRepository.findUserByDiary(id);
-            for (String nickname : users) {
-                if (userList.contains(nickname)) continue;
+        if (userList.size() >= diaryUserRepository.countUserByDiary(diaryId)) {
+            List<Tuple> usersByDiary = diaryUserRepository.findUsersByDiary(userId, diaryId, userList);
+            if(usersByDiary.size()>9 || usersByDiary.size()<userList.size()){
+                // TODO : throws EXCEPTION -> request를 보낸 유저까지 11명이 되는 케이스
 
-                Users user = userRepository.findByNickname(nickname).orElse(null);
-                // TODO : null(존재하지 않는 유저) -> Exception
-                DiaryUserId diaryUserId = new DiaryUserId(updatedDiary, user);
-                diaryUserRepository.save(new DiaryUser(diaryUserId));
+                // TODO : throws EXCEPTION -> 존재하지 않는 유저 닉네임이 보내진 경우
+            }
+            for (Tuple tuple : usersByDiary) {
+                Users user = tuple.get(users);
+                if(tuple.get(QDiary.diary.id)!=null){
+                    if(!userList.contains(user.getNickname())){
+                        // TODO : throws Exception -> 기존 유저가 사라진 케이스
+                    }
+                }else{
+                    DiaryUserId diaryUserId = new DiaryUserId(updatedDiary, user);
+                    diaryUserRepository.save(new DiaryUser(diaryUserId));
+                }
             }
         }
+
         return DiaryResponse.toDiaryResponse(updatedDiary);
     }
 
@@ -114,6 +123,7 @@ public class DiaryService {
             DiaryUser diaryUser = diaryUserRepository.findById(diaryUserId).orElse(null);
             diaryUserRepository.delete(diaryUser);
         }
+        // TODO : diary가 비워진 경우 소프트 딜리트(?)
     }
 
 }

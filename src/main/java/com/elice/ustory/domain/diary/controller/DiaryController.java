@@ -37,8 +37,8 @@ public class DiaryController {
     }
 
     @Operation(summary = "Get User's Diary By User API", description = "유저가 속한 다이어리 목록 불러오기")
-    @GetMapping("/diary")
-    public ResponseEntity<Page<DiaryListResponse>> getDiaries(@RequestParam("userId") Long userId
+    @GetMapping("/diary/{userId}")
+    public ResponseEntity<Page<DiaryListResponse>> getDiaries(@PathVariable("userId") Long userId
             , @RequestParam(name = "page", defaultValue = "1") int page
             , @RequestParam(name = "size", defaultValue = "10") int size
             , @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory) {
@@ -58,12 +58,12 @@ public class DiaryController {
     }
 
     @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
-    @PutMapping("/diary/{diaryId}")
-    public ResponseEntity<DiaryResponse> updateDiary(@PathVariable("diaryId") Long diaryId, @Valid @RequestBody DiaryDto diaryDto) {
+    @PutMapping("/diary/{diaryId}/{userId}")
+    public ResponseEntity<DiaryResponse> updateDiary(@PathVariable("userId") Long userId, @PathVariable("diaryId") Long diaryId, @Valid @RequestBody DiaryDto diaryDto) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        DiaryResponse diaryResponse = diaryService.updateDiary(diaryId, diaryDto.toDiary(), diaryDto.getUsers());
+        DiaryResponse diaryResponse = diaryService.updateDiary(userId, diaryId, diaryDto.toDiary(), diaryDto.getUsers());
         // TODO : 인원 수 변동 확인
 
         return ResponseEntity.ok(diaryResponse);
@@ -84,8 +84,8 @@ public class DiaryController {
     }
 
     @Operation(summary = "Get Diary Count", description = "유저가 속한 다이어리 개수 불러오기")
-    @GetMapping("/diary/{userId}/count")
-    public ResponseEntity<Long> getDiaryCount(@PathVariable("userId") Long userId) {
+    @GetMapping("/diary/count")
+    public ResponseEntity<Long> getDiaryCount(@RequestParam("userId") Long userId) {
         Long count = diaryService.getDiaryCount(userId);
         return ResponseEntity.ok(count);
     }
