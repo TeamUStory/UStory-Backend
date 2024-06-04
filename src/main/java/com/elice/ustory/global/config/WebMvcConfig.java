@@ -22,7 +22,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtInterceptor(jwtTokenProvider, jwtUtil))
-                .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/**", "/papers/**")
+                .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**",
+                        "/user", "/user/login", "/user/validate-nickname", "/user/send-validate")
                 .addPathPatterns("/**");
 
         //TODO: 로그인 관련 엔드포인트는 제외시켜야함
