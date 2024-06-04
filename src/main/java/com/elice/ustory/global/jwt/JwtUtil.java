@@ -1,5 +1,8 @@
 package com.elice.ustory.global.jwt;
 
+import com.elice.ustory.global.redis.refresh.RefreshToken;
+import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
+import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -17,13 +22,24 @@ import java.util.Optional;
 @Slf4j
 public class JwtUtil {
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        String refreshToken = getTokenFromRequest(request, "Refresh"); // TODO: Redis RefreshToken에 맞게 수정 1
-        if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
-            log.info("[refreshToken] RefreshToken으로 AccessToken 재발급 시작");
-            String accessToken = jwtTokenProvider.createAccessToken(jwtTokenProvider.getUserPk(refreshToken));
-            Cookie cookie = new Cookie("Authorization", accessToken);
+        String accessToken = getTokenFromRequest(request, "Authorization"); // TODO: Redis RefreshToken에 맞게 수정 1
+        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
+                .orElseThrow();
+
+
+        log.info("redis안의 토큰: {}", refreshToken.getRefreshToken());
+        if (jwtTokenProvider.validateToken(refreshToken.getRefreshToken())) {
+            log.info("[refreshToken] 기존 RefreshToken으로 AccessToken 재발급 && 새 RefreshToken 발급 시작");
+            String newAccessToken = jwtTokenProvider.createAccessToken(Long.valueOf(refreshToken.getId()));
+            String newRefreshToken = jwtTokenProvider.createRefreshToken();
+            int remainingTTL = (int) jwtTokenProvider.getRemainingTTL(refreshToken.getRefreshToken());
+
+            refreshTokenService.saveTokenInfo(Long.valueOf(refreshToken.getId()), newRefreshToken, newAccessToken, remainingTTL);
+            Cookie cookie = new Cookie("Authorization", URLEncoder.encode("Bearer " + newAccessToken, StandardCharsets.UTF_8));
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60);
             response.addCookie(cookie);
