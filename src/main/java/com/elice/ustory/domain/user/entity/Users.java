@@ -35,7 +35,7 @@ public class Users extends BaseEntity {
     @Column(name = "password", columnDefinition = "VARCHAR(100)")
     private String password;
 
-    @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
+    @Column(name = "profile_img_url", columnDefinition = "TEXT")
     private String profileImgUrl;
 
     @Column(name = "profile_description", columnDefinition = "VARCHAR(150)")
