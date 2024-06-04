@@ -54,12 +54,7 @@ public class UserController {
     @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다.")
     @PostMapping(value = "/login")
     public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        String id = loginRequest.getLoginEmail();
-        String password = loginRequest.getPassword();
-        LoginResponse loginResponse = userService.login(id, password, response);
-        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
-
-        //TODO: 유저 정보 Cookie에 저장
+        LoginResponse loginResponse = userService.login(loginRequest, response);
         return ResponseEntity.ok().body(loginResponse);
     }
 

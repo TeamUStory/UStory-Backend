@@ -123,7 +123,9 @@ public class UserService {
         return deletedUser;
     }
 
-    public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
+    public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
+        String id = loginRequest.getLoginEmail();
+        String rawPassword = loginRequest.getPassword();
         LoginResponse loginResponse = new LoginResponse();
 
         //TODO: 예외처리
@@ -160,6 +162,7 @@ public class UserService {
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
 
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
         return loginResponse;
     }
 
