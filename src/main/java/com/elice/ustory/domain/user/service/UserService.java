@@ -5,8 +5,7 @@ import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
-//import com.elice.ustory.global.redis.refresh.RefreshToken;
-//import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
+import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-//    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     public Users findById(Long userId){
         return userRepository.findById(userId).orElseThrow();
@@ -140,9 +139,7 @@ public class UserService {
         }
         log.info("[getLogInResult] 패스워드 일치");
         log.info("[getLogInResult] LogInResponse 객체 생성");
-        String accessToken = jwtTokenProvider.createAccessToken(
-                loginUser.getId()
-        );
+        String accessToken = jwtTokenProvider.createAccessToken(loginUser.getId());
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
@@ -158,11 +155,8 @@ public class UserService {
         cookie1.setMaxAge(60 * 60);
         response.addCookie(cookie1);
 
-//        RefreshToken refreshToken1 = new RefreshToken(String.valueOf(loginUser.getId()), refreshToken, accessToken);
-//        refreshTokenRepository.save(refreshToken1);
-//        RefreshToken foundTokenInfo = refreshTokenRepository.findByAccessToken(accessToken)
-//                .orElseThrow();
-//        log.info("redis안의 토큰: {}", foundTokenInfo.getRefreshToken());
+        refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
+
         return loginResponse;
     }
 
