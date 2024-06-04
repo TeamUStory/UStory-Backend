@@ -73,11 +73,11 @@ public class UserService {
         return newUser;
     }
 
-    public Users updateUser(UpdateRequest updateRequest) {
+    public Users updateUser(UpdateRequest updateRequest, Long userId) {
         //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
         //TODO: Optional 예외처리
         Users user = userRepository
-                .findById(updateRequest.getUserId())
+                .findById(userId)
                 .orElseThrow();
 
         String name = updateRequest.getName();
@@ -106,9 +106,7 @@ public class UserService {
         return updatedUser;
     }
 
-    public Users deleteUser(DeleteRequest deleteRequest) {
-
-        Long userId = deleteRequest.getUserId();
+    public Users deleteUser(Long userId) {
 
         //TODO: 예외처리
         Users user = userRepository.findById(userId)

@@ -3,6 +3,7 @@ package com.elice.ustory.domain.friend.controller;
 import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
+import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class FriendController {
      */
     @Operation(summary = "Get / Friends", description = "사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.")
     @GetMapping("/search")
-    public ResponseEntity<List<UserFriendDTO>> getFriends(@RequestParam Long userId, @RequestParam(required = false) String nickname) {
+    public ResponseEntity<List<UserFriendDTO>> getFriends(@JwtAuthorization Long userId, @RequestParam(required = false) String nickname) {
         List<UserFriendDTO> friends = friendService.getFriends(userId, nickname);
         return ResponseEntity.ok(friends);
     }
@@ -57,7 +58,7 @@ public class FriendController {
      */
     @Operation(summary = "Get / Friend Requests", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
     @GetMapping("/received")
-    public ResponseEntity<List<FriendRequestDTO>> getFriendRequests(@RequestParam Long userId) {
+    public ResponseEntity<List<FriendRequestDTO>> getFriendRequests(@JwtAuthorization Long userId) {
         List<FriendRequestDTO> friendRequests = friendService.getFriendRequests(userId);
         return ResponseEntity.ok(friendRequests);
     }
@@ -86,7 +87,7 @@ public class FriendController {
      */
     @Operation(summary = "Delete / Delete Friend", description = "친구 관계를 삭제합니다.")
     @DeleteMapping("/{friendId}")
-    public ResponseEntity<Void> deleteFriend(@RequestParam Long userId, @PathVariable Long friendId) {
+    public ResponseEntity<Void> deleteFriend(Long userId, @PathVariable Long friendId) {
         friendService.deleteFriendById(userId, friendId);
         return ResponseEntity.noContent().build();
     }
