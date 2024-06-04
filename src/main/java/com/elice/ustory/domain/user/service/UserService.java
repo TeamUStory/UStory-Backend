@@ -7,15 +7,18 @@ import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
@@ -160,11 +163,25 @@ public class UserService {
         return loginResponse;
     }
 
-    public LogoutResponse logout(HttpServletResponse response) {
-        var currentCookie = new Cookie("Authorization", null);
-        currentCookie.setPath("/");
-        currentCookie.setMaxAge(0);
-        response.addCookie(currentCookie); // 생성 즉시 만료되는 쿠키로 덮어씌움
+    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        // 1. 쿠키 만료 시작
+        Cookie cookieForExpire = new Cookie("Authorization", null);
+        cookieForExpire.setPath("/");
+        cookieForExpire.setMaxAge(0);
+        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
+        // 1. 쿠키 만료 끝
+
+        // 2. 리프레시 토큰 삭제 시작
+        Cookie currentCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .findFirst().orElseThrow();
+        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        refreshTokenService.removeTokenInfo(token);
+        // 2. 리프레시 토큰 삭제 끝
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
         return logoutResponse;

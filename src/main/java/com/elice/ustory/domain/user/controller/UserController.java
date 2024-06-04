@@ -11,6 +11,7 @@ import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,10 +63,10 @@ public class UserController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
-    @Operation(summary = "User Logout API", description = "쿠키를 만료시켜, 현재 유저를 로그아웃한다.")
+    @Operation(summary = "User Logout API", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletResponse response) {
-        LogoutResponse logoutResponse = userService.logout(response);
+    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
+        LogoutResponse logoutResponse = userService.logout(request, response);
         return ResponseEntity.ok().body(logoutResponse);
     }
 
