@@ -87,7 +87,7 @@ public class FriendController {
      */
     @Operation(summary = "Delete / Delete Friend", description = "친구 관계를 삭제합니다.")
     @DeleteMapping("/{friendId}")
-    public ResponseEntity<Void> deleteFriend(Long userId, @PathVariable Long friendId) {
+    public ResponseEntity<Void> deleteFriend(@JwtAuthorization Long userId, @PathVariable Long friendId) {
         friendService.deleteFriendById(userId, friendId);
         return ResponseEntity.noContent().build();
     }
