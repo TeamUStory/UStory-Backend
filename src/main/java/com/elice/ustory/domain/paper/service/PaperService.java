@@ -144,9 +144,12 @@ public class PaperService {
         }
     }
 
-    // 준용아 DB에 저장 되고 호출해줘야한다?
     @Transactional
     public void noticeLocked(Diary diary, Paper paper) {
+
+        if (paper.isUnlocked()) {
+            return;
+        }
 
         // 체크된 페이퍼에서 모든 코멘트를 불러온다.
         List<Comment> comments = paper.getComments();
