@@ -38,15 +38,16 @@ public class UserController {
 
     @Operation(summary = "Update User API", description = "로그인한 회원의 정보를 수정한다.")
     @PutMapping
-    public ResponseEntity<Users> updateCurrentUser(@Valid @RequestBody UpdateRequest updateRequest) {
-        Users updatedUser = userService.updateUser(updateRequest);
+    public ResponseEntity<Users> updateCurrentUser(@JwtAuthorization Long userId,
+                                                   @Valid @RequestBody UpdateRequest updateRequest) {
+        Users updatedUser = userService.updateUser(updateRequest, userId);
         return ResponseEntity.ok().body(updatedUser);
     }
 
     @Operation(summary = "Delete User API", description = "로그인한 회원을 삭제한다. (소프트 딜리트)")
     @DeleteMapping
-    public ResponseEntity<Users> deleteCurrentUser(@Valid @RequestBody DeleteRequest deleteRequest) {
-        Users deletedUser = userService.deleteUser(deleteRequest);
+    public ResponseEntity<Users> deleteCurrentUser(@JwtAuthorization Long userId) {
+        Users deletedUser = userService.deleteUser(userId);
         return ResponseEntity.ok().body(deletedUser);
     }
 
@@ -79,7 +80,7 @@ public class UserController {
 
     @Operation(summary = "User MyPage API", description = "마이페이지에 필요한 정보를 조회한다.")
     @GetMapping(value = "/my-page")
-    public ResponseEntity<MyPageResponse> showMyPage(@Valid @RequestParam("userId") Long userId) {
+    public ResponseEntity<MyPageResponse> showMyPage(@JwtAuthorization Long userId) {
         MyPageResponse myPageResponse = userService.showMyPage(userId);
         return ResponseEntity.ok(myPageResponse);
     }
