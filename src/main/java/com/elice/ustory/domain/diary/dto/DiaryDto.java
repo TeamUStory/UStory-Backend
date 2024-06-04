@@ -20,13 +20,13 @@ public class DiaryDto {
     private String name;
 
     @NotNull
-    private String diaryImg;
+    private String imgUrl;
 
     @NotNull
     private DiaryCategory diaryCategory;
 
     @NotNull
-    @Size(max = 20)
+    @Size(min = 1,max = 20)
     private String description;
 
     @NotNull
@@ -35,9 +35,9 @@ public class DiaryDto {
     @NotEmpty
     private List<String> users;
 
-    public DiaryDto(String name, String diaryImg, DiaryCategory diaryCategory, String description, Color color, List<String> users) {
+    public DiaryDto(String name, String imgUrl, DiaryCategory diaryCategory, String description, Color color, List<String> users) {
         this.name = name;
-        this.diaryImg = diaryImg;
+        this.imgUrl = imgUrl;
         this.diaryCategory = diaryCategory;
         this.description = description;
         this.color = color;
@@ -45,7 +45,7 @@ public class DiaryDto {
     }
 
     public Diary toDiary() {
-        Diary diary = new Diary(name, diaryImg, diaryCategory, description, color);
+        Diary diary = new Diary(name, imgUrl, diaryCategory, description, color);
         return diary;
     }
 }
