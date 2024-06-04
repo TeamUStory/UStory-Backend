@@ -29,7 +29,7 @@ public class UserController {
     private final EmailService emailService;
 
     @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다.")
-    @PostMapping
+    @PostMapping("/sign-up")
     public ResponseEntity<Users> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
         Users newUser = userService.signUp(signUpRequest);
@@ -86,14 +86,14 @@ public class UserController {
     }
 
     @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
-    @PostMapping(value = "/validate-nickname")
+    @PostMapping(value = "/sign-up/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
         ValidateNicknameResponse validateNicknameResponse = userService.isValid(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
     @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-    @PostMapping("/send-validate")
+    @PostMapping("/sign-up/send-validate")
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
