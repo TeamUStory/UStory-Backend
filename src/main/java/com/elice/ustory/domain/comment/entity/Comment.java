@@ -42,7 +42,7 @@ public class Comment extends BaseEntity {
     }
 
     private void setPaper() {
-        if (paper.getComments().contains(this)) {
+        if (!paper.getComments().contains(this)) {
             paper.getComments().add(this);
         }
     }
