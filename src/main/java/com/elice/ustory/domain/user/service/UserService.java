@@ -160,6 +160,16 @@ public class UserService {
         return loginResponse;
     }
 
+    public LogoutResponse logout(HttpServletResponse response) {
+        var currentCookie = new Cookie("Authorization", null);
+        currentCookie.setPath("/");
+        currentCookie.setMaxAge(0);
+        response.addCookie(currentCookie); // 생성 즉시 만료되는 쿠키로 덮어씌움
+
+        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
+        return logoutResponse;
+    }
+
     public MyPageResponse showMyPage(Long userId) {
         Users currentUser = userRepository.findById(userId)
                 .orElseThrow();

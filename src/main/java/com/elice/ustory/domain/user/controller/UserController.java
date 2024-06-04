@@ -62,6 +62,13 @@ public class UserController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
+    @Operation(summary = "User Logout API", description = "쿠키를 만료시켜, 현재 유저를 로그아웃한다.")
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletResponse response) {
+        LogoutResponse logoutResponse = userService.logout(response);
+        return ResponseEntity.ok().body(logoutResponse);
+    }
+
     /**
      * 닉네임으로 전체 사용자를 검색합니다.
      *
