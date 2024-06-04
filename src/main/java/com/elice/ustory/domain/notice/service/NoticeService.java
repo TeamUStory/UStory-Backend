@@ -9,7 +9,7 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.util.CommonUtils;
+import com.elice.ustory.global.util.NoticeUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,15 +75,15 @@ public class NoticeService {
 
         if (noticeRequest.getMessageType() == 3) {
             Users findUser = userRepository.findById(noticeRequest.getSenderId()).orElseThrow(() -> new NotFoundException("해당 유저 없음"));
-            message = CommonUtils.generateMessage(noticeRequest, findUser.getNickname());
+            message = NoticeUtils.generateMessage(noticeRequest, findUser.getNickname());
             Long senderId = noticeRequest.getSenderId();
             requestId = senderId;
         } else if (noticeRequest.getMessageType() == 1) {
-            message = CommonUtils.generateMessage(noticeRequest);
+            message = NoticeUtils.generateMessage(noticeRequest);
             Long senderId = noticeRequest.getSenderId();
             requestId =senderId;
         } else {
-            message = CommonUtils.generateMessage(noticeRequest);
+            message = NoticeUtils.generateMessage(noticeRequest);
             Long paperId = noticeRequest.getPaperId();
             requestId = paperId;
         }
