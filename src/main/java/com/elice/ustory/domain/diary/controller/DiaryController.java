@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -40,12 +39,12 @@ public class DiaryController {
     }
 
     @Operation(summary = "Get User's Diary By User API", description = "유저가 속한 다이어리 목록 불러오기")
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<DiaryListResponse>> getDiaries(@PathVariable("userId") Long userId
+    @GetMapping
+    public ResponseEntity<List<DiaryListResponse>> getDiaries(Long userId
             , @RequestParam(name = "page", defaultValue = "1") int page
             , @RequestParam(name = "size", defaultValue = "10") int size
             , @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory
-            , @RequestParam(name = "dateTime")LocalDateTime dateTime) {
+            , @RequestParam(name = "dateTime") LocalDateTime dateTime) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, dateTime);
@@ -61,8 +60,8 @@ public class DiaryController {
     }
 
     @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
-    @PutMapping("/{diaryId}/{userId}")
-    public ResponseEntity<DiaryResponse> updateDiary(@PathVariable("userId") Long userId, @PathVariable("diaryId") Long diaryId, @Valid @RequestBody DiaryDto diaryDto) {
+    @PutMapping("/{diaryId}")
+    public ResponseEntity<DiaryResponse> updateDiary(Long userId, @PathVariable("diaryId") Long diaryId, @Valid @RequestBody DiaryDto diaryDto) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -73,7 +72,7 @@ public class DiaryController {
     }
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
-    @GetMapping("/detail/{diaryId}")
+    @GetMapping("/{diaryId}")
     public ResponseEntity<DiaryResponse> getDiaryByID(@PathVariable("diaryId") Long diaryId) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -102,9 +101,9 @@ public class DiaryController {
     }
 
     @Operation(summary = "Exit Diary", description = "다이어리 나가기")
-    @GetMapping("/{diaryId}/exit/{userId}")
-    public ResponseEntity<Void> exitDiary(@PathVariable("userId") Long userId, @PathVariable("diaryId") Long diaryId){
-        diaryService.exitDiary(userId,diaryId);
+    @GetMapping("/{diaryId}/exit")
+    public ResponseEntity<Void> exitDiary(Long userId, @PathVariable("diaryId") Long diaryId) {
+        diaryService.exitDiary(userId, diaryId);
         return ResponseEntity.noContent().build();
     }
 }
