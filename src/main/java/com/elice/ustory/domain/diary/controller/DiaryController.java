@@ -99,4 +99,10 @@ public class DiaryController {
     }
 
     // TODO : 다이어리 나가기
+    @Operation(summary = "Exit Dirat", description = "다이어리 나가기")
+    @GetMapping("/diary/{diaryId}/exit/{userId}")
+    public ResponseEntity<Void> exitDiary(@PathVariable("userId") Long userId, @PathVariable("diaryId") Long diaryId){
+        diaryService.exitDiary(userId,diaryId);
+        return ResponseEntity.noContent().build();
+    }
 }

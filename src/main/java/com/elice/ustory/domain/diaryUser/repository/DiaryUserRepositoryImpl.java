@@ -2,6 +2,7 @@ package com.elice.ustory.domain.diaryUser.repository;
 
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.user.entity.Users;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.elice.ustory.domain.diary.entity.QDiary.diary;
 import static com.elice.ustory.domain.diaryUser.entity.QDiaryUser.diaryUser;
@@ -128,6 +130,16 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                     )
                     .fetch();
 
+    }
+
+    @Override
+    public DiaryUser findDiaryUserById(Long userId, Long diaryId){
+        return queryFactory
+                .selectFrom(diaryUser)
+                .where(
+                        diaryUser.id.users.id.eq(userId)
+                                .and(diaryUser.id.diary.id.eq(diaryId))
+                ).fetchOne();
     }
 
     private BooleanExpression categoryEq(DiaryCategory diaryCategory) {

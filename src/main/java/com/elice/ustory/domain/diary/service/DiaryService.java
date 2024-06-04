@@ -115,14 +115,14 @@ public class DiaryService {
         diaryRepository.delete(diary);
     }
 
-    public void exitDiary(Long diaryId, Long userId) {
-        Diary diary = diaryRepository.findById(diaryId).orElse(null);
-        Users users = userRepository.findById(userId).orElse(null);
-        if (diary != null && users != null) {
-            DiaryUserId diaryUserId = new DiaryUserId(diary, users);
-            DiaryUser diaryUser = diaryUserRepository.findById(diaryUserId).orElse(null);
+    public void exitDiary(Long userId, Long diaryId) {
+        DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
+        if (diaryUser != null) {
             diaryUserRepository.delete(diaryUser);
+        }else{
+            // TODO : throws EXCEPTION
         }
+
         // TODO : diary가 비워진 경우 소프트 딜리트(?)
     }
 
