@@ -58,7 +58,7 @@ public class Paper extends BaseEntity {
     private Address address;
 
     @OneToMany(mappedBy = "paper")
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

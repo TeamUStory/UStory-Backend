@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.paper.service;
 
 import com.elice.ustory.domain.comment.entity.Comment;
+import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
@@ -37,9 +38,10 @@ public class PaperService {
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
-    public Paper createPaper(Paper paper, Long writerId, Long diaryId) {
+    public Paper createPaper(Paper paper, Long writerId, Long diaryId, String comment) {
 
         Users writer = userRepository.findById(writerId)
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_MESSAGE, writerId)));
@@ -50,6 +52,14 @@ public class PaperService {
         paper.addDiary(diary);
 
         Paper savedPaper = paperRepository.save(paper);
+
+        Comment commentEntity = Comment.addCommentBuilder()
+                .paper(savedPaper)
+                .content(comment)
+                .user(writer)
+                .build();
+
+        commentRepository.save(commentEntity);
 
         needCommentNotice(diary, paper);
 
