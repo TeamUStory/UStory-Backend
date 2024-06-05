@@ -52,11 +52,7 @@ public class PaperController {
     public ResponseEntity<AddPaperResponse> create(@JwtAuthorization Long userId,
                                                    @RequestBody AddPaperRequest addPaperRequest) {
 
-        Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), userId, addPaperRequest.getDiaryId(), addPaperRequest.getWriterComment());
-
-        addressService.create(addPaperRequest.toAddressEntity(), paper);
-
-        imageService.createImages(addPaperRequest.toImagesEntity(), paper);
+        Paper paper = paperService.create(userId, addPaperRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new AddPaperResponse(paper.getId()));
     }

@@ -1,12 +1,17 @@
 package com.elice.ustory.domain.paper.service;
 
+import com.elice.ustory.domain.address.Address;
+import com.elice.ustory.domain.address.AddressRepository;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
+import com.elice.ustory.domain.image.Image;
+import com.elice.ustory.domain.image.ImageRepository;
 import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.service.NoticeService;
+import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
@@ -35,6 +40,8 @@ public class PaperService {
     private static final String ORDER_BY_UPDATED_AT = "updatedAt";
 
     private final PaperRepository paperRepository;
+    private final AddressRepository addressRepository;
+    private final ImageRepository imageRepository;
     private final NoticeService noticeService;
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
@@ -42,33 +49,53 @@ public class PaperService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Paper createPaper(Paper paper, Long writerId, Long diaryId, String comment) {
+    public Paper create(Long writerId, AddPaperRequest request) {
 
+        // Paper 객체 생성
+        Paper paper = request.toPaperEntity();
+
+        // Writer 주입
         Users writer = userRepository.findById(writerId)
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_MESSAGE, writerId)));
         paper.addWriter(writer);
 
-        Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId)));
+        // Diary 주입
+        Diary diary = diaryRepository.findById(request.getDiaryId())
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, request.getDiaryId())));
         paper.addDiary(diary);
 
+        // 개인 다이어리인 경우 Paper 해금상태로 변경
         if (diary.getDiaryCategory().getName().equals("개인")) {
             paper.unLock();
         }
 
-        Paper savedPaper = paperRepository.save(paper);
+        // Paper 객체 저장
+        paper = paperRepository.save(paper);
 
+        // Address 객체 생성 및 저장
+        Address address = request.toAddressEntity();
+        address.setPaper(paper);
+        addressRepository.save(address);
+
+        // Images 객체 생성 및 저장
+        List<Image> images = request.toImagesEntity();
+        for (Image image : images) {
+            image.setPaper(paper);
+            imageRepository.save(image);
+        }
+
+        // 작성자 Comment 저장
         Comment commentEntity = Comment.addCommentBuilder()
-                .paper(savedPaper)
-                .content(comment)
+                .paper(paper)
+                .content(request.getWriterComment())
                 .user(writer)
                 .build();
-
         commentRepository.save(commentEntity);
 
+        // Comment 작성 알림 전송
         needCommentNotice(diary, paper);
 
-        return savedPaper;
+        return paper;
     }
 
     public Paper getPaperById(long Id) {
