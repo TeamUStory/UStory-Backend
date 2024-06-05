@@ -70,8 +70,14 @@
     <button class="button is-info is-fullwidth" id="submitButton" type="submit">로그인하기</button>
   </form>
   <div class="text-center">
-    <a href="https://kauth.kakao.com/oauth/authorize"
+    <a href=""
        th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
+      <img src="/images/kakao_login_medium_narrow.png">
+    </a>
+  </div>
+  <div class="text-center">
+    <a href=""
+       th:href="@{'https://kauth.kakao.com/oauth/logout?client_id=' + ${kakaoApiKey} + '&logout_redirect_uri=' + ${redirectLogoutUri}}">
       <img src="/images/kakao_login_medium_narrow.png">
     </a>
   </div>
