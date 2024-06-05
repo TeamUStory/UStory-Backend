@@ -134,7 +134,6 @@ public class UserService {
 
         if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
             loginResponse.builder()
-                    //TODO: 틀릴 경우엔 어떤 에러를 보낼까
                     .accessToken(null)
                     .refreshToken(null)
                     .build();
