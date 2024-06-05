@@ -19,10 +19,10 @@ public class Diary extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", columnDefinition = "varchar(20) not null")
+    @Column(name = "name", columnDefinition = "varchar(40) not null")
     private String name;
 
-    @Column(name = "img_url", columnDefinition = "varchar(255) not null")
+    @Column(name = "img_url", columnDefinition = "varchar(1000) not null")
     private String imgUrl;
 
     @Column(name = "diary_category", nullable = false)
@@ -62,8 +62,7 @@ public class Diary extends BaseEntity {
         }
     }
 
-    public void updateTime(){
-        LocalDateTime now = LocalDateTime.now();
+    public void updateTime(LocalDateTime now){
         setUpdatedAt(now);
     }
 }
