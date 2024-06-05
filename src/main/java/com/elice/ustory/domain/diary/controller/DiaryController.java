@@ -69,7 +69,6 @@ public class DiaryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         DiaryResponse diaryResponse = diaryService.updateDiary(userId, diaryId, diaryDto.toDiary(), diaryDto.getUsers());
-        // TODO : 인원 수 변동 확인
 
         return ResponseEntity.ok(diaryResponse);
     }
