@@ -35,7 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOriginPatterns("*") // TODO: 필수적인 요청만 열도록 제한 (ex. allowedOrigins(http://localhost:5174))
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("Custom-Header")
+                .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);
     }
