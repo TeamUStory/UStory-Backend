@@ -91,15 +91,15 @@ public class UserController {
     @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
     @PostMapping(value = "/sign-up/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
-        ValidateNicknameResponse validateNicknameResponse = userService.isValid(validateNicknameRequest);
+        ValidateNicknameResponse validateNicknameResponse = userService.isValidNickname(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
     @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-    @PostMapping("/sign-up/send-validate")
-    public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
-        ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
-        return ResponseEntity.ok(validateEmailResponse);
+    @PostMapping("/send-validate")
+    public ResponseEntity<AuthCodeCreateResponse> SendMailToValidate(@Valid @RequestBody AuthCodeCreateRequest authCodeCreateRequest) throws MessagingException {
+        AuthCodeCreateResponse authCodeCreateResponse = emailService.sendValidateSignupMail(authCodeCreateRequest.getEmail());
+        return ResponseEntity.ok(authCodeCreateResponse);
     }
     // TODO: 인증코드 검증
 //    @GetMapping("/get-member")
