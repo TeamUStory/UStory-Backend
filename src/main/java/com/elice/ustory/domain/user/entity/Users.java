@@ -23,7 +23,7 @@ public class Users extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
-    @Column(name = "email", columnDefinition = "VARCHAR(20) UNIQUE")
+    @Column(name = "email", columnDefinition = "VARCHAR(30) UNIQUE")
     private String email;
 
     @Column(name = "name", columnDefinition = "VARCHAR(10)")
