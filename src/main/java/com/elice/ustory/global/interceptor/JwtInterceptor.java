@@ -57,14 +57,4 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
         return true;
     }
-
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) throws Exception {
-        log.info("@@@@@@ POSTHANDLE @@@@@@");
-        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-    }
-
-    //view 처리 이후 이벤트 작동
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        log.info("================================ END ================================");
-    }
 }
