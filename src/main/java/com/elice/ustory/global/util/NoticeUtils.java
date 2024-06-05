@@ -1,13 +1,12 @@
 package com.elice.ustory.global.util;
 
 
-import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 
 
-public class CommonUtils {
+public class NoticeUtils {
     // 알림 메시지 상수
     public static final String FRIEND_REQUEST_MESSAGE = "친구 요청이 있습니다.";
     public static final String COMMENT_REQUEST_MESSAGE = "당신의 코멘트가 필요해요!";
@@ -45,15 +44,6 @@ public class CommonUtils {
         return String.format(FRIEND_ACCEPT_MESSAGE, nickname);
     }
 
-    /**
-     * 친구 요청 ID 생성
-     *
-     * @param senderId   친구 요청을 보낸 사용자의 ID
-     * @param receiverId 친구 요청을 받은 사용자의 ID
-     * @return FriendId 객체
-     */
-    public static FriendId createFriendId(Long senderId, Long receiverId) {
-        return new FriendId(senderId, receiverId);
-    }
+
 
 }

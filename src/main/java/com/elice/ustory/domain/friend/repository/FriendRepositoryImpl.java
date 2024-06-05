@@ -10,17 +10,21 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 public class FriendRepositoryImpl implements FriendQueryDslRepository {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final JPAQueryFactory queryFactory;
+
+    public FriendRepositoryImpl(EntityManager entityManager) {
+        this.queryFactory = new JPAQueryFactory(entityManager);
+    }
+
 
     @Override
     public List<UserFriendDTO> findFriends(Long userId, String nickname) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QFriend friend = QFriend.friend;
         QUsers user = QUsers.users;
 
@@ -43,7 +47,6 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
 
     @Override
     public List<FriendRequestDTO> findFriendRequests(Long userId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QFriend friend = QFriend.friend;
         QUsers sender = new QUsers("sender");
         QUsers receiver = new QUsers("receiver");
@@ -61,6 +64,19 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
                 .where(friend.id.friendId.eq(userId)
                         .and(friend.status.eq(FriendStatus.PENDING)))
                 .fetch();
+    }
+
+    @Override
+    public boolean existsByReceiverAndSender(Long receiverId, Long senderId) {
+        QFriend friend = QFriend.friend;
+
+        Number count = queryFactory.selectOne()
+                .from(friend)
+                .where(friend.id.userId.eq(receiverId)
+                        .and(friend.id.friendId.eq(senderId)))
+                .fetchFirst();
+
+        return count != null && count.longValue() > 0;
     }
 
 }

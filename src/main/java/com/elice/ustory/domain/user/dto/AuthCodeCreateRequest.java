@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmailRequest {
+public class AuthCodeCreateRequest {
     @Email // 이메일 형식 검증
     private String email;
 }

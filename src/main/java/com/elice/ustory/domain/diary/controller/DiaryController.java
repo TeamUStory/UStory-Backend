@@ -28,8 +28,9 @@ public class DiaryController {
 
     @Operation(summary = "Create Diary API", description = "다이어리 생성 및 링크 테이블에 등록")
     @PostMapping
-    public ResponseEntity<DiaryResponse> createDiary(@JwtAuthorization Long id, @Valid @RequestBody DiaryDto diaryDto) {
-        DiaryResponse diary = diaryService.createDiary(id, diaryDto.toDiary(), diaryDto.getUsers());
+    public ResponseEntity<DiaryResponse> createDiary(@JwtAuthorization Long userId,
+                                                     @Valid @RequestBody DiaryDto diaryDto) {
+        DiaryResponse diary = diaryService.createDiary(userId, diaryDto.toDiary(), diaryDto.getUsers());
         if (diary == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -40,32 +41,34 @@ public class DiaryController {
     @Operation(summary = "Get User's Diary By User API", description = "유저가 속한 다이어리 목록 불러오기")
     @GetMapping
     public ResponseEntity<List<DiaryListResponse>> getDiaries(
-            @JwtAuthorization Long id
-            , @RequestParam(name = "page", defaultValue = "1") int page
-            , @RequestParam(name = "size", defaultValue = "10") int size
-            , @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory
-            , @RequestParam(name = "dateTime") LocalDateTime dateTime) {
+            @JwtAuthorization Long userId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory,
+            @RequestParam(name = "requestTime") LocalDateTime requestTime) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(id, pageable, diaryCategory, dateTime);
+        List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, requestTime);
 
         return ResponseEntity.ok(userDiaries);
     }
 
     @Operation(summary = "Get DiaryList limit 6", description = "홈 페이지 용 최신 다이어리 6개 불러오기")
     @GetMapping("/home")
-    public ResponseEntity<List<DiaryListResponse>> getDiaryList(@JwtAuthorization Long id) {
-        List<DiaryListResponse> result = diaryService.getUserDiaryList(id);
+    public ResponseEntity<List<DiaryListResponse>> getDiaryList(@JwtAuthorization Long userId) {
+        List<DiaryListResponse> result = diaryService.getUserDiaryList(userId);
         return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
     @PutMapping("/{diaryId}")
-    public ResponseEntity<DiaryResponse> updateDiary(@JwtAuthorization Long id, @PathVariable("diaryId") Long diaryId, @Valid @RequestBody DiaryDto diaryDto) {
+    public ResponseEntity<DiaryResponse> updateDiary(@JwtAuthorization Long userId,
+                                                     @PathVariable("diaryId") Long diaryId,
+                                                     @Valid @RequestBody DiaryDto diaryDto) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        DiaryResponse diaryResponse = diaryService.updateDiary(id, diaryId, diaryDto.toDiary(), diaryDto.getUsers());
+        DiaryResponse diaryResponse = diaryService.updateDiary(userId, diaryId, diaryDto.toDiary(), diaryDto.getUsers());
         // TODO : 인원 수 변동 확인
 
         return ResponseEntity.ok(diaryResponse);
@@ -73,11 +76,12 @@ public class DiaryController {
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
     @GetMapping("/{diaryId}")
-    public ResponseEntity<DiaryResponse> getDiaryByID(@JwtAuthorization Long id, @PathVariable("diaryId") Long diaryId) {
+    public ResponseEntity<DiaryResponse> getDiaryByID(@JwtAuthorization Long userId,
+                                                      @PathVariable("diaryId") Long diaryId) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        DiaryResponse diary = diaryService.getDiaryDetailById(id,diaryId);
+        DiaryResponse diary = diaryService.getDiaryDetailById(userId,diaryId);
         if (diary == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -87,8 +91,8 @@ public class DiaryController {
 
     @Operation(summary = "Get Diary Count", description = "유저가 속한 다이어리 개수 불러오기")
     @GetMapping("/count")
-    public ResponseEntity<Long> getDiaryCount(@JwtAuthorization Long id) {
-        Long count = diaryService.getDiaryCount(id);
+    public ResponseEntity<Long> getDiaryCount(@JwtAuthorization Long userId) {
+        Long count = diaryService.getDiaryCount(userId);
         return ResponseEntity.ok(count);
     }
 
@@ -102,8 +106,9 @@ public class DiaryController {
 
     @Operation(summary = "Exit Diary", description = "다이어리 나가기")
     @GetMapping("/{diaryId}/exit")
-    public ResponseEntity<Void> exitDiary(@JwtAuthorization Long id, @PathVariable("diaryId") Long diaryId) {
-        diaryService.exitDiary(id, diaryId);
+    public ResponseEntity<Void> exitDiary(@JwtAuthorization Long userId,
+                                          @PathVariable("diaryId") Long diaryId) {
+        diaryService.exitDiary(userId, diaryId);
         return ResponseEntity.noContent().build();
     }
 }

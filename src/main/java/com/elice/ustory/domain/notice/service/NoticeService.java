@@ -9,7 +9,7 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.util.CommonUtils;
+import com.elice.ustory.global.util.NoticeUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,8 +41,7 @@ public class NoticeService {
             noticeResponse.setMessage(notice.getMessage());
 
             switch (notice.getMessageType()) {
-                case 1 -> {
-                    // 여기에는 친구 노티스의 요청 시간이 시간으로만 셋이 되면 된다. 리퀘스트 ID
+                case 1, 3 -> {
                     noticeResponse.setType("친구");
                     noticeResponse.setTime(notice.getCreatedAt());
                 }
@@ -52,11 +51,6 @@ public class NoticeService {
                     noticeResponse.setTime(paperRepository.findById(noticeResponse.getPaperId())
                             .orElseThrow(() -> new NotFoundException("유저 못찾음"))
                             .getCreatedAt());
-                }
-                case 3 -> {
-                    // 여기에는 친구 노티스의 수락 시간이 셋이 되야 한다. 리스판스 ID
-                    noticeResponse.setType("친구");
-                    noticeResponse.setTime(notice.getCreatedAt());
                 }
                 case 4 -> {
                     noticeResponse.setType("기록");
@@ -81,15 +75,15 @@ public class NoticeService {
 
         if (noticeRequest.getMessageType() == 3) {
             Users findUser = userRepository.findById(noticeRequest.getSenderId()).orElseThrow(() -> new NotFoundException("해당 유저 없음"));
-            message = CommonUtils.generateMessage(noticeRequest, findUser.getNickname());
+            message = NoticeUtils.generateMessage(noticeRequest, findUser.getNickname());
             Long senderId = noticeRequest.getSenderId();
             requestId = senderId;
         } else if (noticeRequest.getMessageType() == 1) {
-            message = CommonUtils.generateMessage(noticeRequest);
+            message = NoticeUtils.generateMessage(noticeRequest);
             Long senderId = noticeRequest.getSenderId();
             requestId =senderId;
         } else {
-            message = CommonUtils.generateMessage(noticeRequest);
+            message = NoticeUtils.generateMessage(noticeRequest);
             Long paperId = noticeRequest.getPaperId();
             requestId = paperId;
         }

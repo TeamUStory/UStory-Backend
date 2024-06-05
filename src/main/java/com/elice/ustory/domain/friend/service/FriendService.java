@@ -15,7 +15,6 @@ import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.ConflictException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.ValidationException;
-import com.elice.ustory.global.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -40,6 +39,29 @@ public class FriendService {
     }
 
     /**
+     * 친구 요청 ID 생성
+     *
+     * @param senderId   친구 요청을 보낸 사용자의 ID
+     * @param receiverId 친구 요청을 받은 사용자의 ID
+     * @return FriendId 객체
+     */
+    public FriendId createFriendId(Long senderId, Long receiverId) {
+        return new FriendId(senderId, receiverId);
+    }
+
+    /**
+     * 사용자 조회
+     *
+     * @param userId 사용자 ID
+     * @return Users 객체
+     */
+    private Users getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException("잘못된 사용자 ID", ErrorCode.VALIDATION_EXCEPTION));
+    }
+
+
+    /**
      * 사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.
      *
      * @param userId   조회할 사용자의 ID (옵션)
@@ -49,7 +71,6 @@ public class FriendService {
     public List<UserFriendDTO> getFriends(Long userId, String nickname) {
         return friendRepository.findFriends(userId, nickname);
     }
-
 
     /**
      * 친구 추가 요청을 보냅니다.
@@ -65,8 +86,10 @@ public class FriendService {
         Users receiver = userRepository.findByNickname(receiverNickname)
                 .orElseThrow(() -> new NotFoundException("Receiver를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
-        FriendId friendId = CommonUtils.createFriendId(sender.getId(), receiver.getId());
-        validateFriendRequestNotExists(friendId);
+        FriendId friendId = createFriendId(sender.getId(), receiver.getId());
+
+        // 이미 친구 요청이 있는지 확인
+        validateFriendRequestNotExists(receiver.getId(), sender.getId());
 
         Friend friend = friendRequestDTO.toFriend(sender, receiver); // 변환 메서드 사용
         friendRepository.save(friend);
@@ -92,26 +115,12 @@ public class FriendService {
 
     /**
      * 친구 요청 존재 여부 확인
-     *
-     * @param friendId 친구 요청 ID
      */
-    private void validateFriendRequestNotExists(FriendId friendId) {
-        if (friendRepository.existsById(friendId)) {
+    private void validateFriendRequestNotExists(Long receiverId, Long senderId) {
+        if (friendRepository.existsByReceiverAndSender(receiverId, senderId)) {
             throw new ConflictException("친구 요청이 이미 있습니다.", ErrorCode.CONFLICT_EXCEPTION);
         }
     }
-
-    /**
-     * 사용자 조회
-     *
-     * @param userId 사용자 ID
-     * @return Users 객체
-     */
-    private Users getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("잘못된 사용자 ID", ErrorCode.VALIDATION_EXCEPTION));
-    }
-
 
     /**
      * 친구 요청에 응답합니다.
@@ -126,7 +135,7 @@ public class FriendService {
         Users receiver = userRepository.findByNickname(receiverNickname)
                 .orElseThrow(() -> new NotFoundException("receiver를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
-        FriendId friendId = CommonUtils.createFriendId(sender.getId(), receiver.getId());
+        FriendId friendId = createFriendId(sender.getId(), receiver.getId());
 
         Friend friend = friendRepository.findById(friendId)
                 .orElseThrow(() -> new NotFoundException("친구 요청을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
@@ -187,8 +196,8 @@ public class FriendService {
      * @param friendId 삭제할 친구의 ID
      */
     public void deleteFriendById(Long userId, Long friendId) {
-        FriendId id = CommonUtils.createFriendId(userId, friendId);
-        FriendId reverseId = CommonUtils.createFriendId(friendId, userId);
+        FriendId id = createFriendId(userId, friendId);
+        FriendId reverseId = createFriendId(friendId, userId);
 
         if (!friendRepository.existsById(id) && !friendRepository.existsById(reverseId)) {
             throw new NotFoundException("친구 관계를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION);
