@@ -32,6 +32,7 @@ import static com.elice.ustory.domain.user.entity.QUsers.users;
 public class DiaryService {
     private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
     private static final String NOT_FOUND_USER_MESSAGE = "%d: 해당하는 사용자가 존재하지 않습니다.";
+    private static final String UNAUTHORIZED_DIARY_MESSAGE = "%d: 해당 다이어리에 대한 권한이 없습니다.";
 
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
@@ -63,7 +64,7 @@ public class DiaryService {
     public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if(diaryUser==null){
-            throw new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId));
+            throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
         return DiaryResponse.toDiaryResponse(diaryUser.getId().getDiary());
@@ -144,7 +145,7 @@ public class DiaryService {
             diaryUserRepository.delete(diaryUser);
         }else{
             // 사용자가 속한 다이어리가 아닌 경우
-            throw new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId));
+            throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
         // TODO : diary가 비워진 경우 소프트 딜리트(?)
