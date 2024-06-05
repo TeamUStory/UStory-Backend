@@ -3,6 +3,7 @@ package com.elice.ustory.domain.diary.service;
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.dto.DiaryListResponse;
 import com.elice.ustory.domain.diary.dto.DiaryResponse;
+import com.elice.ustory.domain.diary.entity.Color;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.entity.QDiary;
@@ -12,6 +13,9 @@ import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.NotFoundException;
+import com.elice.ustory.global.exception.model.UnauthorizedException;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +31,9 @@ import static com.elice.ustory.domain.user.entity.QUsers.users;
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
+    private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
+    private static final String NOT_FOUND_USER_MESSAGE = "%d: 해당하는 사용자가 존재하지 않습니다.";
+
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
     private final UserRepository userRepository;
@@ -37,14 +44,17 @@ public class DiaryService {
 
         List<Users> friendList = diaryUserRepository.findFriendUsersByList(userId, userList);
         if(friendList.size()!=userList.size()){
-            // TODO : throws Exception
+            // 친구가 아닌 인원을 다이어리에 추가할 때
+            throw new UnauthorizedException("해당하는 친구가 존재하지 않습니다.");
         }
 
         for (Users friend : friendList) {
             DiaryUserId diaryUserId = new DiaryUserId(savedDiary, friend);
             diaryUserRepository.save(new DiaryUser(diaryUserId));
         }
-        Users user = userRepository.findById(userId).orElse(null);
+        Users user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format(NOT_FOUND_USER_MESSAGE, userId))
+        );
         DiaryUserId diaryUserId = new DiaryUserId(savedDiary, user);
         diaryUserRepository.save(new DiaryUser(diaryUserId));
 
@@ -52,38 +62,44 @@ public class DiaryService {
     }
 
     public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
-        Diary diary = diaryUserRepository.findDiaryUserById(userId,diaryId).getId().getDiary();
-        if(diary==null){
-            // TODO : throws Exception
-            return null;
+        DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
+        if(diaryUser==null){
+            throw new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId));
         }
 
-        return DiaryResponse.toDiaryResponse(diary);
+        return DiaryResponse.toDiaryResponse(diaryUser.getId().getDiary());
     }
 
-    public Diary getDiaryById(Long id) {
-        return diaryRepository.findById(id).orElse(null);
+    public Diary getDiaryById(Long diaryId) {
+        return diaryRepository.findById(diaryId).orElseThrow(
+                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
+        );
     }
 
     @Transactional
     public DiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
-        Diary updatedDiary = diaryRepository.findById(diaryId).orElse(null);
-        if (updatedDiary == null) return null;
+        Diary updatedDiary = diaryRepository.findById(diaryId).orElseThrow(
+                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
+        );
         updatedDiary.updateDiary(diary);
 
         // 다이어리에 유저가 추가된 경우
         if (userList.size() >= diaryUserRepository.countUserByDiary(diaryId)) {
             List<Tuple> usersByDiary = diaryUserRepository.findUsersByDiary(userId, diaryId, userList);
-            if(usersByDiary.size()>9 || usersByDiary.size()<userList.size()){
-                // TODO : throws EXCEPTION -> request를 보낸 유저까지 11명이 되는 케이스
+            if(usersByDiary.size()>9) {
+                // request를 보낸 유저까지 10명을 초과하는 경우
+                throw new ValidationException("다이어리 인원을 10명을 초과할 수 없습니다.");
 
-                // TODO : throws EXCEPTION -> 존재하지 않는 유저 닉네임이 보내진 경우
+            }else if(usersByDiary.size()<userList.size()){
+                // 존재하지 않는 유저 닉네임이 보내진 경우
+                throw new NotFoundException("해당하는 친구가 존재하지 않습니다.");
             }
             for (Tuple tuple : usersByDiary) {
                 Users user = tuple.get(users);
                 if(tuple.get(QDiary.diary.id)!=null){
                     if(!userList.contains(user.getNickname())){
-                        // TODO : throws Exception -> 기존 유저가 사라진 케이스
+                        // 존 유저가 사라진 케이스
+                        throw new ValidationException("기존 다이어리의 유저가 모두 포함되지 않습니다.");
                     }
                 }else{
                     DiaryUserId diaryUserId = new DiaryUserId(updatedDiary, user);
@@ -96,10 +112,6 @@ public class DiaryService {
     }
 
     public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime) {
-        if (userId == null) {
-            // TODO : EXCEPTION 처리
-            return null;
-        }
         List<DiaryList> diaryList = diaryUserRepository.searchDiary(userId, pageable, diaryCategory, dateTime);
         List<DiaryListResponse> result = diaryList.stream()
                 .map(DiaryList::toDiaryListResponse)
@@ -119,9 +131,11 @@ public class DiaryService {
         return diaryUserRepository.countDiaryByUser(userId);
     }
 
-    public void deleteDiary(Long id) {
-        Diary diary = diaryRepository.findById(id).orElse(null);
-        if (diary == null) return;
+    public void deleteDiary(Long diaryId) {
+        Diary diary = diaryRepository.findById(diaryId).orElseThrow(
+                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
+        );
+
         diaryRepository.delete(diary);
     }
 
@@ -130,7 +144,8 @@ public class DiaryService {
         if (diaryUser != null) {
             diaryUserRepository.delete(diaryUser);
         }else{
-            // TODO : throws EXCEPTION
+            // 사용자가 속한 다이어리가 아닌 경우
+            throw new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId));
         }
 
         // TODO : diary가 비워진 경우 소프트 딜리트(?)
