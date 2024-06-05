@@ -7,11 +7,9 @@ import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.repository.FriendRepository;
 import com.elice.ustory.domain.notice.dto.NoticeRequest;
-import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.ConflictException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -32,7 +30,7 @@ public class FriendService {
     private final NoticeService noticeService;
 
     @Autowired
-    public FriendService(FriendRepository friendRepository, UserRepository userRepository, @Lazy NoticeService noticeService, NoticeRepository noticeRepository) {
+    public FriendService(FriendRepository friendRepository, UserRepository userRepository, @Lazy NoticeService noticeService) {
         this.friendRepository = friendRepository;
         this.userRepository = userRepository;
         this.noticeService = noticeService;

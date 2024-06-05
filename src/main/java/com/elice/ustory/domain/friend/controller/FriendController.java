@@ -64,7 +64,7 @@ public class FriendController {
      * @param userId 사용자의 ID
      * @return 친구 요청 목록
      */
-    @Operation(summary = "Get / Friend Requests", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
+    @Operation(summary = "Get / Friend received", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
     @GetMapping("/received")
     public ResponseEntity<List<FriendRequestListDTO>> getFriendRequests(@JwtAuthorization Long userId) {
         List<FriendRequestListDTO> friendRequests = friendService.getFriendRequests(userId);
@@ -79,7 +79,7 @@ public class FriendController {
      * @param accepted true이면 요청 수락, false이면 요청 거절
      * @return 응답 메시지
      */
-    @Operation(summary = "Post / Friend Request Response", description = "친구 요청에 응답합니다.")
+    @Operation(summary = "Post / Friend approve", description = "친구 요청에 응답합니다.")
     @PostMapping("/approve")
     public ResponseEntity<String> respondToFriendRequest(@JwtAuthorization Long userId, @RequestParam String senderNickname, @RequestParam boolean accepted) {
         friendService.respondToFriendRequest(userId, senderNickname, accepted);
