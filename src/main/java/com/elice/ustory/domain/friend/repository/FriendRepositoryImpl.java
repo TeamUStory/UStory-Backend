@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.friend.repository;
 
-import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
+import com.elice.ustory.domain.friend.dto.FriendRequestListDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.entity.QFriend;
@@ -9,8 +9,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -46,21 +44,17 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
     }
 
     @Override
-    public List<FriendRequestDTO> findFriendRequests(Long userId) {
+    public List<FriendRequestListDTO> findFriendRequests(Long userId) {
         QFriend friend = QFriend.friend;
         QUsers sender = new QUsers("sender");
-        QUsers receiver = new QUsers("receiver");
 
-        return queryFactory.select(Projections.constructor(FriendRequestDTO.class,
-                        friend.invitedAt,
+        return queryFactory.select(Projections.constructor(FriendRequestListDTO.class,
                         sender.name,
                         sender.profileImgUrl,
-                        sender.nickname,
-                        receiver.nickname
+                        sender.nickname
                 ))
                 .from(friend)
                 .join(friend.user, sender)
-                .join(friend.friendUser, receiver)
                 .where(friend.id.friendId.eq(userId)
                         .and(friend.status.eq(FriendStatus.PENDING)))
                 .fetch();
