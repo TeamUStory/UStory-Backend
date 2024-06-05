@@ -245,4 +245,8 @@ public class UserService {
 
         return validateNicknameResponse;
     }
+
+    public boolean checkByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
 }
