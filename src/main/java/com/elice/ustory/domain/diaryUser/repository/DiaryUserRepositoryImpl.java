@@ -139,7 +139,9 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
         return queryFactory
                 .select(friend.friendUser.as(users))
                 .from(friend)
-                .where(friend.friendUser.nickname.in(userList))
+                .where( friend.user.id.eq(userId)
+                    .and(friend.friendUser.nickname.in(userList))
+                )
                 .fetch();
     }
 
