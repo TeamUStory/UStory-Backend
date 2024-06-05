@@ -43,8 +43,6 @@ import java.util.List;
 public class PaperController {
 
     private final PaperService paperService;
-    private final AddressService addressService;
-    private final ImageService imageService;
     private final BookmarkService bookmarkService;
 
     @Operation(summary = "Create Paper API", description = "페이퍼를 생성한다.")
@@ -63,11 +61,7 @@ public class PaperController {
                                                       @JwtAuthorization Long userId,
                                                       @RequestBody UpdatePaperRequest updatePaperRequest) {
 
-        Paper paper = paperService.updatePaper(userId, paperId, updatePaperRequest.toPageEntity());
-
-        addressService.update(paper.getAddress().getId(), updatePaperRequest.toAddressEntity());
-
-        imageService.updateImages(paper, updatePaperRequest.toImagesEntity());
+        Paper paper = paperService.update(userId, paperId, updatePaperRequest);
 
         return ResponseEntity.ok(new UpdatePaperResponse(paper.getId()));
     }

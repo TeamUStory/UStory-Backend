@@ -12,6 +12,7 @@ import com.elice.ustory.domain.image.ImageRepository;
 import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
+import com.elice.ustory.domain.paper.dto.UpdatePaperRequest;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
@@ -102,6 +103,61 @@ public class PaperService {
         return validatePaper(Id);
     }
 
+    @Transactional
+    public Paper update(Long userId, Long paperId, UpdatePaperRequest request) {
+
+        // Paper 검증 및 불러오기
+        Paper paper = validatePaper(paperId);
+
+        // User 검증
+        Users findUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+
+        // User가 Diary에 속하는 User인지 검증
+        List<String> findDiaryByUserId = diaryUserRepository.findUserByDiary(paper.getDiary().getId());
+        if (!findDiaryByUserId.contains(findUser.getNickname())) {
+            throw new ForbiddenException("해당 다이어리에 속해 있는 사용자가 아닙니다.");
+        }
+
+        // Paper 업데이트
+        paper.update(
+                request.getTitle(),
+                request.getThumbnailImageUrl(),
+                request.getVisitedAt()
+        );
+
+        // Address 업데이트
+        Address address = paper.getAddress();
+        address.update(
+                request.getCity(),
+                request.getStore(),
+                request.getCoordinateX(),
+                request.getCoordinateY()
+        );
+
+        // Images 업데이트 (1/2) 덮어씌우기 및 남는다면 삭제
+        List<Image> newImages = request.toImagesEntity();
+        List<Image> savedimages = paper.getImages();
+        for (int i = 0; i < savedimages.size(); i ++) {
+            Image image = savedimages.get(i);
+
+            if (newImages.size() <= i) {
+                imageRepository.delete(image);
+                continue;
+            }
+
+            image.update(newImages.get(i).getImageUrl());
+        }
+
+        // Images 업데이트 (2/2) 추가로 저장하기
+        for (int i = savedimages.size(); i < newImages.size(); i++) {
+            Image image = newImages.get(i);
+            image.setPaper(paper);
+            imageRepository.save(image);
+        }
+
+        return paper;
+    }
+
     /**
      * 다이어리 내에 존재하는 Papers 최신순으로 페이지네이션
      */
@@ -127,27 +183,6 @@ public class PaperService {
      */
     public List<Paper> getPapersByUserId(Long userId) {
         return paperRepository.findAllPapersByUserId(userId);
-    }
-
-    @Transactional
-    public Paper updatePaper(Long userId, Long paperId, Paper paper) {
-
-        Paper previousPaper = validatePaper(paperId);
-
-        previousPaper.update(
-                paper.getTitle(),
-                paper.getThumbnailImageUrl(),
-                paper.getVisitedAt()
-        );
-
-        List<String> findDiaryByUserId = diaryUserRepository.findUserByDiary(previousPaper.getDiary().getId());
-        Users findUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
-
-        if (!findDiaryByUserId.contains(findUser.getNickname())) {
-            throw new ForbiddenException("해당 다이어리에 속해 있는 사용자가 아닙니다.");
-        }
-
-        return previousPaper;
     }
 
     public void deleteById(Long userId, Long paperId) {
