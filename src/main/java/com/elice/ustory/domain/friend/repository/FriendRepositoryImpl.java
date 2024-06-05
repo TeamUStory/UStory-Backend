@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.friend.repository;
 
-import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
+import com.elice.ustory.domain.friend.dto.FriendRequestListDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.friend.entity.QFriend;
@@ -9,8 +9,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -46,37 +44,40 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
     }
 
     @Override
-    public List<FriendRequestDTO> findFriendRequests(Long userId) {
+    public List<FriendRequestListDTO> findFriendRequests(Long userId) {
         QFriend friend = QFriend.friend;
         QUsers sender = new QUsers("sender");
-        QUsers receiver = new QUsers("receiver");
 
-        return queryFactory.select(Projections.constructor(FriendRequestDTO.class,
-                        friend.invitedAt,
+        return queryFactory.select(Projections.constructor(FriendRequestListDTO.class,
                         sender.name,
                         sender.profileImgUrl,
-                        sender.nickname,
-                        receiver.nickname
+                        sender.nickname
                 ))
                 .from(friend)
                 .join(friend.user, sender)
-                .join(friend.friendUser, receiver)
                 .where(friend.id.friendId.eq(userId)
                         .and(friend.status.eq(FriendStatus.PENDING)))
                 .fetch();
     }
 
     @Override
-    public boolean existsByReceiverAndSender(Long receiverId, Long senderId) {
+    public boolean existsBySenderAndReceiverAndStatus(Long senderId, Long receiverId, FriendStatus status) {
         QFriend friend = QFriend.friend;
-
-        Number count = queryFactory.selectOne()
+        return queryFactory.selectOne()
                 .from(friend)
-                .where(friend.id.userId.eq(receiverId)
-                        .and(friend.id.friendId.eq(senderId)))
-                .fetchFirst();
-
-        return count != null && count.longValue() > 0;
+                .where(friend.id.userId.eq(senderId)
+                        .and(friend.id.friendId.eq(receiverId))
+                        .and(friend.status.eq(status)))
+                .fetchFirst() != null;
     }
 
+    @Override
+    public boolean existsBySenderAndReceiver(Long senderId, Long receiverId) {
+        QFriend friend = QFriend.friend;
+        return queryFactory.selectOne()
+                .from(friend)
+                .where(friend.id.userId.eq(senderId)
+                        .and(friend.id.friendId.eq(receiverId)))
+                .fetchFirst() != null;
+    }
 }
