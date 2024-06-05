@@ -74,7 +74,7 @@ public class FriendService {
      */
     private Users getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("잘못된 사용자 ID", ErrorCode.VALIDATION_EXCEPTION));
+                .orElseThrow(() -> new ValidationException("잘못된 사용자 ID"));
     }
 
 
@@ -98,9 +98,9 @@ public class FriendService {
     // userid랑 ReceiverNickname으로 해결 해야됨
     public void sendFriendRequest(Long userId, String receiverNickname) {
         Users sender = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Sender를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new NotFoundException("Sender를 찾을 수 없습니다."));
         Users receiver = userRepository.findByNickname(receiverNickname)
-                .orElseThrow(() -> new NotFoundException("Receiver를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new NotFoundException("Receiver를 찾을 수 없습니다."));
 
         FriendId friendId = createFriendId(sender.getId(), receiver.getId());
 
@@ -139,7 +139,7 @@ public class FriendService {
      */
     private void validateFriendRequestNotExists(Long senderId, Long receiverId) {
         if (friendRepository.existsBySenderAndReceiverAndStatus(senderId, receiverId, FriendStatus.PENDING)) {
-            throw new ConflictException("친구 요청이 이미 있습니다.", ErrorCode.CONFLICT_EXCEPTION);
+            throw new ConflictException("친구 요청이 이미 있습니다.");
         }
     }
 
@@ -149,7 +149,7 @@ public class FriendService {
     private void validateNotAlreadyFriends(Long userId, Long friendId) {
         if (friendRepository.existsBySenderAndReceiver(userId, friendId) ||
                 friendRepository.existsBySenderAndReceiver(friendId, userId)) {
-            throw new ConflictException("이미 친구로 등록되어 있습니다.", ErrorCode.CONFLICT_EXCEPTION);
+            throw new ConflictException("이미 친구로 등록되어 있습니다.");
         }
     }
 
@@ -163,14 +163,14 @@ public class FriendService {
     // 응답도 userId, senderNickname 으로 해서 보내야됨
     public void respondToFriendRequest(Long userId, String senderNickname, boolean accepted) {
         Users sender = userRepository.findByNickname(senderNickname)
-                .orElseThrow(() -> new NotFoundException("sender를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new NotFoundException("sender를 찾을 수 없습니다."));
         Users receiver = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("receiver를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new NotFoundException("receiver를 찾을 수 없습니다."));
 
         FriendId friendId = createFriendId(sender.getId(), receiver.getId());
 
         Friend friend = friendRepository.findById(friendId)
-                .orElseThrow(() -> new NotFoundException("친구 요청을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new NotFoundException("친구 요청을 찾을 수 없습니다."));
 
         if (accepted) {
             processAcceptedFriendRequest(friend, sender.getId(), receiver.getId());
@@ -232,7 +232,7 @@ public class FriendService {
         FriendId reverseId = createFriendId(friendId, userId);
 
         if (!friendRepository.existsById(id) && !friendRepository.existsById(reverseId)) {
-            throw new NotFoundException("친구 관계를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION);
+            throw new NotFoundException("친구 관계를 찾을 수 없습니다");
         }
 
         friendRepository.deleteById(id);
