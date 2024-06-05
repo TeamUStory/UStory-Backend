@@ -61,16 +61,23 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
     }
 
     @Override
-    public boolean existsByReceiverAndSender(Long receiverId, Long senderId) {
+    public boolean existsBySenderAndReceiverAndStatus(Long senderId, Long receiverId, FriendStatus status) {
         QFriend friend = QFriend.friend;
-
-        Number count = queryFactory.selectOne()
+        return queryFactory.selectOne()
                 .from(friend)
-                .where(friend.id.userId.eq(receiverId)
-                        .and(friend.id.friendId.eq(senderId)))
-                .fetchFirst();
-
-        return count != null && count.longValue() > 0;
+                .where(friend.id.userId.eq(senderId)
+                        .and(friend.id.friendId.eq(receiverId))
+                        .and(friend.status.eq(status)))
+                .fetchFirst() != null;
     }
 
+    @Override
+    public boolean existsBySenderAndReceiver(Long senderId, Long receiverId) {
+        QFriend friend = QFriend.friend;
+        return queryFactory.selectOne()
+                .from(friend)
+                .where(friend.id.userId.eq(senderId)
+                        .and(friend.id.friendId.eq(receiverId)))
+                .fetchFirst() != null;
+    }
 }

@@ -105,7 +105,12 @@ public class FriendService {
         FriendId friendId = createFriendId(sender.getId(), receiver.getId());
 
         // 이미 친구 요청이 있는지 확인
+        validateFriendRequestNotExists(sender.getId(), receiver.getId());
         validateFriendRequestNotExists(receiver.getId(), sender.getId());
+
+
+        // 친구 목록에 이미 있는 친구인지 확인
+        validateNotAlreadyFriends(sender.getId(), receiver.getId());
 
         Friend friend = createFriend(sender, receiver);
         friendRepository.save(friend);
@@ -132,9 +137,19 @@ public class FriendService {
     /**
      * 친구 요청 존재 여부 확인
      */
-    private void validateFriendRequestNotExists(Long receiverId, Long senderId) {
-        if (friendRepository.existsByReceiverAndSender(receiverId, senderId)) {
+    private void validateFriendRequestNotExists(Long senderId, Long receiverId) {
+        if (friendRepository.existsBySenderAndReceiverAndStatus(senderId, receiverId, FriendStatus.PENDING)) {
             throw new ConflictException("친구 요청이 이미 있습니다.", ErrorCode.CONFLICT_EXCEPTION);
+        }
+    }
+
+    /**
+     * 친구 존재 여부 확인
+     */
+    private void validateNotAlreadyFriends(Long userId, Long friendId) {
+        if (friendRepository.existsBySenderAndReceiver(userId, friendId) ||
+                friendRepository.existsBySenderAndReceiver(friendId, userId)) {
+            throw new ConflictException("이미 친구로 등록되어 있습니다.", ErrorCode.CONFLICT_EXCEPTION);
         }
     }
 
