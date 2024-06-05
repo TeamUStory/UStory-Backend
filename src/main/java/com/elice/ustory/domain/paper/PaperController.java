@@ -67,7 +67,7 @@ public class PaperController {
                                                       @JwtAuthorization Long userId,
                                                       @RequestBody UpdatePaperRequest updatePaperRequest) {
 
-        Paper paper = paperService.updatePaper(paperId, updatePaperRequest.toPageEntity());
+        Paper paper = paperService.updatePaper(userId, paperId, updatePaperRequest.toPageEntity());
 
         addressService.update(paper.getAddress().getId(), updatePaperRequest.toAddressEntity());
 
@@ -93,7 +93,7 @@ public class PaperController {
                                        @JwtAuthorization Long userId) {
 
         // paperId에 해당하는 paper 삭제
-        paperService.deleteById(paperId);
+        paperService.deleteById(userId, paperId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
