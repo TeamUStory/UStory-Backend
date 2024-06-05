@@ -11,6 +11,7 @@ import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.ForbiddenException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -98,7 +99,7 @@ public class PaperService {
     }
 
     @Transactional
-    public Paper updatePaper(Long paperId, Paper paper) {
+    public Paper updatePaper(Long userId, Long paperId, Paper paper) {
 
         Paper previousPaper = validatePaper(paperId);
 
@@ -108,13 +109,25 @@ public class PaperService {
                 paper.getVisitedAt()
         );
 
+        List<String> findDiaryByUserId = diaryUserRepository.findUserByDiary(previousPaper.getDiary().getId());
+        Users findUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+
+        if (!findDiaryByUserId.contains(findUser.getNickname())) {
+            throw new ForbiddenException("해당 다이어리에 속해 있는 사용자가 아닙니다.");
+        }
+
         return previousPaper;
     }
 
-    public void deleteById(Long paperId) {
-        paperRepository.findById(paperId)
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId)))
-                .softDelete();
+    public void deleteById(Long userId, Long paperId) {
+
+        Paper findPaper = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAPER_MESSAGE));
+
+        if (findPaper.getWriter().getId().equals(userId)) {
+            findPaper.softDelete();
+        } else {
+            throw new ForbiddenException("페이퍼는 작성자만 지울 수 있습니다.");
+        }
     }
 
     public Paper validatePaper(Long paperId) {
