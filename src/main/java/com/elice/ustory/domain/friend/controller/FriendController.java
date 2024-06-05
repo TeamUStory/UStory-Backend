@@ -1,8 +1,9 @@
 package com.elice.ustory.domain.friend.controller;
 
-import com.elice.ustory.domain.friend.dto.FriendRequestDTO;
+import com.elice.ustory.domain.friend.dto.FriendRequestListDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.service.FriendService;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.elice.ustory.global.exception.ErrorCode.VALIDATION_PARAMETER_EXCEPTION;
 
 
 @Tag(name = "friend", description = "Friend API")
@@ -40,15 +43,20 @@ public class FriendController {
     /**
      * 친구 추가 요청을 보냅니다.
      *
-     * @param friendRequestDTO 친구 요청 정보
+     * @param userId 요청을 보낸 사용자의 ID
+     * @param receiverNickname 친구 요청을 받을 사용자의 닉네임
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Post / Friend Request", description = "친구 추가 요청을 보냅니다.")
-    @PostMapping
-    public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
-        friendService.sendFriendRequest(friendRequestDTO);
-        return ResponseEntity.ok("친구 요청이 성공적으로 전송되었습니다.");
+    @Operation(summary = "Get / Friend Request", description = "친구 추가 요청을 보냅니다.")
+    @GetMapping
+    public ResponseEntity<Void> sendFriendRequest(@JwtAuthorization Long userId, @RequestParam String receiverNickname) {
+        if (receiverNickname == null || receiverNickname.trim().isEmpty()) {
+            throw new ValidationException("닉네임값이 잘못 들어왔습니다.");
+        }
+        friendService.sendFriendRequest(userId, receiverNickname);
+        return ResponseEntity.noContent().build();
     }
+
 
     /**
      * 특정 사용자가 받은 친구 요청 목록을 조회합니다.
@@ -58,23 +66,23 @@ public class FriendController {
      */
     @Operation(summary = "Get / Friend Requests", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
     @GetMapping("/received")
-    public ResponseEntity<List<FriendRequestDTO>> getFriendRequests(@JwtAuthorization Long userId) {
-        List<FriendRequestDTO> friendRequests = friendService.getFriendRequests(userId);
+    public ResponseEntity<List<FriendRequestListDTO>> getFriendRequests(@JwtAuthorization Long userId) {
+        List<FriendRequestListDTO> friendRequests = friendService.getFriendRequests(userId);
         return ResponseEntity.ok(friendRequests);
     }
 
     /**
      * 친구 요청에 응답합니다.
      *
+     * @param userId 친구 요청을 받은 사용자의 ID
      * @param senderNickname 친구 요청을 보낸 사용자의 닉네임
-     * @param receiverNickname 친구 요청을 받은 사용자의 닉네임
      * @param accepted true이면 요청 수락, false이면 요청 거절
      * @return 응답 메시지
      */
     @Operation(summary = "Post / Friend Request Response", description = "친구 요청에 응답합니다.")
     @PostMapping("/approve")
-    public ResponseEntity<String> respondToFriendRequest(@RequestParam String senderNickname, @RequestParam String receiverNickname, @RequestParam boolean accepted) {
-        friendService.respondToFriendRequest(senderNickname, receiverNickname, accepted);
+    public ResponseEntity<String> respondToFriendRequest(@JwtAuthorization Long userId, @RequestParam String senderNickname, @RequestParam boolean accepted) {
+        friendService.respondToFriendRequest(userId, senderNickname, accepted);
         return ResponseEntity.ok("친구요청 " + (accepted ? "수락" : "거절") + "이 되었습니다.");
     }
 
