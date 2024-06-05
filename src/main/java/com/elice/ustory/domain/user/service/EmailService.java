@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.user.service;
 
-import com.elice.ustory.domain.user.dto.ValidateEmailResponse;
+import com.elice.ustory.domain.user.dto.AuthCodeCreateResponse;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -52,7 +52,7 @@ public class EmailService {
         javaMailSender.send(mimeMessage);
     }
 
-    public ValidateEmailResponse sendValidateSignupMail(String toEmail) throws MessagingException {
+    public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
         String authCode = generateAuthCode();
         String title = "UStory 회원가입 인증코드입니다.";
         String content =
@@ -65,13 +65,13 @@ public class EmailService {
 //        redisUtil.setDataExpire(toEmail, authCode, 60 * 30L); // TODO: Redis에 인증코드 유효시간 설정
 
         log.info("[sendValidateSigunupResult] 인증코드 메일이 발송됨. 수신자 id : {}", userRepository.findByEmail(toEmail));
-        ValidateEmailResponse validateEmailResponse = ValidateEmailResponse.builder()
+        AuthCodeCreateResponse authCodeCreateResponse = AuthCodeCreateResponse.builder()
                 .fromMail(fromEmail)
                 .toMail(toEmail)
                 .title(title)
                 .authCode(authCode)
                 .build();
 
-        return validateEmailResponse;
+        return authCodeCreateResponse;
     }
 }
