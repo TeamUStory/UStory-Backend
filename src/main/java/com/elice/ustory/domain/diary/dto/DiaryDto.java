@@ -19,6 +19,7 @@ import java.util.List;
 public class DiaryDto {
     @Schema(description = "다이어리 이름", example = "꽁냥껑냥")
     @NotNull
+    @Size(min = 2, max = 40)
     private String name;
 
     @Schema(description = "다이어리 이미지 URL", example = "http://image.com")
@@ -31,7 +32,7 @@ public class DiaryDto {
 
     @Schema(description = "다이어리 소개", example = "껑냥이들의 다이어리")
     @NotNull
-    @Size(min = 1, max = 20)
+    @Size(min = 1, max = 255)
     private String description;
 
     @Schema(description = "다이어리 마커 색", example = "ORANGE")
