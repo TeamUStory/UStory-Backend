@@ -1,5 +1,12 @@
 package com.elice.ustory.domain.user.service;
 
+import com.elice.ustory.domain.diary.entity.Color;
+import com.elice.ustory.domain.diary.entity.Diary;
+import com.elice.ustory.domain.diary.entity.DiaryCategory;
+import com.elice.ustory.domain.diary.repository.DiaryRepository;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
+import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.dto.UserListDTO;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
@@ -26,6 +33,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final DiaryRepository diaryRepository;
+    private final DiaryUserRepository diaryUserRepository;
+
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
@@ -73,6 +83,18 @@ public class UserService {
                 .build();
 
         Users newUser = userRepository.save(builtUser);
+
+        // 개인 다이어리 생성
+        Diary userDiary = new Diary(
+                String.format("%s의 다이어리", builtUser.getNickname()),
+                "기본 DiaryImgUrl",
+                DiaryCategory.INDIVIDUAL,
+                String.format("%s의 개인 다이어리", builtUser.getNickname()),
+                Color.RED
+        );
+        diaryRepository.save(userDiary);
+        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
+
         return newUser;
     }
 
