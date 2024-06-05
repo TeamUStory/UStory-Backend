@@ -40,6 +40,10 @@ public class DiaryService {
 
     @Transactional
     public DiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
+        if(diary.getDiaryCategory()==DiaryCategory.INDIVIDUAL){
+            throw new ValidationException("개인 다이어리는 생성할 수 없습니다.");
+        }
+
         Diary savedDiary = diaryRepository.save(diary);
 
         List<Users> friendList = diaryUserRepository.findFriendUsersByList(userId, userList);
@@ -81,6 +85,9 @@ public class DiaryService {
         Diary updatedDiary = diaryRepository.findById(diaryId).orElseThrow(
                 () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
         );
+        if(diary.getDiaryCategory()==DiaryCategory.INDIVIDUAL){
+            throw new ValidationException("개인 다이어리는 생성할 수 없습니다.");
+        }
         updatedDiary.updateDiary(diary);
 
         // 다이어리에 유저가 추가된 경우
@@ -141,14 +148,24 @@ public class DiaryService {
 
     public void exitDiary(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
-        if (diaryUser != null) {
-            diaryUserRepository.delete(diaryUser);
-        }else{
+        if(diaryUser == null){
             // 사용자가 속한 다이어리가 아닌 경우
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
-        // TODO : diary가 비워진 경우 소프트 딜리트(?)
+        if (diaryUser.getId().getDiary().getDiaryCategory()!=DiaryCategory.INDIVIDUAL) {
+            throw new UnauthorizedException("개인 다이어리는 삭제할 수 없습니다.");
+            // TODO : 삭제 후 재생성(?)
+        }
+        else{
+            // 사용자가 속한 다이어리가 아닌 경우
+            diaryUserRepository.delete(diaryUser);
+        }
+
+        // TODO : diary가 비워진 경우 소프트 딜리트(?) -> 관련 페이퍼는 ?
+        if(diaryUserRepository.countUserByDiary(diaryId)==0){
+
+        }
     }
 
 }
