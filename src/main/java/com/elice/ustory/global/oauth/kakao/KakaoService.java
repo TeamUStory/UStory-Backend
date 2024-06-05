@@ -8,17 +8,22 @@ import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.dto.LoginResponse;
+import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
+import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -32,6 +37,9 @@ public class KakaoService {
     private final DiaryUserRepository diaryUserRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final JwtUtil jwtUtil;
+    private final KakaoOauth kakaoOauth;
+    private final UserService userService;
 
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
@@ -59,18 +67,17 @@ public class KakaoService {
         diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
     }
 
-    public LoginResponse kakaoLogin(String kakaoUserId, HttpServletResponse response){
+    public LoginResponse kakaoLogin(String kakaoUserId, HttpServletResponse response, String kakaoToken){
         Users loginUser = userRepository.findByEmail(kakaoUserId+"@ustory.com")
                 .orElseThrow();
 
-        String accessToken = jwtTokenProvider.createAccessToken(loginUser.getId());
+        String accessToken = jwtTokenProvider.createAccessTokenKakao(loginUser.getId(), kakaoToken);
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
         var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
@@ -82,5 +89,14 @@ public class KakaoService {
 
         log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;
+    }
+
+    public LogoutResponse kakaoLogout(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        String accessToken = jwtUtil.getTokenFromRequest(request, "Authorization");
+        String kakaoToken = jwtTokenProvider.getKakaoToken(accessToken);
+        kakaoOauth.expireKakaoToken(kakaoToken);
+        userService.logout(request, response);
+
+        return LogoutResponse.builder().success(true).build();
     }
 }
