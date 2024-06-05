@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ValidateEmailResponse {
+public class AuthCodeCreateResponse {
     String fromMail;
     String toMail;
     String title;
