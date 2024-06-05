@@ -51,6 +51,10 @@ public class PaperService {
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId)));
         paper.addDiary(diary);
 
+        if (diary.getDiaryCategory().getName().equals("개인")) {
+            paper.unLock();
+        }
+
         Paper savedPaper = paperRepository.save(paper);
 
         Comment commentEntity = Comment.addCommentBuilder()
