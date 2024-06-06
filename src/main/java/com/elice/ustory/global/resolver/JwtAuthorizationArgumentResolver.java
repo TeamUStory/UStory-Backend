@@ -32,7 +32,7 @@ public class JwtAuthorizationArgumentResolver implements HandlerMethodArgumentRe
 
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
-        String accessToken = jwtUtil.getTokenFromRequest(request, "Authorization");
+        String accessToken = jwtUtil.getTokenFromRequest(request);
         if (accessToken != null) {
             if (jwtTokenProvider.validateToken(accessToken)) {
                 return jwtTokenProvider.getUserPk(accessToken);

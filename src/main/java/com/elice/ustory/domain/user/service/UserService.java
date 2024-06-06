@@ -7,7 +7,7 @@ import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
-import com.elice.ustory.domain.user.dto.UserListDTO;
+import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
@@ -44,21 +44,26 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow();
     }
 
-    /**
-     * 닉네임으로 전체 사용자를 검색합니다.
-     *
-     * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록 (옵셔널)
-     */
-    public Optional<UserListDTO> findUserByNickname(String nickname) {
-        return Optional.ofNullable(nickname)
-                .filter(name -> !name.isEmpty())
-                .flatMap(userRepository::findByNickname)
-                .map(u -> UserListDTO.builder()
-                        .name(u.getName())
-                        .nickname(u.getNickname())
-                        .profileImgUrl(u.getProfileImgUrl())
-                        .build());
+    public FindByNicknameResponse searchUserByNickname(String nickname) {
+        Optional<Users> userOptional = userRepository.findByNickname(nickname);
+
+        if (userOptional.isPresent()) {
+            Users user = userOptional.get();
+
+            return FindByNicknameResponse.builder()
+                    .isExist(true)
+                    .name(user.getName())
+                    .nickname(user.getNickname())
+                    .profileImgUrl(user.getProfileImgUrl())
+                    .build();
+        } else {
+            return FindByNicknameResponse.builder()
+                    .isExist(false)
+                    .name(null)
+                    .nickname(null)
+                    .profileImgUrl(null)
+                    .build();
+        }
     }
 
     public Users signUp(SignUpRequest signUpRequest) {
