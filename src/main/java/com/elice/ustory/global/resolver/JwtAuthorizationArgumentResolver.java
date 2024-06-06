@@ -26,11 +26,12 @@ public class JwtAuthorizationArgumentResolver implements HandlerMethodArgumentRe
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory){
 
         log.info("JwtAuthorizationArgumentResolver 동작!!");
 
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+
 
         String accessToken = jwtUtil.getTokenFromRequest(request);
         if (accessToken != null) {
