@@ -88,8 +88,6 @@ public class FriendService {
             throw new ValidationException("자기 자신에게 친구 요청을 할 수 없습니다.");
         }
 
-        FriendId friendId = createFriendId(sender.getId(), receiver.getId());
-
         // 이미 친구 요청이 있는지 확인
         validateOutgoingFriendRequestNotExists(sender.getId(), receiver.getId());
         validateIncomingFriendRequestNotExists(receiver.getId(), sender.getId());
