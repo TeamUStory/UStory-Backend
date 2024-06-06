@@ -134,25 +134,30 @@ public class PaperService {
                 request.getCoordinateY()
         );
 
-        // Images 업데이트 (1/2) 덮어씌우기 및 남는다면 삭제
         List<Image> newImages = request.toImagesEntity();
         List<Image> savedimages = paper.getImages();
-        for (int i = 0; i < savedimages.size(); i ++) {
+
+        int newImageSize = newImages.size();
+        int savedImageSize = savedimages.size();
+
+        // Images 업데이트 (1/3) 덮어씌우기
+        for (int i = 0; i < newImageSize; i++) {
+            if (i == savedImageSize) break;
             Image image = savedimages.get(i);
-
-            if (newImages.size() <= i) {
-                imageRepository.delete(image);
-                continue;
-            }
-
             image.update(newImages.get(i).getImageUrl());
         }
 
-        // Images 업데이트 (2/2) 추가로 저장하기
-        for (int i = savedimages.size(); i < newImages.size(); i++) {
+        // Images 업데이트 (2/3) 추가로 저장하기
+        for (int i = savedImageSize; i < newImageSize; i++) {
             Image image = newImages.get(i);
             image.setPaper(paper);
             imageRepository.save(image);
+        }
+
+        // Images 업데이트 (3/3) 남는다면 삭제하기
+        for (int i = savedImageSize - 1; i >= newImageSize; i--) {
+            Image image = savedimages.remove(i);
+            imageRepository.delete(image);
         }
 
         return paper;
