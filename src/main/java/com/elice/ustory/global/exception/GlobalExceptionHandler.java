@@ -147,6 +147,15 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(ex2, message));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+
+        CustomException customException = new ValidationException(ex.getMessage(), ErrorCode.PARAMETER_INCORRECT_FORMAT);
+
+        ErrorResponse errorResponse = new ErrorResponse(customException);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     /** 예외 처리를 벗어난 서버 에러 */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
