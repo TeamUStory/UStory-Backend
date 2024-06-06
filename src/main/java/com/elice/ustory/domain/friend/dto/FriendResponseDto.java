@@ -13,7 +13,7 @@ public class FriendResponseDto {
     @NotNull
     private String senderNickname;
 
-    @Schema(description = "수락/거절 여부", example = "true/false")
+    @Schema(description = "수락/거절 여부", example = "true")
     @NotNull
     private boolean accepted;
 
