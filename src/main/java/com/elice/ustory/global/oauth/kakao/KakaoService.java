@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -43,12 +44,13 @@ public class KakaoService {
 
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
+        String generatedNickname = kakaoNickname + "#" + generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
                 .email(kakaoUserId+"@ustory.com")
                 .loginType(Users.LoginType.KAKAO)
                 .name(kakaoNickname)
-                .nickname(kakaoNickname)
+                .nickname(generatedNickname)
                 .password(randomPassword)
                 .profileImgUrl("")
                 .profileDescription("자기소개")
@@ -98,5 +100,18 @@ public class KakaoService {
         userService.logout(request, response);
 
         return LogoutResponse.builder().success(true).build();
+    }
+
+    public String generateRandomPostfix() {
+        int leftLimit = 48; // 숫자 '0'의 ASCII 코드
+        int rightLimit = 122; // 알파벳 'z'의 ASCII 코드
+        int stringLength = 4;
+        Random random = new Random();
+
+        return random.ints(leftLimit, rightLimit + 1) // leftLimit(포함) 부터 rightLimit+1(불포함) 사이의 난수 스트림 생성
+                .filter(i -> (i < 57 || i >= 65) && ( i <= 90 || i >= 97)) // ASCII 테이블에서 숫자, 대문자, 소문자만 사용함
+                .limit(stringLength) // 생성된 난수를 지정된 길이로 잘라냄
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append) // 생성된 난수를 ASCII 테이블에서 대응되는 문자로 변환
+                .toString(); // StringBuilder 객체를 문자열로 변환해 반환
     }
 }
