@@ -12,6 +12,7 @@ import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.util.NoticeUtils;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,7 @@ public class NoticeService {
                 noticeResponse.setType("코멘트");
                 noticeResponse.setPaperId(notice.getResponseId());
                 noticeResponse.setTime(paperRepository.findById(noticeResponse.getPaperId())
-                        .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."))
+                        .orElseThrow(() -> new NotFoundException("페이퍼를 찾을 수 없습니다."))
                         .getCreatedAt());
             }
             case 4 -> {
@@ -71,17 +72,7 @@ public class NoticeService {
      * @param noticeRequest 알림 DTO
      */
     @Transactional
-    public void sendNotice(NoticeRequest noticeRequest) {
-
-        if (noticeRequest == null) {
-            throw new ValidationException("NoticeRequest가 null입니다.");
-        }
-        if (noticeRequest.getResponseId() == null) {
-            throw new ValidationException("응답자 ID가 null입니다.");
-        }
-        if (noticeRequest.getMessageType() == 0) {
-            throw new ValidationException("메시지 타입이 null입니다.");
-        }
+    public void sendNotice(@Valid NoticeRequest noticeRequest) {
 
         String message;
         Long requestId;
