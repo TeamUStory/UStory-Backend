@@ -15,7 +15,6 @@ import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -82,10 +81,7 @@ public class KakaoService {
                 .build();
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
-        var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
-        cookie1.setPath("/");
-        cookie1.setMaxAge(60 * 60);
-        response.addCookie(cookie1);
+        response.addHeader("Authorization", "Bearer " + accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
 

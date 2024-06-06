@@ -4,7 +4,6 @@ import com.elice.ustory.global.exception.model.ForbiddenException;
 import com.elice.ustory.global.redis.refresh.RefreshToken;
 import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 @Component
@@ -24,7 +21,7 @@ public class JwtUtil {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
 
-    public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+    public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request); // TODO: Redis RefreshToken에 맞게 수정 1
         RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
                 .orElseThrow();
@@ -38,11 +35,10 @@ public class JwtUtil {
             int remainingTTL = (int) jwtTokenProvider.getRemainingTTL(refreshToken.getRefreshToken());
 
             refreshTokenService.saveTokenInfo(Long.valueOf(refreshToken.getId()), newRefreshToken, newAccessToken, remainingTTL);
-            Cookie cookie = new Cookie("Authorization", URLEncoder.encode("Bearer " + newAccessToken, StandardCharsets.UTF_8));
-            cookie.setPath("/");
-            cookie.setMaxAge(60 * 60);
-            response.addCookie(cookie);
-            log.info("[refreshToken] AccessToken이 재발급 되었습니다.");
+
+            log.info("[refreshToken] AccessToken이 재발급 되었습니다: {}", newAccessToken);
+            log.info("[refreshToken] RefreshToken이 재발급 되었습니다: {}", newRefreshToken);
+            response.addHeader("Authorization", "Bearer " + newAccessToken);
             return true;
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
@@ -50,14 +46,14 @@ public class JwtUtil {
         }
     } // TODO: Redis RefreshToken에 맞게 수정 2
 
-    public String getTokenFromRequest(HttpServletRequest request) throws UnsupportedEncodingException {
+    public String getTokenFromRequest(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             log.info("이거 베어러 토큰임: {}", bearerToken);
             return bearerToken.substring("Bearer ".length());
         }
 
-        throw new ForbiddenException("유효하지 않은 토큰입니다.");
+        return null;
 
 //        if (request.getCookies() != null) {
 //            Optional<Cookie> tokenCookie = Arrays.stream(request.getCookies())

@@ -13,7 +13,6 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
@@ -179,10 +174,7 @@ public class UserService {
 
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
-        var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
-        cookie1.setPath("/");
-        cookie1.setMaxAge(60 * 60);
-        response.addCookie(cookie1);
+        response.addHeader("Authorization", "Bearer " + accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
 
@@ -191,24 +183,15 @@ public class UserService {
     }
 
     public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-        // 1. 쿠키 만료 시작
-        Cookie cookieForExpire = new Cookie("Authorization", null);
-        cookieForExpire.setPath("/");
-        cookieForExpire.setMaxAge(0);
-        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
-        // 1. 쿠키 만료 끝
 
-        // 2. 리프레시 토큰 삭제 시작
-        Cookie currentCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> "Authorization".equals(cookie.getName()))
-                .findFirst().orElseThrow();
-        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+        // 1-1. 리프레시 토큰 삭제 시작
+        String token = request.getHeader("Authorization");
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
 
         refreshTokenService.removeTokenInfo(token);
-        // 2. 리프레시 토큰 삭제 끝
+        // 1-2. 리프레시 토큰 삭제 끝
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
         return logoutResponse;
