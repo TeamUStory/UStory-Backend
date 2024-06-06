@@ -49,7 +49,7 @@ public class AddPaperRequest {
     @Schema(description = "작성자 Comment", example = "맛있는듯?")
     private String writerComment;
 
-    public Paper toPageEntity() {
+    public Paper toPaperEntity() {
         return Paper.createBuilder()
                 .title(this.title)
                 .thumbnailImageUrl(this.thumbnailImageUrl)
