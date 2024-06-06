@@ -21,8 +21,6 @@ import com.elice.ustory.global.exception.model.ForbiddenException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,8 +1,6 @@
 package com.elice.ustory.domain.paper;
 
 import com.elice.ustory.domain.bookmark.BookmarkService;
-import com.elice.ustory.domain.comment.dto.AddCommentRequest;
-import com.elice.ustory.domain.comment.service.CommentService;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperCountResponse;
@@ -12,8 +10,6 @@ import com.elice.ustory.domain.paper.dto.PaperResponse;
 import com.elice.ustory.domain.paper.dto.UpdatePaperRequest;
 import com.elice.ustory.domain.paper.dto.UpdatePaperResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
-import com.elice.ustory.domain.address.AddressService;
-import com.elice.ustory.domain.image.ImageService;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;

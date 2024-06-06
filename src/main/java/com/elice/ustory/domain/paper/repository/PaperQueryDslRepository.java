@@ -2,7 +2,6 @@ package com.elice.ustory.domain.paper.repository;
 
 import com.elice.ustory.domain.paper.entity.Paper;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
