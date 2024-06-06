@@ -77,6 +77,10 @@ dependencies {
     // Mail 발송 (이메일 인증)
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.6.3'
     implementation 'com.sun.mail:jakarta.mail:2.0.1'
+
+    // aws
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4'
 }
 
 tasks.named('test') {

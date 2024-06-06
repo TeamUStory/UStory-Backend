@@ -44,6 +44,20 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String createAccessTokenKakao(Long userId, String kakaoAccessToken) {
+        Claims claims = Jwts.claims();
+        Date now = new Date();
+        claims.put("userId", userId);
+        claims.put("kakao", kakaoAccessToken);
+        log.info("[createKakaoAccessToken] access 토큰(kakao 로그인) 생성 완료");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(ACCESSTOKEN_VALID_MILISECOND))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    } //TODO: 코드 중복 되는 부분이 많아서 리팩토링 예정
+
     public String createRefreshToken(){
         Claims claims = Jwts.claims();
         Date now = new Date();
@@ -81,5 +95,11 @@ public class JwtTokenProvider {
         Date now = new Date();
         long remainingMillis = expiration.getTime() - now.getTime();
         return Math.max(remainingMillis, 0) / 1000;
+    }
+
+    public String getKakaoToken(String jwtToken){
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(jwtToken);
+        return claims.getBody().get("kakao").toString();
     }
 }
