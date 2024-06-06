@@ -69,7 +69,7 @@ public class PaperController {
                                                   @JwtAuthorization Long userId) {
 
         Paper paper = paperService.getPaperById(paperId);
-        Boolean bookmarked = bookmarkService.isPaperBookmarkedByUser(paperId, userId);
+        Boolean bookmarked = bookmarkService.isPaperBookmarkedByUser(userId, paperId);
 
         return ResponseEntity.ok(new PaperResponse(paper, bookmarked));
     }

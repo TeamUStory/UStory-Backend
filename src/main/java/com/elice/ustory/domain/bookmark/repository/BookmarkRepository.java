@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.bookmark;
+package com.elice.ustory.domain.bookmark.repository;
 
 import com.elice.ustory.domain.bookmark.entity.Bookmark;
 import com.elice.ustory.domain.bookmark.entity.BookmarkId;
@@ -13,13 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkId> {
+public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkId>, BookmarkQueryDslRepository {
 
     /** userId와 paperId가 일치하는 Bookmark 가져오기 */
     Optional<Bookmark> findByUserIdAndPaperId(Long userId, Long paperId);
 
-    /** userId와 paperId가 일치하는 Bookmark 존재 유무 확인하기 */
-    boolean existsByUserIdAndPaperId(Long userId, Long paperId);
 
     /** userId에 해당하는 Bookmark 들의 Paper List 가져오기 */
     @Query("SELECT b.paper FROM Bookmark b WHERE b.user.id = :userId")
