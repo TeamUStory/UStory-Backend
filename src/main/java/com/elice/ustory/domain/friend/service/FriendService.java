@@ -1,7 +1,6 @@
 package com.elice.ustory.domain.friend.service;
 
-import com.elice.ustory.domain.friend.dto.FriendRequestListDTO;
-import com.elice.ustory.domain.friend.dto.UserFriendDTO;
+import com.elice.ustory.domain.friend.dto.*;
 import com.elice.ustory.domain.friend.entity.Friend;
 import com.elice.ustory.domain.friend.entity.FriendId;
 import com.elice.ustory.domain.friend.entity.FriendStatus;
@@ -47,22 +46,7 @@ public class FriendService {
         return new FriendId(senderId, receiverId);
     }
 
-    /**
-     * 두 사용자 간의 친구 요청을 나타내는 Friend 객체를 생성합니다.
-     *
-     * @param sender 친구 요청을 보낸 사용자
-     * @param receiver 친구 요청을 받을 사용자
-     * @return 생성된 Friend 객체
-     */
-    private Friend createFriend(Users sender, Users receiver) {
-        return Friend.builder()
-                .id(new FriendId(sender.getId(), receiver.getId()))
-                .invitedAt(LocalDateTime.now())
-                .status(FriendStatus.PENDING)
-                .user(sender)
-                .friendUser(receiver)
-                .build();
-    }
+
 
     /**
      * 사용자 조회
@@ -91,13 +75,12 @@ public class FriendService {
      * 친구 추가 요청을 보냅니다.
      *
      * @param userId 요청을 보낸 사용자의 ID
-     * @param receiverNickname 친구 요청을 받을 사용자의 닉네임
+     * @param friendRequestDto 친구 요청을 받을 사용자의 닉네임
      */
-    // userid랑 ReceiverNickname으로 해결 해야됨
-    public void sendFriendRequest(Long userId, String receiverNickname) {
+    public void sendFriendRequest(Long userId, FriendRequestDto friendRequestDto) {
         Users sender = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Sender를 찾을 수 없습니다."));
-        Users receiver = userRepository.findByNickname(receiverNickname)
+        Users receiver = userRepository.findByNickname(friendRequestDto.getReceiverNickname())
                 .orElseThrow(() -> new NotFoundException("Receiver를 찾을 수 없습니다."));
 
         FriendId friendId = createFriendId(sender.getId(), receiver.getId());
@@ -110,7 +93,7 @@ public class FriendService {
         // 친구 목록에 이미 있는 친구인지 확인
         validateNotAlreadyFriends(sender.getId(), receiver.getId());
 
-        Friend friend = createFriend(sender, receiver);
+        Friend friend = new FriendDto(sender.getId(), receiver.getId()).toFriend(sender, receiver);
         friendRepository.save(friend);
 
         NoticeRequest noticeRequest = NoticeRequest.builder()
@@ -155,22 +138,21 @@ public class FriendService {
      * 친구 요청에 응답합니다.
      *
      * @param userId 친구 요청을 받은 사용자의 ID
-     * @param senderNickname 친구 요청을 보낸 사용자의 닉네임
-     * @param accepted true이면 요청 수락, false이면 요청 거절
+     * @param FriendResponseDto 친구 요청을 보낸 사용자의 닉네임과 수락 거절 응답
      */
     // 응답도 userId, senderNickname 으로 해서 보내야됨
-    public void respondToFriendRequest(Long userId, String senderNickname, boolean accepted) {
-        Users sender = userRepository.findByNickname(senderNickname)
+    public void respondToFriendRequest(Long userId, FriendResponseDto friendResponseDto) {
+        Users sender = userRepository.findByNickname(friendResponseDto.getSenderNickname())
                 .orElseThrow(() -> new NotFoundException("sender를 찾을 수 없습니다."));
         Users receiver = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("receiver를 찾을 수 없습니다."));
 
-        FriendId friendId = createFriendId(sender.getId(), receiver.getId());
+        FriendId friendId = new FriendId(sender.getId(), receiver.getId());
 
         Friend friend = friendRepository.findById(friendId)
                 .orElseThrow(() -> new NotFoundException("친구 요청을 찾을 수 없습니다."));
 
-        if (accepted) {
+        if (friendResponseDto.isAccepted()) {
             processAcceptedFriendRequest(friend, sender.getId(), receiver.getId());
         } else {
             friendRepository.delete(friend);
