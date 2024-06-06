@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.notice.entity;
 
-import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
