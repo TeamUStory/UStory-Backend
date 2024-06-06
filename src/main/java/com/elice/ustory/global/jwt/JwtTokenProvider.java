@@ -17,7 +17,7 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 60 * 30;
+    private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
 
     @Value("${key.salt}")
@@ -53,7 +53,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(ACCESSTOKEN_VALID_MILISECOND))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESSTOKEN_VALID_MILISECOND))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     } //TODO: 코드 중복 되는 부분이 많아서 리팩토링 예정
