@@ -31,7 +31,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*") // TODO: 필수적인 요청만 열도록 제한 (ex. allowedOrigins(http://localhost:5174))
+                .allowedOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true)
