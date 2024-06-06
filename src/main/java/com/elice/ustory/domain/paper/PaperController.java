@@ -58,7 +58,7 @@ public class PaperController {
     @PutMapping("/{paperId}")
     public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long paperId,
                                                       @JwtAuthorization Long userId,
-                                                      @RequestBody UpdatePaperRequest updatePaperRequest) {
+                                                      @Valid @RequestBody UpdatePaperRequest updatePaperRequest) {
 
         Paper paper = paperService.update(userId, paperId, updatePaperRequest);
 
