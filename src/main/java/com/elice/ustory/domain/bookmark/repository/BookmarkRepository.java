@@ -17,9 +17,4 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkId>,
 
     /** userId와 paperId가 일치하는 Bookmark 가져오기 */
     Optional<Bookmark> findByUserIdAndPaperId(Long userId, Long paperId);
-
-
-    /** userId에 해당하는 Bookmark 들의 Paper List 가져오기 */
-    @Query("SELECT b.paper FROM Bookmark b WHERE b.user.id = :userId")
-    List<Paper> findPapersByUserId(@Param("userId") Long userId, Pageable pageable);
 }
