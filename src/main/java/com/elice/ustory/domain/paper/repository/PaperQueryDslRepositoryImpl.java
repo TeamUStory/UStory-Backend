@@ -56,6 +56,7 @@ public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
                                 .from(diaryUser)
                                 .where(diaryUser.id.users.id.eq(userId))
                 ))
+                .orderBy(paper.createdAt.desc())
                 .fetch();
     }
 

@@ -37,6 +37,8 @@ public class PaperService {
     private static final String NOT_FOUND_PAPER_MESSAGE = "%d: 해당하는 페이퍼가 존재하지 않습니다.";
     private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
     private static final String NOT_FOUND_USER_MESSAGE = "%d: 해당하는 사용자가 존재하지 않습니다.";
+    private static final String NOT_FOUND_IN_DIARY_MESSAGE = "%s: 해당하는 사용자가 다이어리 내에 존재하지 않습니다.";
+    private static final String ORDER_BY_UPDATED_AT = "updatedAt";
 
     private final PaperRepository paperRepository;
     private final AddressRepository addressRepository;
@@ -216,19 +218,20 @@ public class PaperService {
         return findByWriterId.size();
     }
 
-    // 작성자를 제외한 멤버들에게 코멘트를 달아달라고 알림 전송
+    // 작성자를 제외한 멤버들에게 코멘트를 달아달라고 알림 전송, 트랜잭션?
+    //@Transactional?
     public void needCommentNotice(Diary diary, Paper paper) {
-//         TODO : 다이어리에 속한 멤버들 전체 다 가져오기
+        // 다이어리에 속해있는 유저의 닉네임으로 전부 저장
         List<String> userFindByDiary = diaryUserRepository.findUserByDiary(diary.getId());
 
-//         속한 멤버들 중 작성자 제거하기
+        // 속한 멤버들 중 작성자 제거하기
         userFindByDiary.remove(paper.getWriter().getNickname());
 
         // 작성자를 제외한 남은 멤버가 들어가있는 다이어리-유저 리스트에다가 알림 보내기
         if (!userFindByDiary.isEmpty()) {
             for (String nickName : userFindByDiary) {
                 NoticeRequest noticeRequest = NoticeRequest.builder()
-                        .responseId(userRepository.findByNickname(nickName).orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다.")).getId())
+                        .responseId(userRepository.findByNickname(nickName).orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_IN_DIARY_MESSAGE, nickName))).getId())
                         .paperId(paper.getId())
                         .messageType(2)
                         .build();
@@ -252,7 +255,7 @@ public class PaperService {
                 .map(comment -> comment.getUser().getId())
                 .collect(Collectors.toSet());
 
-        // TODO : 다이어리에 속한 유저 List를 가져온다. 현재 다이어리에서 유저를 불러올 수 없기 때문에 주석 처리.
+        // 다이어리에 속한 유저의 닉네임 List를 가져온다.
         List<String> userFindByDiary = diaryUserRepository.findUserByDiary(diary.getId());
 
         // TODO : 다이어리에 속한 유저 List와 set 사이즈 비교 후, 일치하면 바꾸고 노티스 던진다. 현재 다이어리에서 유저를 불러올 수 없기 때문에 주석 처리.
