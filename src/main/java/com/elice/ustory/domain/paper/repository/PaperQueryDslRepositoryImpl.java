@@ -1,7 +1,10 @@
 package com.elice.ustory.domain.paper.repository;
 
+import com.elice.ustory.domain.diaryUser.entity.QDiaryUser;
 import com.elice.ustory.domain.paper.entity.Paper;
+import com.elice.ustory.domain.paper.entity.QPaper;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +50,19 @@ public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
 
     private BooleanExpression endDateCondition(LocalDate endDate) {
         return endDate != null ? paper.createdAt.loe(endDate.plusDays(1).atStartOfDay().minusNanos(1)) : null;
+    }
+
+    @Override
+    public List<Paper> findAllPapersByUserId(Long userId) {
+        QPaper paper = QPaper.paper;
+        QDiaryUser diaryUser = QDiaryUser.diaryUser;
+
+        return queryFactory.selectFrom(paper)
+                .where(paper.diary.id.in(
+                        JPAExpressions.select(diaryUser.id.diary.id)
+                                .from(diaryUser)
+                                .where(diaryUser.id.users.id.eq(userId))
+                ))
+                .fetch();
     }
 }

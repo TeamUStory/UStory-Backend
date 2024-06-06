@@ -17,8 +17,5 @@ public interface PaperRepository extends JpaRepository<Paper, Long>, PaperQueryD
     List<Paper> findByWriterId(Long writerId);
     List<Paper> findByWriterId(Long writerId, Pageable pageable);
 
-    /** 사용자가 포함되어 있는 다이어리의 모든 Paper 리스트 불러오기 */
-    @Query("SELECT p FROM Paper p WHERE p.diary.id IN (SELECT du.id.diary.id FROM DiaryUser du WHERE du.id.users.id = :userId)")
-    List<Paper> findAllPapersByUserId(@Param("userId") Long userId);
 }
 
