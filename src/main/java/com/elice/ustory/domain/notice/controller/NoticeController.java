@@ -39,7 +39,6 @@ public class NoticeController {
     }
 
 
-
     /**
      * 알림을 삭제합니다.
      *
@@ -52,8 +51,6 @@ public class NoticeController {
         noticeService.deleteNoticeById(noticeId);
         return ResponseEntity.noContent().build();
     }
-
-
 
 
 }
