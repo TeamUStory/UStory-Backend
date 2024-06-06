@@ -8,6 +8,7 @@ import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.NotFoundException;
+import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.util.NoticeUtils;
 import jakarta.transaction.Transactional;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 @Transactional
@@ -118,15 +120,18 @@ public class NoticeService {
 
     /**
      * 알림을 ID로 삭제합니다.
-     *
+     * @param userId 로그인한 사용자의 아이디
      * @param id 삭제할 알림의 ID
      */
-    public void deleteNoticeById(Long id) {
+    public void deleteNoticeById(Long userId, Long id) {
         if (id == null) {
             throw new ValidationException("알림 ID가 null입니다.");
         }
         Notice notice = noticeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("알림을 찾을 수 없습니다."));
+        if (notice.getResponseId() != userId) {
+            throw new UnauthorizedException("해당 알림을 삭제할 권한이 없습니다.");
+        }
         noticeRepository.delete(notice);
     }
 
