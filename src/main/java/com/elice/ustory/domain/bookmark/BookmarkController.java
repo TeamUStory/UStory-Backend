@@ -62,7 +62,7 @@ public class BookmarkController {
     public ResponseEntity<BookmarkResponse> isPaperBookmarked(@PathVariable Long paperId,
                                                               @JwtAuthorization Long userId) {
 
-        boolean isBookmarked = bookmarkService.isPaperBookmarkedByUser(paperId, userId);
+        boolean isBookmarked = bookmarkService.isPaperBookmarkedByUser(userId, paperId);
 
         return ResponseEntity.ok(new BookmarkResponse(isBookmarked));
     }
