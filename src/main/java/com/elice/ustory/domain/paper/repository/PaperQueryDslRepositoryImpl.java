@@ -9,11 +9,10 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.elice.ustory.domain.paper.entity.QPaper.paper;
@@ -25,11 +24,12 @@ public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Paper> findAllByDiaryIdAndDateRange(Long diaryId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    public List<Paper> findAllByDiaryIdAndDateRange(Long diaryId, LocalDateTime requestTime, Pageable pageable, LocalDate startDate, LocalDate endDate) {
         JPQLQuery<Paper> query = queryFactory.selectFrom(paper)
                 .where(paper.diary.id.eq(diaryId),
                         startDateCondition(startDate),
-                        endDateCondition(endDate))
+                        endDateCondition(endDate),
+                        paper.createdAt.loe(requestTime))
                 .orderBy(paper.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -56,6 +56,18 @@ public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
                                 .from(diaryUser)
                                 .where(diaryUser.id.users.id.eq(userId))
                 ))
+                .fetch();
+    }
+
+    @Override
+    public List<Paper> findByWriterId(Long writerId, LocalDateTime requestTime, Pageable pageable) {
+        QPaper paper = QPaper.paper;
+
+        return queryFactory.selectFrom(paper)
+                .where(paper.writer.id.eq(writerId), paper.createdAt.loe(requestTime))
+                .orderBy(paper.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
     }
 }

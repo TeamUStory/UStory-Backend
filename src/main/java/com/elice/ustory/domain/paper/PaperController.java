@@ -95,7 +95,7 @@ public class PaperController {
                                                                    @RequestParam(name = "size", defaultValue = "20") int size,
                                                                    @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
+        List<Paper> papers = paperService.getPapersByWriterId(userId, page, size, requestTime);
 
         List<PaperListResponse> result = papers.stream()
                 .map(PaperListResponse::new)
@@ -108,14 +108,14 @@ public class PaperController {
     @GetMapping("/diary/{diaryId}")
     public ResponseEntity<List<PaperListResponse>> getPapersByDiary(
             @PathVariable Long diaryId,
+            @RequestParam(name = "requestTime") LocalDateTime requestTime,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size,
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate,
-            @RequestParam(name = "requestTime") LocalDateTime requestTime
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate
     ) {
 
-        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate).stream().toList();
+        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate, requestTime);
 
         List<PaperListResponse> response = papers.stream()
                 .map(PaperListResponse::new)

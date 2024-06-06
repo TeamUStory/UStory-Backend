@@ -15,7 +15,5 @@ import java.util.List;
 public interface PaperRepository extends JpaRepository<Paper, Long>, PaperQueryDslRepository {
 
     List<Paper> findByWriterId(Long writerId);
-    List<Paper> findByWriterId(Long writerId, Pageable pageable);
-
 }
 
