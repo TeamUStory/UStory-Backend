@@ -1,8 +1,6 @@
 package com.elice.ustory.domain.paper;
 
 import com.elice.ustory.domain.bookmark.BookmarkService;
-import com.elice.ustory.domain.comment.dto.AddCommentRequest;
-import com.elice.ustory.domain.comment.service.CommentService;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperCountResponse;
@@ -18,6 +16,7 @@ import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -50,7 +49,7 @@ public class PaperController {
     @Operation(summary = "Create Paper API", description = "페이퍼를 생성한다.")
     @PostMapping
     public ResponseEntity<AddPaperResponse> create(@JwtAuthorization Long userId,
-                                                   @RequestBody AddPaperRequest addPaperRequest) {
+                                                   @Valid @RequestBody AddPaperRequest addPaperRequest) {
 
         Paper paper = paperService.createPaper(addPaperRequest.toPageEntity(), userId, addPaperRequest.getDiaryId(), addPaperRequest.getWriterComment());
 
