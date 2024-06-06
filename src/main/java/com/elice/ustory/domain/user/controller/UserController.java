@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다.")
-    @PostMapping(value = "/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         LoginResponse loginResponse = userService.login(loginRequest, response);
         return ResponseEntity.ok().body(loginResponse);
@@ -73,21 +73,21 @@ public class UserController {
 
 
     @Operation(summary = "User MyPage API", description = "마이페이지에 필요한 정보를 조회한다.")
-    @GetMapping(value = "/my-page")
+    @GetMapping("/my-page")
     public ResponseEntity<MyPageResponse> showMyPage(@JwtAuthorization Long userId) {
         MyPageResponse myPageResponse = userService.showMyPage(userId);
         return ResponseEntity.ok(myPageResponse);
     }
 
     @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
-    @PostMapping(value = "/sign-up/validate-nickname")
+    @PostMapping("/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
         ValidateNicknameResponse validateNicknameResponse = userService.isValidNickname(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
     @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-    @PostMapping("/send-validate")
+    @PostMapping("/sign-up/send-validate")
     public ResponseEntity<AuthCodeCreateResponse> SendMailToValidate(@Valid @RequestBody AuthCodeCreateRequest authCodeCreateRequest) throws MessagingException {
         AuthCodeCreateResponse authCodeCreateResponse = emailService.sendValidateSignupMail(authCodeCreateRequest.getEmail());
         return ResponseEntity.ok(authCodeCreateResponse);
