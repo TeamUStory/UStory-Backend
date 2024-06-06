@@ -36,7 +36,7 @@ public class KakaoController {
 
     @RequestMapping("/login/oauth2/code/kakao")
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
-        String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code, response);
+        String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
         Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(kakaoAccessToken);
 
         String id = (String) userInfo.get("id");

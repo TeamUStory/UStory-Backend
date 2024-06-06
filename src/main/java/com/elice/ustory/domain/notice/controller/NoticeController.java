@@ -39,7 +39,6 @@ public class NoticeController {
     }
 
 
-
     /**
      * 알림을 삭제합니다.
      *
@@ -48,12 +47,10 @@ public class NoticeController {
      */
     @Operation(summary = "Delete / Notice", description = "알림을 삭제합니다.")
     @DeleteMapping("/{noticeId}")
-    public ResponseEntity<Void> deleteNotice(@PathVariable Long noticeId) {
-        noticeService.deleteNoticeById(noticeId);
+    public ResponseEntity<Void> deleteNotice(@JwtAuthorization Long userId, @PathVariable Long noticeId) {
+        noticeService.deleteNoticeById(userId, noticeId);
         return ResponseEntity.noContent().build();
     }
-
-
 
 
 }
