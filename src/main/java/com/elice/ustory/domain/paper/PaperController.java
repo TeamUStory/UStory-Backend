@@ -117,7 +117,9 @@ public class PaperController {
 
         List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate).stream().toList();
 
-        List<PaperListResponse> response = papers.stream().map(PaperListResponse::new).toList();
+        List<PaperListResponse> response = papers.stream()
+                .map(PaperListResponse::new)
+                .toList();
 
         return ResponseEntity.ok(response);
     }

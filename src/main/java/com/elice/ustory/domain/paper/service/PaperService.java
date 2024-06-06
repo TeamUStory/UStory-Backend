@@ -166,7 +166,7 @@ public class PaperService {
     /**
      * 다이어리 내에 존재하는 Papers 최신순으로 페이지네이션
      */
-    public Slice<Paper> getPapersByDiaryId(Long diaryId, int page, int size, LocalDate startDate, LocalDate endDate) {
+    public List<Paper> getPapersByDiaryId(Long diaryId, int page, int size, LocalDate startDate, LocalDate endDate) {
 
         // 다이어리 검증
         diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId)));

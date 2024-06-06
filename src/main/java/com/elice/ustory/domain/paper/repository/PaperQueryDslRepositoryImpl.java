@@ -25,23 +25,16 @@ public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<Paper> findAllByDiaryIdAndDateRange(Long diaryId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    public List<Paper> findAllByDiaryIdAndDateRange(Long diaryId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         JPQLQuery<Paper> query = queryFactory.selectFrom(paper)
                 .where(paper.diary.id.eq(diaryId),
                         startDateCondition(startDate),
                         endDateCondition(endDate))
                 .orderBy(paper.createdAt.desc())
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1);
+                .limit(pageable.getPageSize());
 
-        List<Paper> results = query.fetch();
-        boolean hasNext = results.size() > pageable.getPageSize();
-
-        if (hasNext) {
-            results.remove(results.size() - 1);
-        }
-
-        return new SliceImpl<>(results, pageable, hasNext);
+        return query.fetch();
     }
 
     private BooleanExpression startDateCondition(LocalDate startDate) {
