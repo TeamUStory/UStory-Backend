@@ -83,11 +83,16 @@ public class FriendService {
         Users receiver = userRepository.findByNickname(friendRequestDto.getReceiverNickname())
                 .orElseThrow(() -> new NotFoundException("Receiver를 찾을 수 없습니다."));
 
+        // 자기 자신에게 친구 요청을 할 수 없도록 예외 처리
+        if (sender.getId().equals(receiver.getId())) {
+            throw new ValidationException("자기 자신에게 친구 요청을 할 수 없습니다.");
+        }
+
         FriendId friendId = createFriendId(sender.getId(), receiver.getId());
 
         // 이미 친구 요청이 있는지 확인
-        validateFriendRequestNotExists(sender.getId(), receiver.getId());
-        validateFriendRequestNotExists(receiver.getId(), sender.getId());
+        validateOutgoingFriendRequestNotExists(sender.getId(), receiver.getId());
+        validateIncomingFriendRequestNotExists(receiver.getId(), sender.getId());
 
 
         // 친구 목록에 이미 있는 친구인지 확인
@@ -116,16 +121,29 @@ public class FriendService {
     }
 
     /**
-     * 친구 요청 존재 여부 확인
+     * 친구 요청을 한 경우 친구요청 불가
+     * @param senderId
+     * @param receiverId
      */
-    private void validateFriendRequestNotExists(Long senderId, Long receiverId) {
+    private void validateOutgoingFriendRequestNotExists(Long senderId, Long receiverId) {
         if (friendRepository.existsBySenderAndReceiverAndStatus(senderId, receiverId, FriendStatus.PENDING)) {
-            throw new ConflictException("친구 요청이 이미 있습니다.");
+            throw new ConflictException("이미 보낸 친구 요청이 있습니다.");
         }
     }
 
     /**
-     * 친구 존재 여부 확인
+     * 친구요청이 있는 경우 친구요청 불가
+     * @param receiverId
+     * @param senderId
+     */
+    private void validateIncomingFriendRequestNotExists(Long receiverId, Long senderId) {
+        if (friendRepository.existsBySenderAndReceiverAndStatus(receiverId, senderId, FriendStatus.PENDING)) {
+            throw new ConflictException("이미 받은 친구 요청이 있습니다.");
+        }
+    }
+
+    /**
+     * 친구리스트에 존재 여부 확인
      */
     private void validateNotAlreadyFriends(Long userId, Long friendId) {
         if (friendRepository.existsBySenderAndReceiver(userId, friendId) ||
@@ -138,7 +156,7 @@ public class FriendService {
      * 친구 요청에 응답합니다.
      *
      * @param userId 친구 요청을 받은 사용자의 ID
-     * @param FriendResponseDto 친구 요청을 보낸 사용자의 닉네임과 수락 거절 응답
+     * @param friendResponseDto 친구 요청을 보낸 사용자의 닉네임과 수락 거절 응답
      */
     // 응답도 userId, senderNickname 으로 해서 보내야됨
     public void respondToFriendRequest(Long userId, FriendResponseDto friendResponseDto) {
