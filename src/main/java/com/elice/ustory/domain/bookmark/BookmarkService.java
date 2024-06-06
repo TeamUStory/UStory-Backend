@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.bookmark;
 
 import com.elice.ustory.domain.bookmark.entity.Bookmark;
+import com.elice.ustory.domain.bookmark.repository.BookmarkRepository;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
