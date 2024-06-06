@@ -25,7 +25,7 @@ public class JwtUtil {
     private final RefreshTokenService refreshTokenService;
 
     public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        String accessToken = getTokenFromRequest(request, "Authorization"); // TODO: Redis RefreshToken에 맞게 수정 1
+        String accessToken = getTokenFromRequest(request); // TODO: Redis RefreshToken에 맞게 수정 1
         RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
                 .orElseThrow();
 
@@ -50,11 +50,11 @@ public class JwtUtil {
         }
     } // TODO: Redis RefreshToken에 맞게 수정 2
 
-    public String getTokenFromRequest(HttpServletRequest request, String tokenName) throws UnsupportedEncodingException {
+    public String getTokenFromRequest(HttpServletRequest request) throws UnsupportedEncodingException {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            String accessToken = bearerToken.substring("Bearer ".length());
-            return accessToken;
+            log.info("이거 베어러 토큰임: {}", bearerToken);
+            return bearerToken.substring("Bearer ".length());
         }
 
         throw new ForbiddenException("유효하지 않은 토큰입니다.");

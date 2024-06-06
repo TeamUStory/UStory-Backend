@@ -41,7 +41,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             }
 
             if (requiresAuthorization) {
-                String accessToken = jwtUtil.getTokenFromRequest(request, "Authorization");
+                String accessToken = jwtUtil.getTokenFromRequest(request);
 
                 log.info("[preHandle] accessToken 값 추출 완료, token: {}", accessToken);
                 log.info("[preHandle] accessToken 값 유효성 체크 시작");
