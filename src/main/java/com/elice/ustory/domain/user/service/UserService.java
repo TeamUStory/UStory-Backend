@@ -187,7 +187,7 @@ public class UserService {
         return loginResponse;
     }
 
-    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
+    public LogoutResponse logout(HttpServletRequest request) {
         // 리프레시 토큰 삭제
         String token = request.getHeader("Authorization");
 
