@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.notice.controller;
 
 import com.elice.ustory.domain.notice.dto.NoticeResponse;
+import com.elice.ustory.domain.notice.entity.Notice;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.domain.notice.service.NoticeService;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.elice.ustory.domain.notice.entity.QNotice.notice;
 
 @Tag(name = "notice", description = "Notice API")
 @RestController
@@ -48,8 +51,10 @@ public class NoticeController {
         }
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        List<NoticeResponse> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
-        return ResponseEntity.ok(notices);
+        List<Notice> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
+        List<NoticeResponse> list = notices.stream().map(NoticeResponse::new).toList();
+
+        return ResponseEntity.ok(list);
     }
 
 
