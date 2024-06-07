@@ -7,4 +7,5 @@ import lombok.Data;
 @Builder
 public class AuthCodeVerifyResponse {
     Boolean isValid;
+    String message;
 }

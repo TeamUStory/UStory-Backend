@@ -12,9 +12,11 @@ public enum ErrorCode {
     VALIDATION_EXCEPTION("V001", "잘못된 요청입니다."),
     MISSING_REQUIRED_PARAMETER("V002", "필수 파라미터가 누락되었습니다."),
     VALIDATION_PARAMETER_EXCEPTION("V003", "파라미터 값이 잘못되었습니다."),
+    PARAMETER_INCORRECT_FORMAT("V004", "파라미터가 잘못된 형식입니다."),
 
     // Unauthorized Exception: 401,
     UNAUTHORIZED_EXCEPTION("U001", "인증되지 않은 접근입니다."),
+    EXPIRED_TOKEN_EXCEPTION("U002", "토큰 값이 만료되었습니다, 토큰을 갱신해주세요."),
 
     // Forbidden Exception: 403
     FORBIDDEN_EXCEPTION("F001", "허용하지 않는 접근입니다."),

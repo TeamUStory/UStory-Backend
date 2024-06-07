@@ -1,8 +1,6 @@
 package com.elice.ustory.domain.paper;
 
 import com.elice.ustory.domain.bookmark.BookmarkService;
-import com.elice.ustory.domain.comment.dto.AddCommentRequest;
-import com.elice.ustory.domain.comment.service.CommentService;
 import com.elice.ustory.domain.paper.dto.AddPaperRequest;
 import com.elice.ustory.domain.paper.dto.AddPaperResponse;
 import com.elice.ustory.domain.paper.dto.PaperCountResponse;
@@ -12,12 +10,11 @@ import com.elice.ustory.domain.paper.dto.PaperResponse;
 import com.elice.ustory.domain.paper.dto.UpdatePaperRequest;
 import com.elice.ustory.domain.paper.dto.UpdatePaperResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
-import com.elice.ustory.domain.address.AddressService;
-import com.elice.ustory.domain.image.ImageService;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -48,7 +45,7 @@ public class PaperController {
     @Operation(summary = "Create Paper API", description = "페이퍼를 생성한다.")
     @PostMapping
     public ResponseEntity<AddPaperResponse> create(@JwtAuthorization Long userId,
-                                                   @RequestBody AddPaperRequest addPaperRequest) {
+                                                   @Valid @RequestBody AddPaperRequest addPaperRequest) {
 
         Paper paper = paperService.create(userId, addPaperRequest);
 
@@ -59,7 +56,7 @@ public class PaperController {
     @PutMapping("/{paperId}")
     public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long paperId,
                                                       @JwtAuthorization Long userId,
-                                                      @RequestBody UpdatePaperRequest updatePaperRequest) {
+                                                      @Valid @RequestBody UpdatePaperRequest updatePaperRequest) {
 
         Paper paper = paperService.update(userId, paperId, updatePaperRequest);
 
@@ -72,7 +69,7 @@ public class PaperController {
                                                   @JwtAuthorization Long userId) {
 
         Paper paper = paperService.getPaperById(paperId);
-        Boolean bookmarked = bookmarkService.isPaperBookmarkedByUser(paperId, userId);
+        Boolean bookmarked = bookmarkService.isPaperBookmarkedByUser(userId, paperId);
 
         return ResponseEntity.ok(new PaperResponse(paper, bookmarked));
     }
@@ -95,7 +92,7 @@ public class PaperController {
                                                                    @RequestParam(name = "size", defaultValue = "20") int size,
                                                                    @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        List<Paper> papers = paperService.getPapersByWriterId(userId, page, size);
+        List<Paper> papers = paperService.getPapersByWriterId(userId, page, size, requestTime);
 
         List<PaperListResponse> result = papers.stream()
                 .map(PaperListResponse::new)
@@ -108,16 +105,18 @@ public class PaperController {
     @GetMapping("/diary/{diaryId}")
     public ResponseEntity<List<PaperListResponse>> getPapersByDiary(
             @PathVariable Long diaryId,
+            @RequestParam(name = "requestTime") LocalDateTime requestTime,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size,
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate,
-            @RequestParam(name = "requestTime") LocalDateTime requestTime
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate
     ) {
 
-        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate).stream().toList();
+        List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate, requestTime);
 
-        List<PaperListResponse> response = papers.stream().map(PaperListResponse::new).toList();
+        List<PaperListResponse> response = papers.stream()
+                .map(PaperListResponse::new)
+                .toList();
 
         return ResponseEntity.ok(response);
     }

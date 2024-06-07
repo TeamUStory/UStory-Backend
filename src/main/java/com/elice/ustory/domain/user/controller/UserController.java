@@ -1,13 +1,11 @@
 package com.elice.ustory.domain.user.controller;
 
-import com.elice.ustory.domain.user.dto.UserListDTO;
+import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.jwt.JwtAuthorization;
-import com.elice.ustory.global.exception.ErrorCode;
-import com.elice.ustory.global.exception.model.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -53,7 +51,7 @@ public class UserController {
     }
 
     @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다.")
-    @PostMapping(value = "/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         LoginResponse loginResponse = userService.login(loginRequest, response);
         return ResponseEntity.ok().body(loginResponse);
@@ -61,47 +59,47 @@ public class UserController {
 
     @Operation(summary = "User Logout API", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
-        LogoutResponse logoutResponse = userService.logout(request, response);
+    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request) {
+        LogoutResponse logoutResponse = userService.logout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
 
-    /**
-     * 닉네임으로 전체 사용자를 검색합니다.
-     *
-     * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록
-     */
-    @Operation(summary = "Get / Search User by Nickname", description = "닉네임으로 전체 사용자를 검색합니다.")
+    @Operation(summary = "Search User by Nickname", description = "닉네임이 일치하는 사용자를 검색합니다.")
     @GetMapping("/search")
-    public ResponseEntity<UserListDTO> searchUserByNickname(@RequestParam String nickname) {
-        UserListDTO user = userService.findUserByNickname(nickname)
-                .orElseThrow(() -> new NotFoundException("닉네임이 있는 사용자를 찾을 수 없습니다", ErrorCode.NOT_FOUND_EXCEPTION));
-        return ResponseEntity.ok(user);
+    public ResponseEntity<FindByNicknameResponse> searchUserByNickname(@RequestParam(name = "nickname") String nickname) {
+        FindByNicknameResponse findByNicknameResponse = userService.searchUserByNickname(nickname);
+        return ResponseEntity.ok(findByNicknameResponse);
     }
 
 
     @Operation(summary = "User MyPage API", description = "마이페이지에 필요한 정보를 조회한다.")
-    @GetMapping(value = "/my-page")
+    @GetMapping("/my-page")
     public ResponseEntity<MyPageResponse> showMyPage(@JwtAuthorization Long userId) {
         MyPageResponse myPageResponse = userService.showMyPage(userId);
         return ResponseEntity.ok(myPageResponse);
     }
 
-    @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
-    @PostMapping(value = "/sign-up/validate-nickname")
+    @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 닉네임 중복 여부를 검증한다. (글자 수 등 조건은 삭제됨)")
+    @PostMapping("/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
         ValidateNicknameResponse validateNicknameResponse = userService.isValidNickname(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
-    @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-    @PostMapping("/send-validate")
+    @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 'isSucess=false' 반환.")
+    @PostMapping("/sign-up/send-validate")
     public ResponseEntity<AuthCodeCreateResponse> SendMailToValidate(@Valid @RequestBody AuthCodeCreateRequest authCodeCreateRequest) throws MessagingException {
         AuthCodeCreateResponse authCodeCreateResponse = emailService.sendValidateSignupMail(authCodeCreateRequest.getEmail());
         return ResponseEntity.ok(authCodeCreateResponse);
     }
-    // TODO: 인증코드 검증
+
+    @Operation(summary = "Verify Validate Code", description = "사용자가 입력한 인증코드의 유효성을 검증한다.")
+    @PostMapping("/sign-up/verify-validate")
+    public ResponseEntity<AuthCodeVerifyResponse> verifyAuthCode(@Valid @RequestBody AuthCodeVerifyRequest authCodeVerifyRequest) {
+        AuthCodeVerifyResponse authCodeVerifyResponse = emailService.verifySignupAuthCode(authCodeVerifyRequest);
+        return ResponseEntity.ok(authCodeVerifyResponse);
+    }
+
 //    @GetMapping("/get-member")
 //    public Long getCurrentMember(Authentication authentication){
 //        log.info("authentication.getName() : {}", authentication.getName());

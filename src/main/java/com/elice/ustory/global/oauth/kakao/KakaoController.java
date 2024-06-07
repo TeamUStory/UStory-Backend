@@ -36,7 +36,7 @@ public class KakaoController {
 
     @RequestMapping("/login/oauth2/code/kakao")
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
-        String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code, response);
+        String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
         Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(kakaoAccessToken);
 
         String id = (String) userInfo.get("id");
@@ -53,8 +53,8 @@ public class KakaoController {
     }
 
     @RequestMapping("/auth/logout")
-    public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        LogoutResponse logoutResponse = kakaoService.kakaoLogout(request, response);
+    public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request) throws UnsupportedEncodingException {
+        LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
 }

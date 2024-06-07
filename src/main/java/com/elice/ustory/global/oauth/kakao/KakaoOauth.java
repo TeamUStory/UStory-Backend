@@ -3,7 +3,6 @@ package com.elice.ustory.global.oauth.kakao;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,7 @@ public class KakaoOauth {
     private final String userInfoUri = "https://kapi.kakao.com/v2/user/me";
     private final String expireKakaoTokenUri = "https://kapi.kakao.com/v1/user/logout";
 
-    public String getKakaoAccessToken(String code, HttpServletResponse response) {
+    public String getKakaoAccessToken(String code) {
         String kakaoAccessToken = "";
 
         try{
@@ -78,10 +77,6 @@ public class KakaoOauth {
             br.close();
             bw.close();
 
-            var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + kakaoAccessToken, StandardCharsets.UTF_8));
-            cookie1.setPath("/");
-            cookie1.setMaxAge(60 * 60);
-            response.addCookie(cookie1);
         }catch (Exception e){
             e.printStackTrace();
         }

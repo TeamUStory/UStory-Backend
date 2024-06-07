@@ -1,15 +1,11 @@
 package com.elice.ustory.global.exception;
 
 import com.elice.ustory.global.exception.dto.ErrorResponse;
-import com.elice.ustory.global.exception.model.ConflictException;
-import com.elice.ustory.global.exception.model.CustomException;
-import com.elice.ustory.global.exception.model.ForbiddenException;
-import com.elice.ustory.global.exception.model.InternalServerException;
-import com.elice.ustory.global.exception.model.UnsupportedMediaTypeException;
-import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.UnauthorizedException;
-import com.elice.ustory.global.exception.model.UnsupportedMethodTypeException;
-import com.elice.ustory.global.exception.model.ValidationException;
+import com.elice.ustory.global.exception.model.*;
+import com.elice.ustory.global.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +18,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+@RequiredArgsConstructor
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -71,8 +69,10 @@ public class GlobalExceptionHandler {
     }
 
     /** Unauthorized Exception */
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(UnauthorizedException ex) {
+    @ExceptionHandler({
+            UnauthorizedException.class,
+            AccessTokenExpiredException.class})
+    public ResponseEntity<ErrorResponse> handleValidationException(CustomException ex) {
 
         printWarnLog(UNAUTHORIZED_LOG_MESSAGE, ex);
 
@@ -145,6 +145,15 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                 .header("Allow", ex.getSupportedHttpMethods().toString())
                 .body(new ErrorResponse(ex2, message));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+
+        CustomException customException = new ValidationException(ex.getMessage(), ErrorCode.PARAMETER_INCORRECT_FORMAT);
+
+        ErrorResponse errorResponse = new ErrorResponse(customException);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /** 예외 처리를 벗어난 서버 에러 */

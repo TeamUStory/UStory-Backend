@@ -7,25 +7,22 @@ import com.elice.ustory.domain.diary.repository.DiaryRepository;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
-import com.elice.ustory.domain.user.dto.UserListDTO;
+import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
@@ -40,27 +37,35 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
+    private static final String NO_AUTHORIZATION_IN_HEADER_MESSAGE = "헤더에 토큰을 입력해주세요.";
+
     public Users findById(Long userId){
         return userRepository.findById(userId).orElseThrow();
     }
 
-    /**
-     * 닉네임으로 전체 사용자를 검색합니다.
-     *
-     * @param nickname 검색할 닉네임
-     * @return 검색된 사용자 목록 (옵셔널)
-     */
-    public Optional<UserListDTO> findUserByNickname(String nickname) {
-        return Optional.ofNullable(nickname)
-                .filter(name -> !name.isEmpty())
-                .flatMap(userRepository::findByNickname)
-                .map(u -> UserListDTO.builder()
-                        .name(u.getName())
-                        .nickname(u.getNickname())
-                        .profileImgUrl(u.getProfileImgUrl())
-                        .build());
+    public FindByNicknameResponse searchUserByNickname(String nickname) {
+        Optional<Users> userOptional = userRepository.findByNickname(nickname);
+
+        if (userOptional.isPresent()) {
+            Users user = userOptional.get();
+
+            return FindByNicknameResponse.builder()
+                    .isExist(true)
+                    .name(user.getName())
+                    .nickname(user.getNickname())
+                    .profileImgUrl(user.getProfileImgUrl())
+                    .build();
+        } else {
+            return FindByNicknameResponse.builder()
+                    .isExist(false)
+                    .name(null)
+                    .nickname(null)
+                    .profileImgUrl(null)
+                    .build();
+        }
     }
 
+    @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
 
         String email = signUpRequest.getEmail();
@@ -174,10 +179,7 @@ public class UserService {
 
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
-        var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
-        cookie1.setPath("/");
-        cookie1.setMaxAge(60 * 60);
-        response.addCookie(cookie1);
+        response.addHeader("Authorization", "Bearer " + accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
 
@@ -185,25 +187,18 @@ public class UserService {
         return loginResponse;
     }
 
-    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-        // 1. 쿠키 만료 시작
-        Cookie cookieForExpire = new Cookie("Authorization", null);
-        cookieForExpire.setPath("/");
-        cookieForExpire.setMaxAge(0);
-        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
-        // 1. 쿠키 만료 끝
+    public LogoutResponse logout(HttpServletRequest request) {
+        // 리프레시 토큰 삭제
+        String token = request.getHeader("Authorization");
 
-        // 2. 리프레시 토큰 삭제 시작
-        Cookie currentCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> "Authorization".equals(cookie.getName()))
-                .findFirst().orElseThrow();
-        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+        if (token == null) {
+            throw new UnauthorizedException(NO_AUTHORIZATION_IN_HEADER_MESSAGE);
+        }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
 
         refreshTokenService.removeTokenInfo(token);
-        // 2. 리프레시 토큰 삭제 끝
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
         return logoutResponse;
@@ -233,14 +228,9 @@ public class UserService {
         // 중복 여부 확인(false면 합격)
         Boolean isDuplicate = userRepository.findByNickname(nickname).isPresent();
 
-        // 조건 불일치 여부 확인(false면 합격)
-        String regex = "[a-zA-Z가-힣]{2,10}";
-        Boolean isInappropriate = !nickname.matches(regex);
-
         // 최종, 닉네임 유효 여부 반환
         ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
                 .isDuplicate(isDuplicate)
-                .isInappropriate(isInappropriate)
                 .build();
 
         return validateNicknameResponse;

@@ -1,9 +1,6 @@
 package com.elice.ustory.global.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +14,7 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
+    private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 60 * 30;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
 
     @Value("${key.salt}")
@@ -81,9 +78,13 @@ public class JwtTokenProvider {
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
                     .parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (Exception e) {
-            log.info("[validateToken] 토큰 유효 체크 예외 발생");
+
+            return !claims.getBody().getExpiration().before(new Date(System.currentTimeMillis()));
+        } catch (ExpiredJwtException e) {
+            log.info("[validateToken] 토큰 유효 시간 만료");
+            return false;
+        } catch (SignatureException e){
+            log.info("[validateToken] 올바르지 않은 토큰 형식");
             return false;
         }
     }

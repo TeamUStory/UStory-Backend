@@ -7,6 +7,7 @@ import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PaperService paperService;
     private final UserService userService;
+
+    private static final String NOT_FOUND_COMMENT_MESSAGE = "%d: 해당하는 댓글이 존재하지 않습니다.";
 
     public CommentService(CommentRepository commentRepository, PaperService paperService,
                           UserService userService) {
@@ -57,13 +60,9 @@ public class CommentService {
 
     @Transactional
     public Comment updateComment(Long id, UpdateCommentRequest updateCommentRequest) {
-        Optional<Comment> optionalComment = commentRepository.findById(id);
-
-        if(optionalComment.isPresent()){
-            return optionalComment.get().update(updateCommentRequest.getContent());
-        }else{
-            throw new RuntimeException("해당 Id에 대한 댓글을 찾을 수 없습니다.");
-        }
+        Comment optionalComment = commentRepository.findById(id).orElseThrow(
+                () -> new NotFoundException(String.format(NOT_FOUND_COMMENT_MESSAGE, id)));
+        return optionalComment.update(updateCommentRequest.getContent());
     }
 
     public void deleteComment(Long id) {

@@ -24,7 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtInterceptor(jwtTokenProvider, jwtUtil))
                 .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**",
-                        "/user/sign-up/**", "/user/login");
+                        "/user/sign-up/**", "/user/login", "/user/validate-nickname");
         //TODO: 로그인 관련 엔드포인트는 제외시켜야함
     }
 
@@ -35,6 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true)
+                .exposedHeaders("Authorization")
                 .maxAge(3600);
     }
 
