@@ -1,8 +1,12 @@
 package com.elice.ustory.domain.user.service;
 
 import com.elice.ustory.domain.user.dto.AuthCodeCreateResponse;
+import com.elice.ustory.domain.user.dto.AuthCodeVerifyRequest;
+import com.elice.ustory.domain.user.dto.AuthCodeVerifyResponse;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.redis.email.AuthCode;
+import com.elice.ustory.global.redis.email.AuthCodeRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -17,9 +21,9 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-    // private final RedisUtil redisUtil; // TODO: Redis 추가 후 주석 해제
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
+    private final AuthCodeRepository authCodeRepository;
     private final EmailConfig emailConfig; // TODO: 이렇게 Config를 끌고와도 되는건지?
     private String fromEmail;
 
@@ -53,6 +57,7 @@ public class EmailService {
     }
 
     public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
+        // 1. 메일 내용 생성
         String authCode = generateAuthCode();
         String title = "UStory 회원가입 인증코드입니다.";
         String content =
@@ -61,9 +66,17 @@ public class EmailService {
                         + "인증 코드를 바르게 입력해주세요."
                 ;
 
-        sendMail(toEmail, title, content); // 생성된 메일 발송
-//        redisUtil.setDataExpire(toEmail, authCode, 60 * 30L); // TODO: Redis에 인증코드 유효시간 설정
+        // 2. 인증코드를 Redis에 저장
+        AuthCode authCodeObject = AuthCode.builder()
+                .authCode(authCode)
+                .toEmail(toEmail)
+                .build();
+        authCodeRepository.save(authCodeObject);
 
+        // 3. 메일 발송
+        sendMail(toEmail, title, content); // 생성된 메일 발송
+
+        // 4. api 결괏값 반환
         log.info("[sendValidateSigunupResult] 인증코드 메일이 발송됨. 수신자 id : {}", userRepository.findByEmail(toEmail));
         AuthCodeCreateResponse authCodeCreateResponse = AuthCodeCreateResponse.builder()
                 .fromMail(fromEmail)

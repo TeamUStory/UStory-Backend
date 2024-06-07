@@ -79,7 +79,7 @@ public class UserController {
         return ResponseEntity.ok(myPageResponse);
     }
 
-    @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
+    @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 닉네임 중복 여부를 검증한다. (글자 수 등 조건은 삭제됨)")
     @PostMapping("/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
         ValidateNicknameResponse validateNicknameResponse = userService.isValidNickname(validateNicknameRequest);
