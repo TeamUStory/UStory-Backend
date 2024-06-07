@@ -6,6 +6,7 @@ import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.user.entity.Users;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -28,7 +29,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
     }
 
     @Override
-    public List<DiaryList> searchDiary(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime) {
+    public List<DiaryList> searchDiary(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord) {
 
         return queryFactory
                 .select(
@@ -45,6 +46,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                         diaryUser.id.users.id.eq(userId)
                                 .and(diaryUser.id.diary.createdAt.loe(dateTime))
                                 .and(categoryEq(diaryCategory))
+                                .and(wordLike(searchWord))
                 )
                 .orderBy(diaryUser.id.diary.id.desc())
                 .offset(pageable.getOffset())
@@ -160,8 +162,13 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                 .fetch();
     }
 
+
     private BooleanExpression categoryEq(DiaryCategory diaryCategory) {
         return diaryCategory != null ? diaryUser.id.diary.diaryCategory.eq(diaryCategory) : null;
+    }
+
+    private BooleanExpression wordLike(String searchWord) {
+        return searchWord != null ? diaryUser.id.diary.name.like(searchWord) : null;
     }
 
 }
