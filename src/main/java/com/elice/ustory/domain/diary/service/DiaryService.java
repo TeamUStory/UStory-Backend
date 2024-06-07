@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.elice.ustory.domain.user.entity.QUsers.users;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @RequiredArgsConstructor
@@ -87,9 +88,7 @@ public class DiaryService {
             // 사용자가 속한 다이어리가 아닌 경우
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
-//        diaryRepository.findById(diaryId).orElseThrow(
-//                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
-//        );
+
         Diary updatedDiary = diaryUser.getId().getDiary();
         if (updatedDiary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             if (diary.getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
@@ -129,6 +128,7 @@ public class DiaryService {
     }
 
     public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord) {
+        if(!hasText(searchWord)) searchWord = null;
         List<DiaryList> diaryList = diaryUserRepository.searchDiary(userId, pageable, diaryCategory, dateTime, searchWord);
         List<DiaryListResponse> result = diaryList.stream()
                 .map(DiaryList::toDiaryListResponse)
@@ -167,7 +167,6 @@ public class DiaryService {
             throw new UnauthorizedException("개인 다이어리는 삭제할 수 없습니다.");
             // TODO : 삭제 후 재생성(?)
         } else {
-            // 사용자가 속한 다이어리가 아닌 경우
             diaryUserRepository.delete(diaryUser);
         }
 
