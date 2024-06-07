@@ -14,6 +14,7 @@ import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
+import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,6 +38,7 @@ public class KakaoService {
     private final DiaryUserRepository diaryUserRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final KakaoTokenService kakaoTokenService;
     private final JwtUtil jwtUtil;
     private final KakaoOauth kakaoOauth;
     private final UserService userService;
@@ -72,7 +74,7 @@ public class KakaoService {
         Users loginUser = userRepository.findByEmail(kakaoUserId+"@ustory.com")
                 .orElseThrow();
 
-        String accessToken = jwtTokenProvider.createAccessTokenKakao(loginUser.getId(), kakaoToken);
+        String accessToken = jwtTokenProvider.createAccessTokenKakao(loginUser.getId(), kakaoToken, loginUser.getLoginType());
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
         LoginResponse loginResponse = LoginResponse.builder()
@@ -84,6 +86,7 @@ public class KakaoService {
         response.addHeader("Authorization", "Bearer " + accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
+        kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken, accessToken);
 
         log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;

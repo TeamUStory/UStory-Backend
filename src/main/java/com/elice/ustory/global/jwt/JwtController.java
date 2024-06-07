@@ -30,7 +30,7 @@ public class JwtController {
 
         if (isRefreshed) {
             log.info("[handleAccessTokenExpiredException] AccessToken 갱신 완료");
-            return ResponseEntity.ok(response.getHeader("Authorization"));
+            return ResponseEntity.ok().body(response.getHeader("Authorization"));
         } else {
             log.warn("[handleAccessTokenExpiredException] RefreshToken이 만료되었습니다. 재로그인 필요.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 만료되었습니다. 다시 로그인해주세요.");
