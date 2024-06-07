@@ -168,7 +168,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
     }
 
     private BooleanExpression wordLike(String searchWord) {
-        return searchWord != null ? diaryUser.id.diary.name.like(searchWord) : null;
+        return searchWord != null ? diaryUser.id.diary.name.contains(searchWord) : null;
     }
 
 }
