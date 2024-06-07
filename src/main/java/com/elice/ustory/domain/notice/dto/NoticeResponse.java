@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.notice.dto;
 
+import com.elice.ustory.global.exception.model.ValidationException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -26,5 +27,23 @@ public class NoticeResponse {
 
     @Schema(description = "페이퍼Id", example = "1")
     private Long paperId;
+
+    public NoticeResponse(String type, String message, LocalDateTime time, Long paperId) {
+        this.type = type;
+        this.message = message;
+        this.time = time;
+        this.paperId = paperId;
+    }
+
+    public NoticeResponse(String message, LocalDateTime time, int messageType) {
+        this.message = message;
+        this.time = time;
+        switch (messageType) {
+            case 1, 3 -> this.type = "친구";
+            case 2 -> this.type = "코멘트";
+            case 4 -> this.type = "기록";
+            default -> throw new ValidationException("잘못된 메시지 타입입니다.");
+        }
+    }
 
 }
