@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,9 +67,10 @@ public class FriendService {
      * @param userId   조회할 사용자의 ID (옵션)
      * @param nickname 검색할 닉네임 (옵션)
      * @return 친구 목록 또는 검색된 친구 목록
+     * pageable 무한 스크롤
      */
-    public List<UserFriendDTO> getFriends(Long userId, String nickname) {
-        return friendRepository.findFriends(userId, nickname);
+    public List<UserFriendDTO> getFriends(Long userId, String nickname, LocalDateTime requestTime ,Pageable pageable) {
+        return friendRepository.findFriends(userId, nickname, requestTime ,pageable);
     }
 
     /**
@@ -114,8 +116,8 @@ public class FriendService {
      * @param userId 사용자의 ID
      * @return 친구 요청 목록
      */
-    public List<FriendRequestListDTO> getFriendRequests(Long userId) {
-        return friendRepository.findFriendRequests(userId);
+    public List<FriendRequestListDTO> getFriendRequests(Long userId, LocalDateTime requestTime, Pageable pageable) {
+        return friendRepository.findFriendRequests(userId, requestTime, pageable);
     }
 
     /**

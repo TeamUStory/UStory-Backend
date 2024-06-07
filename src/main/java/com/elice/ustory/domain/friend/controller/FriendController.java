@@ -10,9 +10,12 @@ import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -36,8 +39,15 @@ public class FriendController {
      */
     @Operation(summary = "Get / Friends", description = "사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.")
     @GetMapping("/search")
-    public ResponseEntity<List<UserFriendDTO>> getFriends(@JwtAuthorization Long userId, @RequestParam(required = false) String nickname) {
-        List<UserFriendDTO> friends = friendService.getFriends(userId, nickname);
+    public ResponseEntity<List<UserFriendDTO>> getFriends(
+            @JwtAuthorization Long userId,
+            @RequestParam(required = false) String nickname,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "requestTime") LocalDateTime requestTime) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        List<UserFriendDTO> friends = friendService.getFriends(userId, nickname, requestTime, pageable);
         return ResponseEntity.ok(friends);
     }
 
@@ -65,8 +75,12 @@ public class FriendController {
      */
     @Operation(summary = "Get / Friend received", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
     @GetMapping("/received")
-    public ResponseEntity<List<FriendRequestListDTO>> getFriendRequests(@JwtAuthorization Long userId) {
-        List<FriendRequestListDTO> friendRequests = friendService.getFriendRequests(userId);
+    public ResponseEntity<List<FriendRequestListDTO>> getFriendRequests(@JwtAuthorization Long userId,
+                                                                        @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                        @RequestParam(name = "size", defaultValue = "10") int size,
+                                                                        @RequestParam(name = "requestTime") LocalDateTime requestTime) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        List<FriendRequestListDTO> friendRequests = friendService.getFriendRequests(userId, requestTime, pageable);
         return ResponseEntity.ok(friendRequests);
     }
 
