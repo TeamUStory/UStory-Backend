@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Color {
-    RED("#FDD0B1")
-    ,ORANGE("#F9EFC7")
-    ,YELLOW("#C3EDBF")
-    ,GREEN("#B8DFE6")
+    RED("#FBB9C5")
+    ,ORANGE("#FDD0B1")
+    ,YELLOW("#F9EFC7")
+    ,GREEN("#C3EDBF")
     ,BLUE("#B8DFE6")
     ,INDIGO("#A3C4F3")
     ,PURPLE("#C5BBDE")
