@@ -8,18 +8,18 @@ public class ErrorResponse {
 
     private final String errorCode;
     private final String message;
-    private final String detail_message;
+    private final String detailMessage;
 
     public ErrorResponse(CustomException ex) {
         this.errorCode = ex.getErrorCode().getCode();
         this.message = ex.getErrorCode().getMessage();
-        this.detail_message = ex.getMessage();
+        this.detailMessage = ex.getMessage();
     }
 
     public ErrorResponse(CustomException ex, String message) {
         this.errorCode = ex.getErrorCode().getCode();
         this.message = ex.getErrorCode().getMessage();
-        this.detail_message = message;
+        this.detailMessage = message;
     }
 
 }
