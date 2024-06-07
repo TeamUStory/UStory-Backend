@@ -89,11 +89,11 @@ public class KakaoService {
         return loginResponse;
     }
 
-    public LogoutResponse kakaoLogout(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+    public LogoutResponse kakaoLogout(HttpServletRequest request) {
         String accessToken = jwtUtil.getTokenFromRequest(request);
         String kakaoToken = jwtTokenProvider.getKakaoToken(accessToken);
         kakaoOauth.expireKakaoToken(kakaoToken);
-        userService.logout(request, response);
+        userService.logout(request);
 
         return LogoutResponse.builder().success(true).build();
     }
