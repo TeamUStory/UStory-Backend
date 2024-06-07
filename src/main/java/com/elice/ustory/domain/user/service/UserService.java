@@ -15,6 +15,7 @@ import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +62,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
 
         String email = signUpRequest.getEmail();
@@ -221,14 +223,9 @@ public class UserService {
         // 중복 여부 확인(false면 합격)
         Boolean isDuplicate = userRepository.findByNickname(nickname).isPresent();
 
-        // 조건 불일치 여부 확인(false면 합격)
-        String regex = "[a-zA-Z가-힣]{2,10}";
-        Boolean isInappropriate = !nickname.matches(regex);
-
         // 최종, 닉네임 유효 여부 반환
         ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
                 .isDuplicate(isDuplicate)
-                .isInappropriate(isInappropriate)
                 .build();
 
         return validateNicknameResponse;
