@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.notice.dto;
 
-import com.elice.ustory.domain.notice.entity.Notice;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
