@@ -156,8 +156,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                                         diaryUser.id.users.profileImgUrl)
                 )
                 .from(diaryUser)
-                .where(diaryUser.id.diary.id.eq(diaryId)
-                        .and(diaryUser.id.users.id.ne(userId)))
+                .where(diaryUser.id.diary.id.eq(diaryId))
                 .fetch();
     }
 

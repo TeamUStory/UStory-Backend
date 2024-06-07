@@ -2,9 +2,14 @@ package com.elice.ustory.domain.diary.dto;
 
 import com.elice.ustory.domain.diary.entity.Diary;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DiaryDetailResponse {
     @Schema(description = "다이어리 아이디", example = "3")
     private Long id;
