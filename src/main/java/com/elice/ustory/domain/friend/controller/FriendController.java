@@ -48,7 +48,7 @@ public class FriendController {
      * @param friendRequestDto 친구 요청을 받을 사용자의 닉네임
      * @return 요청 성공 여부
      */
-    @Operation(summary = "Get / Friend Request", description = "친구 추가 요청을 보냅니다.")
+    @Operation(summary = "Post / Friend Request", description = "친구 추가 요청을 보냅니다.")
     @PostMapping
     public ResponseEntity<Void> sendFriendRequest(@JwtAuthorization Long userId, @Valid @RequestBody FriendRequestDto friendRequestDto) {
         validateNickname(friendRequestDto.getReceiverNickname());
