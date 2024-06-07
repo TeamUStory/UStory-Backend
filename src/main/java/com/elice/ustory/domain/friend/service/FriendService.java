@@ -13,6 +13,7 @@ import com.elice.ustory.global.exception.model.ConflictException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.ValidationException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Slf4j
 @Service
 @Transactional
 public class FriendService {
@@ -70,6 +71,7 @@ public class FriendService {
      * pageable 무한 스크롤
      */
     public List<UserFriendDTO> getFriends(Long userId, String nickname, LocalDateTime requestTime ,Pageable pageable) {
+
         return friendRepository.findFriends(userId, nickname, requestTime ,pageable);
     }
 
