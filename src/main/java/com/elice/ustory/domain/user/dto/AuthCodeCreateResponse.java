@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class AuthCodeCreateResponse {
+    Boolean isSuccess;
     String fromMail;
     String toMail;
     String title;
