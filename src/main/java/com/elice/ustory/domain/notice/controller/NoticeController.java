@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.notice.controller;
 
 import com.elice.ustory.domain.notice.dto.NoticeResponse;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.domain.notice.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,12 @@ public class NoticeController {
                                                                       @RequestParam(name = "page", defaultValue = "1") int page,
                                                                       @RequestParam(name = "size", defaultValue = "10") int size,
                                                                       @RequestParam(name = "requestTime") LocalDateTime requestTime) {
+        if (page < 1) {
+            throw new ValidationException("페이지는 1 이상이어야 합니다.");
+        } else if (size < 1){
+            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+        }
+
         Pageable pageable = PageRequest.of(page - 1, size);
         List<NoticeResponse> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
         return ResponseEntity.ok(notices);
