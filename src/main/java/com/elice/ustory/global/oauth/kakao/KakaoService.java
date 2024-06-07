@@ -20,12 +20,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 
@@ -96,6 +92,7 @@ public class KakaoService {
         String accessToken = jwtUtil.getTokenFromRequest(request);
         String kakaoToken = jwtTokenProvider.getKakaoToken(accessToken);
         kakaoOauth.expireKakaoToken(kakaoToken);
+        kakaoTokenService.removeKakaoTokenInfo(accessToken);
         userService.logout(request);
 
         return LogoutResponse.builder().success(true).build();
