@@ -16,8 +16,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -35,10 +37,8 @@ public class NoticeService {
      * @param userId 조회할 사용자의 ID
      * @return 알림 목록
      */
-    public List<NoticeResponse> getAllNoticesByUserId(Long userId) {
-        return noticeRepository.findByResponseId(userId).stream()
-                .map(this::convertToNoticeResponse)
-                .collect(Collectors.toList());
+    public List<NoticeResponse> getAllNoticesByUserId(Long userId, LocalDateTime requestTime, Pageable pageable) {
+        return noticeRepository.findAllNoticesByUserId(userId, requestTime, pageable);
     }
 
 
