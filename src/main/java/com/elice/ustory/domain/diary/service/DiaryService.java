@@ -108,7 +108,7 @@ public class DiaryService {
                 // request를 보낸 유저까지 10명을 초과하는 경우
                 throw new ValidationException("다이어리 인원을 10명을 초과할 수 없습니다.");
 
-            }else if(usersByDiary.size()<userList.size()){
+            }else if(usersByDiary.size()<userList.size()-1){
                 // 존재하지 않는 유저 닉네임이 보내진 경우 && 개인 다이어리의 경우(에러 메세지에 대한 분리 및 고민이 필요)
                 throw new NotFoundException("해당하는 친구가 존재하지 않습니다.");
             }
