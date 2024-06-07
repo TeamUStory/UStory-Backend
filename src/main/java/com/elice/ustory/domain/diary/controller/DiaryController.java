@@ -1,10 +1,12 @@
 package com.elice.ustory.domain.diary.controller;
 
+import com.elice.ustory.domain.diary.dto.DiaryDetailResponse;
 import com.elice.ustory.domain.diary.dto.DiaryDto;
 import com.elice.ustory.domain.diary.dto.DiaryListResponse;
 import com.elice.ustory.domain.diary.dto.DiaryResponse;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +48,11 @@ public class DiaryController {
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory,
             @RequestParam(name = "requestTime") LocalDateTime requestTime) {
+        if(page<1){
+            throw new ValidationException("페이지는 1 이상이어야 합니다.");
+        }else if(size<1){
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
+        }
         Pageable pageable = PageRequest.of(page - 1, size);
 
         List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, requestTime);
@@ -75,17 +82,17 @@ public class DiaryController {
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
     @GetMapping("/{diaryId}")
-    public ResponseEntity<DiaryResponse> getDiaryByID(@JwtAuthorization Long userId,
+    public ResponseEntity<DiaryDetailResponse> getDiaryByID(@JwtAuthorization Long userId,
                                                       @PathVariable("diaryId") Long diaryId) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        DiaryResponse diary = diaryService.getDiaryDetailById(userId,diaryId);
-        if (diary == null) {
+        DiaryDetailResponse diaryDetailResponse = diaryService.getDiaryDetailById(userId,diaryId);
+        if (diaryDetailResponse == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        return ResponseEntity.ok(diary);
+        return ResponseEntity.ok(diaryDetailResponse);
     }
 
     @Operation(summary = "Get Diary Count", description = "유저가 속한 다이어리 개수 불러오기")

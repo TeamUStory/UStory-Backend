@@ -1,8 +1,6 @@
 package com.elice.ustory.domain.diary.service;
 
-import com.elice.ustory.domain.diary.dto.DiaryList;
-import com.elice.ustory.domain.diary.dto.DiaryListResponse;
-import com.elice.ustory.domain.diary.dto.DiaryResponse;
+import com.elice.ustory.domain.diary.dto.*;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.entity.QDiary;
@@ -65,13 +63,15 @@ public class DiaryService {
         return DiaryResponse.toDiaryResponse(savedDiary);
     }
 
-    public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
+    public DiaryDetailResponse getDiaryDetailById(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if(diaryUser==null){
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
-        return DiaryResponse.toDiaryResponse(diaryUser.getId().getDiary());
+        List<DiaryFriend> usersByDiaryId = diaryUserRepository.findUsersByDiaryId(userId,diaryId);
+
+        return DiaryDetailResponse.toDiaryDetailResponse(diaryUser.getId().getDiary(),usersByDiaryId);
     }
 
     public Diary getDiaryById(Long diaryId) {
@@ -82,11 +82,22 @@ public class DiaryService {
 
     @Transactional
     public DiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
-        Diary updatedDiary = diaryRepository.findById(diaryId).orElseThrow(
-                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
-        );
-        if(diary.getDiaryCategory()==DiaryCategory.INDIVIDUAL){
-            throw new ValidationException("개인 다이어리는 생성할 수 없습니다.");
+        DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
+        if(diaryUser == null){
+            // 사용자가 속한 다이어리가 아닌 경우
+            throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
+        }
+//        diaryRepository.findById(diaryId).orElseThrow(
+//                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
+//        );
+        Diary updatedDiary = diaryUser.getId().getDiary();
+        if(updatedDiary.getDiaryCategory()==DiaryCategory.INDIVIDUAL){
+            if(diary.getDiaryCategory()!=DiaryCategory.INDIVIDUAL){
+                throw new ValidationException("개인 다이어리의 카테고리는 변경할 수 없습니다.");
+            }
+            if(userList.size()>1){
+                throw new ValidationException("개인 다이어리는 인원이 추가될 수 없습니다.");
+            }
         }
         updatedDiary.updateDiary(diary);
 
