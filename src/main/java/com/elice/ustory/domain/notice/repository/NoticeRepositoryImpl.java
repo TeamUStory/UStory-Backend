@@ -24,7 +24,7 @@ public class NoticeRepositoryImpl implements NoticeQueryDslRepository {
         QNotice notice = QNotice.notice;
 
         BooleanExpression predicate = notice.responseId.eq(userId)
-                .and(notice.createdAt.before(requestTime));
+                .and(notice.createdAt.loe(requestTime));
 
         return queryFactory.select(Projections.constructor(NoticeResponse.class,
                         notice.message,
