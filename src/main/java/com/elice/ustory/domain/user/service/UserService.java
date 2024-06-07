@@ -190,7 +190,7 @@ public class UserService {
     public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
         // 리프레시 토큰 삭제
         String token = request.getHeader("Authorization");
-        
+
         if (token == null) {
             throw new UnauthorizedException(NO_AUTHORIZATION_IN_HEADER_MESSAGE);
         }
