@@ -16,7 +16,6 @@ public class FriendResponseDto {
 
     @Schema(description = "수락/거절 여부", example = "true")
     @NotNull
-    @Pattern(regexp = "true|false", message = "accepted 값은 true 또는 false여야 합니다.")
     private boolean accepted;
 
     public FriendResponseDto(String senderNickname, boolean accepted) {

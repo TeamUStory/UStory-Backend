@@ -37,7 +37,7 @@ public class NoticeService {
      * @param userId 조회할 사용자의 ID
      * @return 알림 목록
      */
-    public List<NoticeResponse> getAllNoticesByUserId(Long userId, LocalDateTime requestTime, Pageable pageable) {
+    public List<Notice> getAllNoticesByUserId(Long userId, LocalDateTime requestTime, Pageable pageable) {
         return noticeRepository.findAllNoticesByUserId(userId, requestTime, pageable);
     }
 
