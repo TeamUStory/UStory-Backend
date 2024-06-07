@@ -47,7 +47,8 @@ public class DiaryController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory,
-            @RequestParam(name = "requestTime") LocalDateTime requestTime) {
+            @RequestParam(name = "requestTime") LocalDateTime requestTime,
+            @RequestParam(name = "searchWord", required = false) String searchWord) {
         if(page<1){
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         }else if(size<1){
@@ -55,7 +56,7 @@ public class DiaryController {
         }
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, requestTime);
+        List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, requestTime, searchWord);
 
         return ResponseEntity.ok(userDiaries);
     }
