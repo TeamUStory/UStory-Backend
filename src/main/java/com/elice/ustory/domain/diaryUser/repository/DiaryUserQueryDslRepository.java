@@ -23,7 +23,7 @@ public interface DiaryUserQueryDslRepository {
 
     List<Tuple> findUsersByDiary(Long userId, Long diaryId, List<String> userList);
 
-    List<DiaryList> searchDiary(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime);
+    List<DiaryList> searchDiary(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord);
 
     DiaryUser findDiaryUserById(Long userId, Long diaryId);
 

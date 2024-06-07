@@ -38,14 +38,14 @@ public class DiaryService {
 
     @Transactional
     public DiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
-        if(diary.getDiaryCategory()==DiaryCategory.INDIVIDUAL){
+        if (diary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             throw new ValidationException("개인 다이어리는 생성할 수 없습니다.");
         }
 
         Diary savedDiary = diaryRepository.save(diary);
 
         List<Users> friendList = diaryUserRepository.findFriendUsersByList(userId, userList);
-        if(friendList.size()!=userList.size()){
+        if (friendList.size() != userList.size()) {
             // 친구가 아닌 인원을 다이어리에 추가할 때
             throw new UnauthorizedException("해당하는 친구가 존재하지 않습니다.");
         }
@@ -65,13 +65,13 @@ public class DiaryService {
 
     public DiaryDetailResponse getDiaryDetailById(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
-        if(diaryUser==null){
+        if (diaryUser == null) {
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
-        List<DiaryFriend> usersByDiaryId = diaryUserRepository.findUsersByDiaryId(userId,diaryId);
+        List<DiaryFriend> usersByDiaryId = diaryUserRepository.findUsersByDiaryId(userId, diaryId);
 
-        return DiaryDetailResponse.toDiaryDetailResponse(diaryUser.getId().getDiary(),usersByDiaryId);
+        return DiaryDetailResponse.toDiaryDetailResponse(diaryUser.getId().getDiary(), usersByDiaryId);
     }
 
     public Diary getDiaryById(Long diaryId) {
@@ -83,7 +83,7 @@ public class DiaryService {
     @Transactional
     public DiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
-        if(diaryUser == null){
+        if (diaryUser == null) {
             // 사용자가 속한 다이어리가 아닌 경우
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
@@ -91,11 +91,11 @@ public class DiaryService {
 //                () -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, diaryId))
 //        );
         Diary updatedDiary = diaryUser.getId().getDiary();
-        if(updatedDiary.getDiaryCategory()==DiaryCategory.INDIVIDUAL){
-            if(diary.getDiaryCategory()!=DiaryCategory.INDIVIDUAL){
+        if (updatedDiary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
+            if (diary.getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
                 throw new ValidationException("개인 다이어리의 카테고리는 변경할 수 없습니다.");
             }
-            if(userList.size()>1){
+            if (userList.size() > 1) {
                 throw new ValidationException("개인 다이어리는 인원이 추가될 수 없습니다.");
             }
         }
@@ -104,22 +104,21 @@ public class DiaryService {
         // 다이어리에 유저가 추가된 경우
         if (userList.size() >= diaryUserRepository.countUserByDiary(diaryId)) {
             List<Tuple> usersByDiary = diaryUserRepository.findUsersByDiary(userId, diaryId, userList);
-            if(usersByDiary.size()>9) {
+            if (usersByDiary.size() > 9) {
                 // request를 보낸 유저까지 10명을 초과하는 경우
                 throw new ValidationException("다이어리 인원을 10명을 초과할 수 없습니다.");
-
-            }else if(usersByDiary.size()<userList.size()-1){
-                // 존재하지 않는 유저 닉네임이 보내진 경우 && 개인 다이어리의 경우(에러 메세지에 대한 분리 및 고민이 필요)
+            } else if (usersByDiary.size() < userList.size() - 1) {
+                // 존재하지 않는 유저 닉네임이 보내진 경우
                 throw new NotFoundException("해당하는 친구가 존재하지 않습니다.");
             }
             for (Tuple tuple : usersByDiary) {
                 Users user = tuple.get(users);
-                if(tuple.get(QDiary.diary.id)!=null){
-                    if(!userList.contains(user.getNickname())){
+                if (tuple.get(QDiary.diary.id) != null) {
+                    if (!userList.contains(user.getNickname())) {
                         // 존 유저가 사라진 케이스
                         throw new ValidationException("기존 다이어리의 유저가 모두 포함되지 않습니다.");
                     }
-                }else{
+                } else {
                     DiaryUserId diaryUserId = new DiaryUserId(updatedDiary, user);
                     diaryUserRepository.save(new DiaryUser(diaryUserId));
                 }
@@ -129,8 +128,8 @@ public class DiaryService {
         return DiaryResponse.toDiaryResponse(updatedDiary);
     }
 
-    public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime) {
-        List<DiaryList> diaryList = diaryUserRepository.searchDiary(userId, pageable, diaryCategory, dateTime);
+    public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord) {
+        List<DiaryList> diaryList = diaryUserRepository.searchDiary(userId, pageable, diaryCategory, dateTime, searchWord);
         List<DiaryListResponse> result = diaryList.stream()
                 .map(DiaryList::toDiaryListResponse)
                 .collect(Collectors.toList());
@@ -159,22 +158,21 @@ public class DiaryService {
 
     public void exitDiary(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
-        if(diaryUser == null){
+        if (diaryUser == null) {
             // 사용자가 속한 다이어리가 아닌 경우
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
-        if (diaryUser.getId().getDiary().getDiaryCategory()!=DiaryCategory.INDIVIDUAL) {
+        if (diaryUser.getId().getDiary().getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
             throw new UnauthorizedException("개인 다이어리는 삭제할 수 없습니다.");
             // TODO : 삭제 후 재생성(?)
-        }
-        else{
+        } else {
             // 사용자가 속한 다이어리가 아닌 경우
             diaryUserRepository.delete(diaryUser);
         }
 
         // TODO : diary가 비워진 경우 소프트 딜리트(?) -> 관련 페이퍼는 ?
-        if(diaryUserRepository.countUserByDiary(diaryId)==0){
+        if (diaryUserRepository.countUserByDiary(diaryId) == 0) {
 
         }
     }
