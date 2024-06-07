@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.diaryUser.repository;
 
+import com.elice.ustory.domain.diary.dto.DiaryFriend;
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
@@ -27,5 +28,7 @@ public interface DiaryUserQueryDslRepository {
     DiaryUser findDiaryUserById(Long userId, Long diaryId);
 
     List<Users> findFriendUsersByList(Long userId, List<String> userList);
+
+    List<DiaryFriend> findUsersByDiaryId(Long userId,Long diaryId);
 
 }

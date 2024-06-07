@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.diaryUser.repository;
 
+import com.elice.ustory.domain.diary.dto.DiaryFriend;
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
@@ -45,7 +46,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                                 .and(diaryUser.id.diary.createdAt.loe(dateTime))
                                 .and(categoryEq(diaryCategory))
                 )
-                .orderBy(diaryUser.id.diary.updatedAt.desc())
+                .orderBy(diaryUser.id.diary.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -142,6 +143,21 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                 .where( friend.user.id.eq(userId)
                     .and(friend.friendUser.nickname.in(userList))
                 )
+                .fetch();
+    }
+
+    @Override
+    public List<DiaryFriend> findUsersByDiaryId(Long userId,Long diaryId){
+        return queryFactory
+                .select(
+                        Projections
+                                .constructor(DiaryFriend.class,
+                                        diaryUser.id.users.nickname,
+                                        diaryUser.id.users.profileImgUrl)
+                )
+                .from(diaryUser)
+                .where(diaryUser.id.diary.id.eq(diaryId)
+                        .and(diaryUser.id.users.id.ne(userId)))
                 .fetch();
     }
 
