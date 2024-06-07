@@ -6,9 +6,12 @@ import com.elice.ustory.domain.notice.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "notice", description = "Notice API")
@@ -33,8 +36,12 @@ public class NoticeController {
     @Operation(summary = "Get All Notice API",
             description = "사용자가 가진 모든 알림 조회, type: 친구, 기록, 코멘트 중 하나로 반납합니다. 페이퍼로 이동해야 할 상황을 고려해서 paperId를 함께 넘기며, 만약 null 값이라면 친구와 관련된 API라고 생각하시면 됩니다.")
     @GetMapping
-    public ResponseEntity<List<NoticeResponse>> getAllNoticesByUserId(@JwtAuthorization Long userId) {
-        List<NoticeResponse> notices = noticeService.getAllNoticesByUserId(userId);
+    public ResponseEntity<List<NoticeResponse>> getAllNoticesByUserId(@JwtAuthorization Long userId,
+                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                      @RequestParam(name = "size", defaultValue = "10") int size,
+                                                                      @RequestParam(name = "requestTime") LocalDateTime requestTime) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        List<NoticeResponse> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
         return ResponseEntity.ok(notices);
     }
 
