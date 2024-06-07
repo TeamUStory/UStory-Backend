@@ -33,7 +33,7 @@ public class NoticeRepositoryImpl implements NoticeQueryDslRepository {
                 ))
                 .from(notice)
                 .where(predicate)
-                .orderBy(notice.createdAt.desc()) //최신순 정렬
+                .orderBy(notice.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
