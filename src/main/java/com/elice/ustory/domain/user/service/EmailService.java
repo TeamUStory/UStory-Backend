@@ -58,11 +58,23 @@ public class EmailService {
     }
 
     public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
+        // 0. 이메일 중복 체크
+        if (userRepository.existsByEmail(toEmail)) {
+            String DUPLICATE = "duplicate";
+            return AuthCodeCreateResponse.builder()
+                    .isSuccess(false)
+                    .fromMail(DUPLICATE)
+                    .toMail(DUPLICATE)
+                    .title(DUPLICATE)
+                    .authCode(DUPLICATE)
+                    .build();
+        }
+
         // 1. 메일 내용 생성
         String authCode = generateAuthCode();
         String title = "UStory 회원가입 인증코드입니다.";
         String content =
-                "Ustory에 방문해주셔서 감사합니다.<br><br>"
+                "UStory에 방문해주셔서 감사합니다.<br><br>"
                         + "인증 코드는 <code>" + authCode + "</code>입니다.<br>"
                         + "인증 코드를 바르게 입력해주세요."
                 ;
@@ -80,6 +92,7 @@ public class EmailService {
         // 4. api 결괏값 반환
         log.info("[sendValidateSigunupResult] 인증코드 메일이 발송됨. 수신자 id : {}", userRepository.findByEmail(toEmail));
         AuthCodeCreateResponse authCodeCreateResponse = AuthCodeCreateResponse.builder()
+                .isSuccess(true)
                 .fromMail(fromEmail)
                 .toMail(toEmail)
                 .title(title)
