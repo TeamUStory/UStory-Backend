@@ -3,6 +3,8 @@ package com.elice.ustory.global.oauth.kakao;
 import com.elice.ustory.domain.user.dto.LoginResponse;
 import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+@Tag(name = "KAKAO", description = "KAKAO OAUTH API")
 @Controller
 @Slf4j
 @RequestMapping
@@ -34,6 +37,7 @@ public class KakaoController {
         return "login/login";
     }
 
+    @Operation(summary = "KAKAO LOGIN API", description = "카카오 로그인")
     @RequestMapping("/login/oauth2/code/kakao")
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
@@ -52,6 +56,7 @@ public class KakaoController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
+    @Operation(summary = "KAKAO LOGOUT API", description = "카카오 로그아웃")
     @RequestMapping("/auth/logout")
     public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request) throws UnsupportedEncodingException {
         LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
