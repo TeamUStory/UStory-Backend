@@ -30,7 +30,7 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
 
         BooleanExpression predicate = friend.id.userId.eq(userId)
                 .and(friend.status.eq(FriendStatus.ACCEPTED))
-                .and(friend.invitedAt.before(requestTime));
+                .and(friend.invitedAt.loe(requestTime));
 
         if (nickname != null && !nickname.isEmpty()) {
             predicate = predicate.and(user.nickname.containsIgnoreCase(nickname));
@@ -57,7 +57,7 @@ public class FriendRepositoryImpl implements FriendQueryDslRepository {
 
         BooleanExpression predicate = friend.id.friendId.eq(userId)
                 .and(friend.status.eq(FriendStatus.PENDING))
-                .and(friend.invitedAt.before(requestTime));
+                .and(friend.invitedAt.loe(requestTime));
 
         return queryFactory.select(Projections.constructor(FriendRequestListDTO.class,
                         sender.name,
