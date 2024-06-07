@@ -3,9 +3,11 @@ package com.elice.ustory.global.redis.email;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 
 @Getter
+@NoArgsConstructor
 @RedisHash(value = "authCode", timeToLive = 60*3L) // 인증코드 유효시간은 3분
 public class AuthCode {
     @Id

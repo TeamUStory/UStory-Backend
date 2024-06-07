@@ -92,7 +92,14 @@ public class UserController {
         AuthCodeCreateResponse authCodeCreateResponse = emailService.sendValidateSignupMail(authCodeCreateRequest.getEmail());
         return ResponseEntity.ok(authCodeCreateResponse);
     }
-    // TODO: 인증코드 검증
+
+    @Operation(summary = "Verify Validate Code", description = "사용자가 입력한 인증코드의 유효성을 검증한다.")
+    @PostMapping("/sign-up/verify-validate")
+    public ResponseEntity<AuthCodeVerifyResponse> verifyAuthCode(@Valid @RequestBody AuthCodeVerifyRequest authCodeVerifyRequest) {
+        AuthCodeVerifyResponse authCodeVerifyResponse = emailService.verifySignupAuthCode(authCodeVerifyRequest);
+        return ResponseEntity.ok(authCodeVerifyResponse);
+    }
+
 //    @GetMapping("/get-member")
 //    public Long getCurrentMember(Authentication authentication){
 //        log.info("authentication.getName() : {}", authentication.getName());

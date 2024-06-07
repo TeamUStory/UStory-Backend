@@ -11,6 +11,7 @@ import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,8 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+
+    private static final String NO_AUTHORIZATION_IN_HEADER_MESSAGE = "헤더에 토큰을 입력해주세요.";
 
     public Users findById(Long userId){
         return userRepository.findById(userId).orElseThrow();
@@ -185,15 +188,17 @@ public class UserService {
     }
 
     public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-
-        // 1-1. 리프레시 토큰 삭제 시작
+        // 리프레시 토큰 삭제
         String token = request.getHeader("Authorization");
+
+        if (token == null) {
+            throw new UnauthorizedException(NO_AUTHORIZATION_IN_HEADER_MESSAGE);
+        }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
 
         refreshTokenService.removeTokenInfo(token);
-        // 1-2. 리프레시 토큰 삭제 끝
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
         return logoutResponse;
