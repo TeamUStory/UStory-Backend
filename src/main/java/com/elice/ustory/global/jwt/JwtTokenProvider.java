@@ -1,5 +1,6 @@
 package com.elice.ustory.global.jwt;
 
+import com.elice.ustory.domain.user.entity.Users;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -14,7 +15,7 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 60 * 30;
+    private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 20;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
 
     @Value("${key.salt}")
@@ -41,11 +42,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createAccessTokenKakao(Long userId, String kakaoAccessToken) {
+    public String createAccessTokenKakao(Long userId, String kakaoAccessToken, Users.LoginType loginType) {
         Claims claims = Jwts.claims();
         Date now = new Date();
         claims.put("userId", userId);
         claims.put("kakao", kakaoAccessToken);
+        claims.put("loginType", loginType);
         log.info("[createKakaoAccessToken] access 토큰(kakao 로그인) 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
