@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 public class Image {
 
     private static final String PARAMETER_TOO_LONG = "이미지의 %d번째 이미지의 길이가 너무 깁니다.";
-    private static final String SUBFIX_NOT_MATCH = "%d번째 이미지의 확장자를 확인하여 주세요. (.jpg, .jpeg, .png, .gif)";
+    private static final String SUBFIX_NOT_MATCH = "이미지의 확장자를 확인하여 주세요. (.jpg, .jpeg, .png, .gif)";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +42,7 @@ public class Image {
     private int sequence;
 
     public Image(String imageUrl, int sequence) {
-        this.imageUrl = validateUrl(validateParam(imageUrl, sequence));
+        this.imageUrl = validateUrl(validateUrlParam(imageUrl, sequence));
         this.sequence = sequence;
     }
 
@@ -59,17 +59,17 @@ public class Image {
         }
     }
 
-    private String updateValidateParam(String validateTarget) {
+    private String validateUrlParam(String validateTarget, int sequence) {
         if (validateTarget.length() > 1000) {
-            throw new ValidationException(PARAMETER_TOO_LONG, ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
+            throw new ValidationException(String.format(PARAMETER_TOO_LONG, sequence), ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
         }
 
         return validateTarget;
     }
 
-    private String validateParam(String validateTarget, int sequence) {
+    private String updateValidateParam(String validateTarget) {
         if (validateTarget.length() > 1000) {
-            throw new ValidationException(String.format(PARAMETER_TOO_LONG, sequence), ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
+            throw new ValidationException(PARAMETER_TOO_LONG, ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
         }
 
         return validateTarget;
