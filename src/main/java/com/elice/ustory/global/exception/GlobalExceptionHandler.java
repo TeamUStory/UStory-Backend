@@ -44,7 +44,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             ValidationException.class,
             UnsatisfiedServletRequestParameterException.class,
-            MethodArgumentNotValidException.class
+            MethodArgumentNotValidException.class,
+            InvalidTokenException.class
     })
     public ResponseEntity<ErrorResponse> handleValidationException(Exception ex) {
 
@@ -58,6 +59,9 @@ public class GlobalExceptionHandler {
 
         } else if (ex instanceof MethodArgumentNotValidException) {
             customException = new ValidationException(ex.getMessage(), ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
+
+        } else if (ex instanceof InvalidTokenException) {
+            customException = new ValidationException(ex.getMessage(), ErrorCode.INVALID_TOKEN_EXCEPTION);
 
         } else {
             customException = (ValidationException) ex;
