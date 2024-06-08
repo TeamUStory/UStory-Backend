@@ -47,7 +47,7 @@ public class KakaoController {
         String id = (String) userInfo.get("id");
         String nickname = (String) userInfo.get("nickname");
 
-        if(!userService.checkByEmail(id + "@ustory.com")){
+        if(!userService.checkExistByEmail(id + "@ustory.com")){
             kakaoService.kakaoSignUp(id, nickname);
         }
 
