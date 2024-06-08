@@ -112,15 +112,12 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                         diaryUser.id.diary.id.as(diary.id))
                 .from(friend)
                 .leftJoin(diaryUser)
-                .on(friend.friendUser.id.eq(diaryUser.id.users.id))
+                .on(friend.friendUser.id.eq(diaryUser.id.users.id)
+                        .and(diaryUser.id.diary.id.eq(diaryId)))
                 .where(
                         friend.user.id.eq(userId)
                                 .and(
                                         friend.friendUser.nickname.in(userList)
-                                )
-                                .and(
-                                        diaryUser.id.diary.id.eq(diaryId)
-                                                .or(diaryUser.id.diary.id.isNull())
                                 )
                 )
                 .fetch();

@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.diary.controller;
 
-import com.elice.ustory.domain.diary.dto.DiaryDetailResponse;
 import com.elice.ustory.domain.diary.dto.DiaryDto;
 import com.elice.ustory.domain.diary.dto.DiaryListResponse;
 import com.elice.ustory.domain.diary.dto.DiaryResponse;
@@ -83,17 +82,14 @@ public class DiaryController {
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
     @GetMapping("/{diaryId}")
-    public ResponseEntity<DiaryDetailResponse> getDiaryByID(@JwtAuthorization Long userId,
+    public ResponseEntity<DiaryResponse> getDiaryByID(@JwtAuthorization Long userId,
                                                       @PathVariable("diaryId") Long diaryId) {
-        if (diaryId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        DiaryDetailResponse diaryDetailResponse = diaryService.getDiaryDetailById(userId,diaryId);
-        if (diaryDetailResponse == null) {
+        DiaryResponse diaryResponse = diaryService.getDiaryDetailById(userId,diaryId);
+        if (diaryResponse == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        return ResponseEntity.ok(diaryDetailResponse);
+        return ResponseEntity.ok(diaryResponse);
     }
 
     @Operation(summary = "Get Diary Count", description = "유저가 속한 다이어리 개수 불러오기")

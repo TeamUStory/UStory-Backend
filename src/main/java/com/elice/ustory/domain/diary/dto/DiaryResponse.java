@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DiaryResponse {
@@ -27,23 +29,28 @@ public class DiaryResponse {
     @Schema(description = "다이어리 마커 색", example = "#FFFFFF")
     private String color;
 
-    public DiaryResponse(Long id, String name, String imgUrl, String diaryCategory, String description, String color) {
+    @Schema(description = "다이어리 멤버", example = "[\"친구1\", \"친구2\"]")
+    private List<DiaryFriend> diaryFriends;
+
+    public DiaryResponse(Long id, String name, String imgUrl, String diaryCategory, String description, String color, List<DiaryFriend> diaryFriends) {
         this.id = id;
         this.name = name;
         this.imgUrl = imgUrl;
         this.diaryCategory = diaryCategory;
         this.description = description;
         this.color = color;
+        this.diaryFriends = diaryFriends;
     }
 
-    public static DiaryResponse toDiaryResponse(Diary diary){
+    public static DiaryResponse toDiaryResponse(Diary diary, List<DiaryFriend> diaryFriends) {
         return new DiaryResponse(
                 diary.getId(),
                 diary.getName(),
                 diary.getImgUrl(),
                 diary.getDiaryCategory().getName(),
                 diary.getDescription(),
-                diary.getColor().getHexCode());
+                diary.getColor().getHexCode(),
+                diaryFriends);
     }
 
 }
