@@ -71,7 +71,8 @@ public class GlobalExceptionHandler {
     /** Unauthorized Exception */
     @ExceptionHandler({
             UnauthorizedException.class,
-            AccessTokenExpiredException.class})
+            AccessTokenExpiredException.class,
+            RefreshTokenExpiredException.class})
     public ResponseEntity<ErrorResponse> handleValidationException(CustomException ex) {
 
         printWarnLog(UNAUTHORIZED_LOG_MESSAGE, ex);
