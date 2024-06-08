@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.UnsupportedEncodingException;
@@ -38,7 +39,7 @@ public class KakaoController {
     }
 
     @Operation(summary = "KAKAO LOGIN API", description = "카카오 로그인")
-    @RequestMapping("/login/oauth2/code/kakao")
+    @RequestMapping(value = "/login/oauth2/code/kakao", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
         Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(kakaoAccessToken);
@@ -57,8 +58,8 @@ public class KakaoController {
     }
 
     @Operation(summary = "KAKAO LOGOUT API", description = "카카오 로그아웃")
-    @RequestMapping("/auth/logout")
-    public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request) throws UnsupportedEncodingException {
+    @RequestMapping(value = "/auth/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request) {
         LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
