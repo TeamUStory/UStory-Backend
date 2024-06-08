@@ -17,6 +17,7 @@ public enum ErrorCode {
     // Unauthorized Exception: 401,
     UNAUTHORIZED_EXCEPTION("U001", "인증되지 않은 접근입니다."),
     EXPIRED_TOKEN_EXCEPTION("U002", "토큰 값이 만료되었습니다, 토큰을 갱신해주세요."),
+    EXPIRED_REFRESH_TOKEN_EXCEPTION("U003", "Refresh 토큰이 만료되었습니다, 재로그인해주세요."),
 
     // Forbidden Exception: 403
     FORBIDDEN_EXCEPTION("F001", "허용하지 않는 접근입니다."),
