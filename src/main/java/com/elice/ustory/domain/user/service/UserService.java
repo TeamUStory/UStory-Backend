@@ -11,6 +11,7 @@ import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
@@ -155,7 +156,7 @@ public class UserService {
 
         //TODO: 예외처리
         Users loginUser = userRepository.findByEmail(id)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("해당 이메일을 가진 유저를 찾을 수 없습니다."));
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
