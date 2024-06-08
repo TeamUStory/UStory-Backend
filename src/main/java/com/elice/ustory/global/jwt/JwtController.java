@@ -1,12 +1,12 @@
 package com.elice.ustory.global.jwt;
 
+import com.elice.ustory.global.exception.model.RefreshTokenExpiredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +33,7 @@ public class JwtController {
             return ResponseEntity.ok().body(response.getHeader("Authorization"));
         } else {
             log.warn("[handleAccessTokenExpiredException] RefreshToken이 만료되었습니다. 재로그인 필요.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 만료되었습니다. 다시 로그인해주세요.");
+            throw new RefreshTokenExpiredException("RefreshToken이 만료되었습니다, 재로그인해주세요.");
         }
     }
 }
