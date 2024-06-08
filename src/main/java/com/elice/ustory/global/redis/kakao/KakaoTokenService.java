@@ -3,6 +3,8 @@ package com.elice.ustory.global.redis.kakao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class KakaoTokenService {
@@ -15,5 +17,9 @@ public class KakaoTokenService {
     public void removeKakaoTokenInfo(String accessToken) {
         kakaoTokenRepository.findByAccessToken(accessToken)
                 .ifPresent(kakaoTokenRepository::delete);
+    }
+
+    public Optional<KakaoToken> getByAccessToken(String accessToken){
+        return kakaoTokenRepository.findByAccessToken(accessToken);
     }
 }

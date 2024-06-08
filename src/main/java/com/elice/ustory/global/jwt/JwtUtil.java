@@ -3,10 +3,8 @@ package com.elice.ustory.global.jwt;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.redis.kakao.KakaoToken;
-import com.elice.ustory.global.redis.kakao.KakaoTokenRepository;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshToken;
-import com.elice.ustory.global.redis.refresh.RefreshTokenRepository;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,18 +19,16 @@ import org.springframework.util.StringUtils;
 public class JwtUtil {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
-    private final KakaoTokenRepository kakaoTokenRepository;
-    private final KakaoTokenService kakaoTokenService; //TODO: 리팩토링 할것
+    private final KakaoTokenService kakaoTokenService;
 
     public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request);
-        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
+        RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
                 .orElseThrow();
         Users loginUser = userService.findById(Long.valueOf(refreshToken.getId()));
 
-        log.info("redis안의 토큰: {}", refreshToken.getRefreshToken());
+        log.info("redis안의 Refresh Token: {}", refreshToken.getRefreshToken());
 
         if (jwtTokenProvider.validateToken(refreshToken.getRefreshToken())) {
             log.info("[refreshToken] 기존 RefreshToken으로 AccessToken 재발급 && 새 RefreshToken 발급 시작");
@@ -43,7 +39,7 @@ public class JwtUtil {
             refreshTokenService.saveTokenInfo(loginUser.getId(), newRefreshToken, newAccessToken, remainingTTL);
 
             if(loginUser.getLoginType().toString().equals("KAKAO")){
-                KakaoToken kakaoToken = kakaoTokenRepository.findByAccessToken(accessToken)
+                KakaoToken kakaoToken = kakaoTokenService.getByAccessToken(accessToken)
                         .orElseThrow();
 
                 kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken.getKakaoToken(), newAccessToken);

@@ -3,6 +3,8 @@ package com.elice.ustory.global.redis.refresh;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
@@ -15,5 +17,9 @@ public class RefreshTokenService {
     public void removeTokenInfo(String accessToken) {
         refreshTokenRepository.findByAccessToken(accessToken)
                 .ifPresent(refreshTokenRepository::delete);
+    }
+
+    public Optional<RefreshToken> getByAccessToken(String accessToken){
+        return refreshTokenRepository.findByAccessToken(accessToken);
     }
 }
