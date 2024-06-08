@@ -29,7 +29,14 @@ public class DiaryResponse {
     @Schema(description = "다이어리 마커 색", example = "#FFFFFF")
     private String color;
 
-    @Schema(description = "다이어리 멤버", example = "[\"친구1\", \"친구2\"]")
+    @Schema(description = "다이어리 멤버", example = "[ {\n" +
+            "      \"nickname\": \"친구1\",\n" +
+            "      \"profileImgUrl\": \"http://image1.com\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"nickname\": \"친구2\",\n" +
+            "      \"profileImgUrl\": \"http://imgae2.com\"\n" +
+            "    }]")
     private List<DiaryFriend> diaryFriends;
 
     public DiaryResponse(Long id, String name, String imgUrl, String diaryCategory, String description, String color, List<DiaryFriend> diaryFriends) {
