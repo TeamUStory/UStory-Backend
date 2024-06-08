@@ -12,6 +12,7 @@ import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
@@ -68,7 +69,7 @@ public class KakaoService {
 
     public LoginResponse kakaoLogin(String kakaoUserId, HttpServletResponse response, String kakaoToken){
         Users loginUser = userRepository.findByEmail(kakaoUserId+"@ustory.com")
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
 
         String accessToken = jwtTokenProvider.createAccessTokenKakao(loginUser.getId(), kakaoToken, loginUser.getLoginType());
         String refreshToken = jwtTokenProvider.createRefreshToken();
