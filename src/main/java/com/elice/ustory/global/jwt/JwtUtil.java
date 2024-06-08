@@ -2,6 +2,7 @@ package com.elice.ustory.global.jwt;
 
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.exception.model.InvalidTokenException;
 import com.elice.ustory.global.redis.kakao.KakaoToken;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshToken;
@@ -60,8 +61,8 @@ public class JwtUtil {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             log.info("이거 베어러 토큰임: {}", bearerToken);
             return bearerToken.substring("Bearer ".length());
+        }else {
+            throw new InvalidTokenException("토큰 형식이 잘못되었습니다.");
         }
-
-        return null;
     }
 }
