@@ -98,6 +98,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
         String profileImgUrl = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
+        String diaryImgUrl = signUpRequest.getDiaryImgUrl();
 
         Users builtUser = Users.addUserBuilder()
                 .email(email)
@@ -114,7 +115,7 @@ public class UserService {
         // 개인 다이어리 생성
         Diary userDiary = new Diary(
                 String.format("%s의 다이어리", builtUser.getNickname()),
-                "기본 DiaryImgUrl",
+                diaryImgUrl,
                 DiaryCategory.INDIVIDUAL,
                 String.format("%s의 개인 다이어리", builtUser.getNickname()),
                 Color.RED
