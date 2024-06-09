@@ -50,8 +50,20 @@ public class PaperResponse {
     private Integer unlocked;
 
     public PaperResponse(Paper paper, Boolean bookmarked) {
-        setDefault(paper);
-        setBookmarked(bookmarked);
+
+        this.title = paper.getTitle();
+        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
+        this.visitedAt = paper.getVisitedAt();
+        this.city = paper.getAddress().getCity();
+        this.store = paper.getAddress().getStore();
+        this.unlocked = paper.getUnLocked();
+        this.diaryName = paper.getDiary().getName();
+
+        if (bookmarked) {
+            this.bookmarked = 1;
+        } else {
+            this.bookmarked = 0;
+        }
 
         if (paper.isUnlocked()) {
             this.imageUrls = paper.getImages().stream()
@@ -60,22 +72,4 @@ public class PaperResponse {
         }
     }
 
-    private void setDefault(Paper paper) {
-        this.title = paper.getTitle();
-        this.thumbnailImageUrl = paper.getThumbnailImageUrl();
-        this.visitedAt = paper.getVisitedAt();
-        this.city = paper.getAddress().getCity();
-        this.store = paper.getAddress().getStore();
-        this.unlocked = paper.getUnLocked();
-        this.diaryName = paper.getDiary().getName();
-    }
-
-    private void setBookmarked(Boolean bookmarked) {
-        if (bookmarked) {
-            this.bookmarked = 1;
-            return;
-        }
-
-        this.bookmarked = 0;
-    }
 }
