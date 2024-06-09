@@ -40,6 +40,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
 
     private static final String NO_AUTHORIZATION_IN_HEADER_MESSAGE = "헤더에 토큰을 입력해주세요.";
+    private static final String PASSWORD_MATCH_CHECK_ERROR_MESSAGE = "비밀번호가 일치하지 않습니다.";
 
     public Users findById(Long userId) {
         return userRepository.findById(userId).orElseThrow();
@@ -261,7 +262,7 @@ public class UserService {
 
     public void checkNewPasswordMatch(String firstEnter, String secondEnter) {
         if (!firstEnter.equals(secondEnter)) {
-            throw new ValidationException("비밀번호가 일치하지 않습니다.");
+            throw new ValidationException(PASSWORD_MATCH_CHECK_ERROR_MESSAGE);
         }
     }
 }
