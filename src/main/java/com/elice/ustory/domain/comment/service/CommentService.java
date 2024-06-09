@@ -29,9 +29,11 @@ public class CommentService {
         this.userService = userService;
     }
 
-    public List<Comment> getComments(Long paperId) {
+    public List<Comment> getComments(Long paperId, Long userId) {
         Paper paper = paperService.getPaperById(paperId);
-        return commentRepository.findByPaper(paper);
+        List<Comment> comments = commentRepository.findByPaper(paper);
+        comments.forEach(comment -> comment.setIsUpdatable(userId));
+        return comments;
     }
 
     public Optional<Comment> getComment(Long paperId, Long id) {
