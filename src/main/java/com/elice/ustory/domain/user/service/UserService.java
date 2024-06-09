@@ -13,6 +13,7 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,12 +70,29 @@ public class UserService {
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
 
+        // 1-0. 입력값 유효성 체크 시작.
+        // TODO: 닉네임, 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
+        // 1-1. TODO: 닉네임 null 체크(중복여부는 확인된 상태로 넘어옴)
+
+        // 1-2. TODO: 이메일 null 체크(인증 및 중복 여부는 확인된 상태로 넘어옴)
+
+        // TODO: 1-3. 이름 null 체크(현재 별도 조건 없음)
+
+        // TODO: 1-4. 비밀번호 형식 체크
+
+        // 1-5. 비밀번호 일치 체크
+        String password = signUpRequest.getPassword();
+        String passwordCheck = signUpRequest.getPasswordCheck();
+        checkNewPasswordMatch(password, passwordCheck);
+
+        // 1-6. 입력값 유효성 체크 끝
+
+        // 인증된 값으로 유저 생성
         String email = signUpRequest.getEmail();
         Users.LoginType loginType = Users.LoginType.BASIC;
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
-        String rawPassword = signUpRequest.getPassword();
-        String encodedPassword = passwordEncoder.encode(rawPassword);
+        String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
         String profileImg = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
 
@@ -239,5 +257,11 @@ public class UserService {
 
     public boolean checkExistByEmail(String email){
         return userRepository.existsByEmail(email);
+    }
+
+    public void checkNewPasswordMatch(String firstEnter, String secondEnter) {
+        if (!firstEnter.equals(secondEnter)) {
+            throw new ValidationException("비밀번호가 일치하지 않습니다.");
+        }
     }
 }
