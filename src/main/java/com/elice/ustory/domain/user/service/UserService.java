@@ -72,13 +72,15 @@ public class UserService {
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
 
-        // 1-0. 입력값 유효성 체크 시작.
+        // 1-0. 입력값 유효성 체크 시작. 유효하지 않은 값은 차례로 하나씩 반환.
         // TODO: 닉네임, 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
         // 1-1. TODO: 닉네임 null 체크(중복여부는 확인된 상태로 넘어옴)
 
         // 1-2. TODO: 이메일 null 체크(인증 및 중복 여부는 확인된 상태로 넘어옴)
 
-        // TODO: 1-3. 이름 null 체크(현재 별도 조건 없음)
+        // 1-3. 이름 null 체크(현재 별도 조건 없음)
+        String name = signUpRequest.getName();
+        checkUsernameRule(name);
 
         // 1-4. 비밀번호 형식 체크
         String password = signUpRequest.getPassword();
@@ -93,7 +95,6 @@ public class UserService {
         // 인증된 값으로 유저 생성
         String email = signUpRequest.getEmail();
         Users.LoginType loginType = Users.LoginType.BASIC;
-        String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
         String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
         String profileImgUrl = signUpRequest.getProfileImgUrl();
@@ -269,7 +270,7 @@ public class UserService {
         }
     }
 
-    public void checkPasswordRule(String password){
+    public void checkPasswordRule(String password) {
         // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
         // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
         final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
@@ -282,5 +283,11 @@ public class UserService {
             throw new ValidationException("비밀번호 형식이 맞지 않습니다.");
         }
 
+    }
+
+    public void checkUsernameRule(String username) {
+        if (username == null) {
+            throw new ValidationException("사용자 이름을 입력해주세요.");
+        }
     }
 }
