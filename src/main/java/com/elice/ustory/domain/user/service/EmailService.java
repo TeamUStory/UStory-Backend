@@ -77,7 +77,7 @@ public class EmailService {
                 "UStory에 방문해주셔서 감사합니다.<br><br>"
                         + "인증 코드는 <code>" + authCode + "</code>입니다.<br>"
                         + "인증 코드를 바르게 입력해주세요."
-                ;
+                ; //TODO: StringBuilder로 변경
 
         // 2. 인증코드를 Redis에 저장
         AuthCode authCodeObject = AuthCode.builder()

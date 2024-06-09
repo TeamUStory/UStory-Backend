@@ -13,6 +13,7 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -39,8 +41,9 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
 
     private static final String NO_AUTHORIZATION_IN_HEADER_MESSAGE = "헤더에 토큰을 입력해주세요.";
+    private static final String PASSWORD_MATCH_CHECK_ERROR_MESSAGE = "비밀번호가 일치하지 않습니다.";
 
-    public Users findById(Long userId){
+    public Users findById(Long userId) {
         return userRepository.findById(userId).orElseThrow();
     }
 
@@ -69,12 +72,30 @@ public class UserService {
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
 
+        // 1-0. 입력값 유효성 체크 시작.
+        // TODO: 닉네임, 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
+        // 1-1. TODO: 닉네임 null 체크(중복여부는 확인된 상태로 넘어옴)
+
+        // 1-2. TODO: 이메일 null 체크(인증 및 중복 여부는 확인된 상태로 넘어옴)
+
+        // TODO: 1-3. 이름 null 체크(현재 별도 조건 없음)
+
+        // 1-4. 비밀번호 형식 체크
+        String password = signUpRequest.getPassword();
+        passwordValidate(password);
+
+        // 1-5. 비밀번호 일치 체크
+        String passwordCheck = signUpRequest.getPasswordCheck();
+        checkNewPasswordMatch(password, passwordCheck);
+
+        // 1-6. 입력값 유효성 체크 끝
+
+        // 인증된 값으로 유저 생성
         String email = signUpRequest.getEmail();
         Users.LoginType loginType = Users.LoginType.BASIC;
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
-        String rawPassword = signUpRequest.getPassword();
-        String encodedPassword = passwordEncoder.encode(rawPassword);
+        String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
         String profileImg = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
 
@@ -99,7 +120,7 @@ public class UserService {
                 Color.RED
         );
         diaryRepository.save(userDiary);
-        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
+        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
 
         return newUser;
     }
@@ -117,19 +138,19 @@ public class UserService {
         String profileImg = updateRequest.getProfileImgUrl();
         String profileDescription = updateRequest.getProfileDescription();
 
-        if(name != null) {
+        if (name != null) {
             user.setName(name);
         }
-        if(nickname != null) {
+        if (nickname != null) {
             user.setNickname(nickname);
         }
-        if(password != null) {
+        if (password != null) {
             user.setPassword(password);
         }
-        if(profileImg != null) {
+        if (profileImg != null) {
             user.setProfileImgUrl(profileImg);
         }
-        if(profileDescription != null) {
+        if (profileDescription != null) {
             user.setProfileDescription(profileDescription);
         }
 
@@ -160,7 +181,7 @@ public class UserService {
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
-        if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             loginResponse.builder()
                     .accessToken(null)
                     .refreshToken(null)
@@ -237,7 +258,28 @@ public class UserService {
         return validateNicknameResponse;
     }
 
-    public boolean checkByEmail(String email){
+    public boolean checkExistByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public void checkNewPasswordMatch(String firstEnter, String secondEnter) {
+        if (!firstEnter.equals(secondEnter)) {
+            throw new ValidationException(PASSWORD_MATCH_CHECK_ERROR_MESSAGE);
+        }
+    }
+
+    public void passwordValidate(String password){
+        // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
+        // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
+        final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
+        final Pattern passwordPattern = Pattern.compile(PASSWORD_REG);
+
+        if (password == null) {
+            throw new ValidationException("비밀번호를 입력해주세요.");
+        }
+        if (!passwordPattern.matcher(password).matches()) {
+            throw new ValidationException("비밀번호 형식이 맞지 않습니다.");
+        }
+
     }
 }
