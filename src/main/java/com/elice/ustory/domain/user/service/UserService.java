@@ -96,7 +96,7 @@ public class UserService {
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
         String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
-        String profileImg = signUpRequest.getProfileImgUrl();
+        String profileImgUrl = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
 
         Users builtUser = Users.addUserBuilder()
@@ -105,7 +105,7 @@ public class UserService {
                 .name(name)
                 .nickname(nickname)
                 .password(encodedPassword)
-                .profileImgUrl(profileImg)
+                .profileImgUrl(profileImgUrl)
                 .profileDescription(profileDescription)
                 .build();
 
@@ -135,7 +135,7 @@ public class UserService {
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
         String password = updateRequest.getPassword();
-        String profileImg = updateRequest.getProfileImgUrl();
+        String profileImgUrl = updateRequest.getProfileImgUrl();
         String profileDescription = updateRequest.getProfileDescription();
 
         if (name != null) {
@@ -147,8 +147,8 @@ public class UserService {
         if (password != null) {
             user.setPassword(password);
         }
-        if (profileImg != null) {
-            user.setProfileImgUrl(profileImg);
+        if (profileImgUrl != null) {
+            user.setProfileImgUrl(profileImgUrl);
         }
         if (profileDescription != null) {
             user.setProfileDescription(profileDescription);
