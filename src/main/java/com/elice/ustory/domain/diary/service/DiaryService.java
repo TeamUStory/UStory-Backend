@@ -15,17 +15,20 @@ import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.elice.ustory.domain.user.entity.QUsers.users;
 import static org.springframework.util.StringUtils.hasText;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
@@ -61,18 +64,24 @@ public class DiaryService {
         DiaryUserId diaryUserId = new DiaryUserId(savedDiary, user);
         diaryUserRepository.save(new DiaryUser(diaryUserId));
 
-        return DiaryResponse.toDiaryResponse(savedDiary);
+        List<DiaryFriend> diaryFriends = new ArrayList<>();
+        for (Users users : friendList) {
+            diaryFriends.add(new DiaryFriend(users.getNickname(),users.getProfileImgUrl()));
+        }
+        diaryFriends.add(new DiaryFriend(user.getNickname(),user.getProfileImgUrl()));
+
+        return DiaryResponse.toDiaryResponse(savedDiary, diaryFriends);
     }
 
-    public DiaryDetailResponse getDiaryDetailById(Long userId, Long diaryId) {
+    public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if (diaryUser == null) {
             throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
         }
 
-        List<DiaryFriend> usersByDiaryId = diaryUserRepository.findUsersByDiaryId(userId, diaryId);
+        List<DiaryFriend> diaryFriends = diaryUserRepository.findUsersByDiaryId(userId, diaryId);
 
-        return DiaryDetailResponse.toDiaryDetailResponse(diaryUser.getId().getDiary(), usersByDiaryId);
+        return DiaryResponse.toDiaryResponse(diaryUser.getId().getDiary(), diaryFriends);
     }
 
     public Diary getDiaryById(Long diaryId) {
@@ -90,6 +99,8 @@ public class DiaryService {
         }
 
         Diary updatedDiary = diaryUser.getId().getDiary();
+        log.info("diary = {}, {}, {}",updatedDiary.getId(),updatedDiary.getName(),updatedDiary.getImgUrl());
+        log.info("user = {}, {}, {}",diaryUser.getId().getUsers().getId(),diaryUser.getId().getUsers().getName(),diaryUser.getId().getUsers().getProfileImgUrl());
         if (updatedDiary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             if (diary.getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
                 throw new ValidationException("개인 다이어리의 카테고리는 변경할 수 없습니다.");
@@ -123,8 +134,9 @@ public class DiaryService {
                 }
             }
         }
+        List<DiaryFriend> diaryFriends = diaryUserRepository.findUsersByDiaryId(userId,diaryId);
 
-        return DiaryResponse.toDiaryResponse(updatedDiary);
+        return DiaryResponse.toDiaryResponse(updatedDiary,diaryFriends);
     }
 
     public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord) {
