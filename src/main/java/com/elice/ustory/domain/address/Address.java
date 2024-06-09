@@ -36,7 +36,7 @@ public class Address {
 
     // TODO : 이거 패턴으로 하던가, 아니면 정규식 메서드를 쓰던가
     @Pattern(
-            regexp = "^([가-힣]+(도|특별시|광역시|시|군|구)\\s*)+([가-힣]+(읍|면|동|리|로|길)\\s*)+\\d+(-\\d+)*$",
+            regexp = "^([가-힣]+(도|특별시|광역시|시|군|구)\\s)+([가-힣0-9]+(읍|면|동|리|로|길)\\s)+\\d+(-\\d+)*$",
             message = "잘못된 주소 형식입니다. 주소를 확인해 주세요."
             )
     @Column(name = "city", nullable = false, columnDefinition = "varchar(70)")
