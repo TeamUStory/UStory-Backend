@@ -41,7 +41,7 @@ public class UserService {
 
     private static final String NO_AUTHORIZATION_IN_HEADER_MESSAGE = "헤더에 토큰을 입력해주세요.";
 
-    public Users findById(Long userId){
+    public Users findById(Long userId) {
         return userRepository.findById(userId).orElseThrow();
     }
 
@@ -117,7 +117,7 @@ public class UserService {
                 Color.RED
         );
         diaryRepository.save(userDiary);
-        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
+        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
 
         return newUser;
     }
@@ -135,19 +135,19 @@ public class UserService {
         String profileImg = updateRequest.getProfileImgUrl();
         String profileDescription = updateRequest.getProfileDescription();
 
-        if(name != null) {
+        if (name != null) {
             user.setName(name);
         }
-        if(nickname != null) {
+        if (nickname != null) {
             user.setNickname(nickname);
         }
-        if(password != null) {
+        if (password != null) {
             user.setPassword(password);
         }
-        if(profileImg != null) {
+        if (profileImg != null) {
             user.setProfileImgUrl(profileImg);
         }
-        if(profileDescription != null) {
+        if (profileDescription != null) {
             user.setProfileDescription(profileDescription);
         }
 
@@ -178,7 +178,7 @@ public class UserService {
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
-        if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             loginResponse.builder()
                     .accessToken(null)
                     .refreshToken(null)
@@ -255,7 +255,7 @@ public class UserService {
         return validateNicknameResponse;
     }
 
-    public boolean checkExistByEmail(String email){
+    public boolean checkExistByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
