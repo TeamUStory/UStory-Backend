@@ -19,6 +19,9 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String content;
 
+    @Column(nullable = false, columnDefinition = "tinyint")
+    private int isUpdatable;
+
     @ManyToOne
     @JoinColumn(name = "paper_id")
     private Paper paper;
@@ -32,6 +35,7 @@ public class Comment extends BaseEntity {
         this.content = content;
         this.paper = paper;
         this.user = user;
+        this.isUpdatable = 0;
 
         setPaper();
     }
@@ -45,5 +49,9 @@ public class Comment extends BaseEntity {
         if (!paper.getComments().contains(this)) {
             paper.getComments().add(this);
         }
+    }
+
+    public void setIsUpdatable(Long userId) {
+        this.isUpdatable = this.user.getId().equals(userId) ? 1 : 0;
     }
 }

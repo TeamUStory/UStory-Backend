@@ -35,8 +35,8 @@ public class CommentController {
 
     @Operation(summary = "Get Comments API", description = "모든 댓글들을 불러옴")
     @GetMapping("/paper/{paperId}")   // 시험용이라 uri 더러운건 무시하셔도 됩니다.
-    public ResponseEntity<List<CommentListResponse>> getComments(@PathVariable Long paperId) {
-        List<Comment> comments = commentService.getComments(paperId);
+    public ResponseEntity<List<CommentListResponse>> getComments(@PathVariable Long paperId, @JwtAuthorization Long userId) {
+        List<Comment> comments = commentService.getComments(paperId, userId);
         List<CommentListResponse> commentListResponses = comments.stream()
                 .map(CommentListResponse::new)
                 .toList();
