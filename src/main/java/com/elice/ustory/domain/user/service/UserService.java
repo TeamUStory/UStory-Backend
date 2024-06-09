@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -79,10 +80,11 @@ public class UserService {
 
         // TODO: 1-3. 이름 null 체크(현재 별도 조건 없음)
 
-        // TODO: 1-4. 비밀번호 형식 체크
+        // 1-4. 비밀번호 형식 체크
+        String password = signUpRequest.getPassword();
+        passwordValidate(password);
 
         // 1-5. 비밀번호 일치 체크
-        String password = signUpRequest.getPassword();
         String passwordCheck = signUpRequest.getPasswordCheck();
         checkNewPasswordMatch(password, passwordCheck);
 
@@ -264,5 +266,20 @@ public class UserService {
         if (!firstEnter.equals(secondEnter)) {
             throw new ValidationException(PASSWORD_MATCH_CHECK_ERROR_MESSAGE);
         }
+    }
+
+    public void passwordValidate(String password){
+        // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
+        // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
+        final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
+        final Pattern passwordPattern = Pattern.compile(PASSWORD_REG);
+
+        if (password == null) {
+            throw new ValidationException("비밀번호를 입력해주세요.");
+        }
+        if (!passwordPattern.matcher(password).matches()) {
+            throw new ValidationException("비밀번호 형식이 맞지 않습니다.");
+        }
+
     }
 }

@@ -27,7 +27,9 @@ public class UserController {
     private final UserService userService;
     private final EmailService emailService;
 
-    @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다.")
+    @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다." +
+            "<br>비밀번호는 **숫자, 영문, 특수문자 각 1개를 포함한 8~16자** 이며," +
+            "<br>보안을 위해, 이때 특수문자는 **~!@#%^*** 만 허용한다.")
     @PostMapping("/sign-up")
     public ResponseEntity<Users> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
