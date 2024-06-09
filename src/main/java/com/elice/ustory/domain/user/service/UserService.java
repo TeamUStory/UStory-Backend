@@ -82,7 +82,7 @@ public class UserService {
 
         // 1-4. 비밀번호 형식 체크
         String password = signUpRequest.getPassword();
-        passwordValidate(password);
+        checkPasswordRule(password);
 
         // 1-5. 비밀번호 일치 체크
         String passwordCheck = signUpRequest.getPasswordCheck();
@@ -269,7 +269,7 @@ public class UserService {
         }
     }
 
-    public void passwordValidate(String password){
+    public void checkPasswordRule(String password){
         // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
         // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
         final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
