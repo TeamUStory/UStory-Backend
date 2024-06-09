@@ -16,6 +16,7 @@ public class CommentResponse {
     private Long userId;
     private String userNickname;
     private String profileImg;
+    private int isUpdatable;
 
     @JsonSerialize(using = LocalDateConverter.class)
     private LocalDate createdAt;
@@ -26,6 +27,7 @@ public class CommentResponse {
         this.userId = comment.getUser().getId();
         this.userNickname = comment.getUser().getNickname();
         this.profileImg = comment.getUser().getProfileImgUrl();
+        this.isUpdatable = comment.getIsUpdatable();
         this.createdAt = LocalDate.now();
     }
 }
