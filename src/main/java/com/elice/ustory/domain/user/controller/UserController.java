@@ -102,10 +102,4 @@ public class UserController {
         return ResponseEntity.ok(authCodeVerifyResponse);
     }
 
-//    @GetMapping("/get-member")
-//    public Long getCurrentMember(Authentication authentication){
-//        log.info("authentication.getName() : {}", authentication.getName());
-//        Users user = userService.readByNickname(authentication.getName());
-//        return user.getId();
-//    }
 }
