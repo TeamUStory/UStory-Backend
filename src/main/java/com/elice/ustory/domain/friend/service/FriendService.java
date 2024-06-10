@@ -225,9 +225,12 @@ public class FriendService {
      * 친구 관계를 삭제합니다.
      *
      * @param userId 현재 사용자의 ID
-     * @param friendId 삭제할 친구의 ID
+     * @param friendNickname 삭제할 친구의 닉네임
      */
-    public void deleteFriendById(Long userId, Long friendId) {
+    public void deleteFriendById(Long userId, String friendNickname) {
+        Users friend = userRepository.findByNickname(friendNickname)
+                .orElseThrow(() -> new NotFoundException("Friend를 찾을 수 없습니다."));
+        Long friendId = friend.getId();
         FriendId id = createFriendId(userId, friendId);
         FriendId reverseId = createFriendId(friendId, userId);
 
