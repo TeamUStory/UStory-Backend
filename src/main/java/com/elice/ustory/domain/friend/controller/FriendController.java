@@ -116,13 +116,13 @@ public class FriendController {
     /**
      * 친구 관계를 삭제합니다.
      * @param userId 현재 사용자의 ID
-     * @param friendId 삭제할 친구의 ID
+     * @param friendNickname 삭제할 친구의 닉네임
      * @return 요청 성공 여부
      */
     @Operation(summary = "Delete / Delete Friend", description = "친구 관계를 삭제합니다.")
-    @DeleteMapping("/{friendId}")
-    public ResponseEntity<Void> deleteFriend(@JwtAuthorization Long userId, @PathVariable Long friendId) {
-        friendService.deleteFriendById(userId, friendId);
+    @DeleteMapping("/{friendNickname}")
+    public ResponseEntity<Void> deleteFriend(@JwtAuthorization Long userId, @PathVariable String friendNickname) {
+        friendService.deleteFriendById(userId, friendNickname);
         return ResponseEntity.noContent().build();
     }
 
