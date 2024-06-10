@@ -11,6 +11,7 @@ import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.InternalServerException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -121,15 +122,19 @@ public class UserService {
         Users newUser = userRepository.save(builtUser);
 
         // 개인 다이어리 생성
-        Diary userDiary = new Diary(
-                String.format("%s의 다이어리", builtUser.getNickname()),
-                diaryImgUrl,
-                DiaryCategory.INDIVIDUAL,
-                String.format("%s의 개인 다이어리", builtUser.getNickname()),
-                Color.RED
-        );
-        diaryRepository.save(userDiary);
-        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
+        try {
+            Diary userDiary = new Diary(
+                    String.format("%s의 다이어리", builtUser.getNickname()),
+                    diaryImgUrl,
+                    DiaryCategory.INDIVIDUAL,
+                    String.format("%s의 개인 다이어리", builtUser.getNickname()),
+                    Color.RED
+            );
+            diaryRepository.save(userDiary);
+            diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
+        } catch (Exception e) {
+            throw new InternalServerException("개인 다이어리를 생성하는 과정에서 문제가 발생하였습니다.");
+        }
 
         return newUser;
     }
