@@ -45,14 +45,14 @@ public class UserController {
         return ResponseEntity.ok().body(updatedUser);
     }
 
-    @Operation(summary = "Delete User API", description = "로그인한 회원을 삭제한다. (소프트 딜리트)")
+    @Operation(summary = "Delete User API", description = "로그인한 회원을 삭제한다. 이메일과 닉네임 재사용 불가. (소프트 딜리트)")
     @DeleteMapping
     public ResponseEntity<Users> deleteCurrentUser(@JwtAuthorization Long userId) {
         Users deletedUser = userService.deleteUser(userId);
         return ResponseEntity.ok().body(deletedUser);
     }
 
-    @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다.")
+    @Operation(summary = "User Login API", description = "아이디와 비밀번호로 로그인한다. 성공 시 토큰 반환, 실패 시 null 반환.")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         LoginResponse loginResponse = userService.login(loginRequest, response);

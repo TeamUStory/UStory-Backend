@@ -25,7 +25,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final AuthCodeRepository authCodeRepository;
-    private final EmailConfig emailConfig; // TODO: 이렇게 Config를 끌고와도 되는건지?
+    private final EmailConfig emailConfig;
     private String fromEmail;
 
     @PostConstruct
