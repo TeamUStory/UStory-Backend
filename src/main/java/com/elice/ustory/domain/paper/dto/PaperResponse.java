@@ -49,7 +49,18 @@ public class PaperResponse {
             example = "1")
     private Integer unlocked;
 
+    @Schema(description =
+            "수정 및 삭제 가능 여부 <br>" +
+                    "0을 반환하는 경우 수정 및 삭제 권한이 없는 상태이다. <br>" +
+                    "1을 반환하는 경우 수정 및 삭제가 가능한 상태이다.",
+            example = "1")
     private Integer isUpdatable;
+
+    @Schema(description = "X좌표", example = "37.5494")
+    private Double coordinateX;
+
+    @Schema(description = "Y좌표", example = "126.9169")
+    private Double coordinateY;
 
     public PaperResponse(Paper paper, Boolean bookmarked, Long userId) {
 
@@ -60,6 +71,8 @@ public class PaperResponse {
         this.store = paper.getAddress().getStore();
         this.unlocked = paper.getUnLocked();
         this.diaryName = paper.getDiary().getName();
+        this.coordinateX = paper.getAddress().getCoordinateX();
+        this.coordinateY = paper.getAddress().getCoordinateY();
 
         if (bookmarked) {
             this.bookmarked = 1;
