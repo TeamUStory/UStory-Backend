@@ -12,11 +12,9 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.ForbiddenException;
 import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +27,6 @@ import java.util.stream.Collectors;
 import static com.elice.ustory.domain.user.entity.QUsers.users;
 import static org.springframework.util.StringUtils.hasText;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
@@ -52,7 +49,7 @@ public class DiaryService {
         List<Users> friendList = diaryUserRepository.findFriendUsersByList(userId, userList);
         if (friendList.size() != userList.size()) {
             // 친구가 아닌 인원을 다이어리에 추가할 때
-            throw new UnauthorizedException("해당하는 친구가 존재하지 않습니다.");
+            throw new ValidationException("해당하는 친구가 존재하지 않습니다.");
         }
 
         for (Users friend : friendList) {
@@ -100,8 +97,6 @@ public class DiaryService {
         }
 
         Diary updatedDiary = diaryUser.getId().getDiary();
-        log.info("diary = {}, {}, {}",updatedDiary.getId(),updatedDiary.getName(),updatedDiary.getImgUrl());
-        log.info("user = {}, {}, {}",diaryUser.getId().getUsers().getId(),diaryUser.getId().getUsers().getName(),diaryUser.getId().getUsers().getProfileImgUrl());
         if (updatedDiary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             if (diary.getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
                 throw new ValidationException("개인 다이어리의 카테고리는 변경할 수 없습니다.");
@@ -181,10 +176,6 @@ public class DiaryService {
             diaryUserRepository.delete(diaryUser);
         }
 
-        // TODO : diary가 비워진 경우 소프트 딜리트(?) -> 관련 페이퍼는 ?
-        if (diaryUserRepository.countUserByDiary(diaryId) == 0) {
-
-        }
         return new ExitResponse(true);
     }
 
