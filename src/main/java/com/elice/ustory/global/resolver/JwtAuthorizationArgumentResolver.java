@@ -35,15 +35,15 @@ public class JwtAuthorizationArgumentResolver implements HandlerMethodArgumentRe
 
         String accessToken = jwtUtil.getTokenFromRequest(request);
         if (accessToken != null) {
-            if (jwtTokenProvider.validateToken(accessToken)) {
-                return jwtTokenProvider.getUserPk(accessToken);
+            if (jwtUtil.validateToken(accessToken)) {
+                return jwtUtil.getUserPk(accessToken);
             }
 
             // 토큰은 없지만 필수가 아닌 경우 체크
             JwtAuthorization annotation = parameter.getParameterAnnotation(JwtAuthorization.class);
             if (annotation != null && !annotation.required()) {
                 // 필수가 아닌 경우 기본 객체 리턴
-                return jwtTokenProvider.getUserPk(accessToken);
+                return jwtUtil.getUserPk(accessToken);
             }
         }
 

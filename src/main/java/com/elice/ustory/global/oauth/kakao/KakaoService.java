@@ -85,13 +85,13 @@ public class KakaoService {
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
         kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken, accessToken);
 
-        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, toke n : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;
     }
 
     public LogoutResponse kakaoLogout(HttpServletRequest request) {
         String accessToken = jwtUtil.getTokenFromRequest(request);
-        String kakaoToken = jwtTokenProvider.getKakaoToken(accessToken);
+        String kakaoToken = jwtUtil.getKakaoToken(accessToken);
         kakaoOauth.expireKakaoToken(kakaoToken);
         kakaoTokenService.removeKakaoTokenInfo(accessToken);
         userService.logout(request);
