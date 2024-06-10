@@ -4,6 +4,7 @@ import com.elice.ustory.domain.comment.dto.AddCommentRequest;
 import com.elice.ustory.domain.comment.dto.UpdateCommentRequest;
 import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
+import com.elice.ustory.domain.notice.service.NoticeService;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.domain.user.service.UserService;
@@ -21,12 +22,14 @@ public class CommentService {
     private final UserService userService;
 
     private static final String NOT_FOUND_COMMENT_MESSAGE = "%d: 해당하는 댓글이 존재하지 않습니다.";
+    private final NoticeService noticeService;
 
     public CommentService(CommentRepository commentRepository, PaperService paperService,
-                          UserService userService) {
+                          UserService userService, NoticeService noticeService) {
         this.commentRepository = commentRepository;
         this.paperService = paperService;
         this.userService = userService;
+        this.noticeService = noticeService;
     }
 
     public List<Comment> getComments(Long paperId) {
@@ -52,6 +55,8 @@ public class CommentService {
                 .build();
 
         Comment savedComment = commentRepository.save(comment);
+
+        noticeService.deleteNoticeBySender(paperId, userId, 2);
 
         paperService.noticeLocked(paper.getDiary(), paper);
 
