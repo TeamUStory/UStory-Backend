@@ -62,7 +62,7 @@ public class EmailService {
     public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
         // 0. 이메일 중복 체크
         if (validateEmail(toEmail).getIsSuccess() == false) {
-            throw new ValidationException("이메일이 유효하지 않습니다.");
+            throw new ValidationException("이미 가입된 이메일입니다.");
         };
 
         // 1. 메일 내용 생성

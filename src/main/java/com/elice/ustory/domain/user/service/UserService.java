@@ -81,6 +81,12 @@ public class UserService {
             throw new ValidationException("사용할 수 없는 닉네임입니다.");
         };
 
+        // 1-2. 이메일 중복 재확인
+        String email = signUpRequest.getEmail();
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new ValidationException("이미 가입된 이메일입니다.");
+        }
+
         // 1-3. 이름 null 체크(현재 별도 조건 없음)
         String name = signUpRequest.getName();
         checkUsernameRule(name);

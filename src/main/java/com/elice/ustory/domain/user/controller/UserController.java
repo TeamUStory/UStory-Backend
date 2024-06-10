@@ -88,7 +88,7 @@ public class UserController {
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
-    @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 'isSucess=false' 반환.")
+    @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 예외 발생.")
     @PostMapping("/sign-up/send-validate")
     public ResponseEntity<AuthCodeCreateResponse> SendMailToValidate(@Valid @RequestBody AuthCodeCreateRequest authCodeCreateRequest) throws MessagingException {
         AuthCodeCreateResponse authCodeCreateResponse = emailService.sendValidateSignupMail(authCodeCreateRequest.getEmail());
