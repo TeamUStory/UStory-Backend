@@ -5,6 +5,7 @@ import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.lang.reflect.Parameter;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Component
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
