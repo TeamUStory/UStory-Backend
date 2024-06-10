@@ -78,7 +78,7 @@ public class UserService {
         // 1-1. 닉네임 유효 재확인
         ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
         validateNicknameRequest.setNickname(nickname);
-        if (isValidNickname(validateNicknameRequest).getIsValid() == true) {
+        if (isValidNickname(validateNicknameRequest).getIsValid() == false) {
             throw new ValidationException("사용할 수 없는 닉네임입니다.");
         };
 
