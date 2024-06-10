@@ -8,10 +8,15 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+
 @NoArgsConstructor
 @Getter
 @Setter
 public class NoticeResponse {
+
+    @Schema(description = "알림 ID", example = "1")
+    @NotNull
+    private Long noticeId;
 
     @Schema(description = "메세지 타입", example = "친구")
     @NotNull
@@ -30,6 +35,7 @@ public class NoticeResponse {
 
     public NoticeResponse(Notice notice) {
 
+        this.noticeId = notice.getId();
         this.message = notice.getMessage();
         this.time = notice.getCreatedAt();
 
@@ -47,7 +53,8 @@ public class NoticeResponse {
         }
     }
 
-    public NoticeResponse(String type, String message, LocalDateTime time, Long paperId) {
+    public NoticeResponse(Long noticeId, String type, String message, LocalDateTime time, Long paperId) {
+        this.noticeId = noticeId;
         this.type = type;
         this.message = message;
         this.time = time;
