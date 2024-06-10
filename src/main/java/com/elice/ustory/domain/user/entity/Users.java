@@ -29,7 +29,7 @@ public class Users extends BaseEntity {
     @Column(name = "name", columnDefinition = "VARCHAR(10)")
     private String name;
 
-    @Column(unique = true, columnDefinition = "VARCHAR(10) UNIQUE")
+    @Column(unique = true, columnDefinition = "VARCHAR(30) UNIQUE")
     private String nickname;
     //TODO: 닉네임 제한 다시 걸기(sql injection 대비. 허용되지 않은 값은 제외하고 받아오도록.)
 
