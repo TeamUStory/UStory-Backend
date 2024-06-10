@@ -71,7 +71,7 @@ public class PaperController {
         Paper paper = paperService.getPaperById(paperId);
         Boolean bookmarked = bookmarkService.isPaperBookmarkedByUser(userId, paperId);
 
-        return ResponseEntity.ok(new PaperResponse(paper, bookmarked));
+        return ResponseEntity.ok(new PaperResponse(paper, bookmarked, userId));
     }
 
     @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
