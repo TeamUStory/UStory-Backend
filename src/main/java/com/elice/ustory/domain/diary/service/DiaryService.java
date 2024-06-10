@@ -41,7 +41,7 @@ public class DiaryService {
     private final UserRepository userRepository;
 
     @Transactional
-    public DiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
+    public AddDiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
         if (diary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             throw new ValidationException("개인 다이어리는 생성할 수 없습니다.");
         }
@@ -70,7 +70,7 @@ public class DiaryService {
         }
         diaryFriends.add(new DiaryFriend(user.getNickname(),user.getProfileImgUrl()));
 
-        return DiaryResponse.toDiaryResponse(savedDiary, diaryFriends);
+        return new AddDiaryResponse(savedDiary.getId());
     }
 
     public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
@@ -91,7 +91,7 @@ public class DiaryService {
     }
 
     @Transactional
-    public DiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
+    public AddDiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if (diaryUser == null) {
             // 사용자가 속한 다이어리가 아닌 경우
@@ -134,9 +134,8 @@ public class DiaryService {
                 }
             }
         }
-        List<DiaryFriend> diaryFriends = diaryUserRepository.findUsersByDiaryId(userId,diaryId);
 
-        return DiaryResponse.toDiaryResponse(updatedDiary,diaryFriends);
+        return new AddDiaryResponse(diaryId);
     }
 
     public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord) {
