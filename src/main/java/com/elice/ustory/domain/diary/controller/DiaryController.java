@@ -1,9 +1,6 @@
 package com.elice.ustory.domain.diary.controller;
 
-import com.elice.ustory.domain.diary.dto.AddDiaryResponse;
-import com.elice.ustory.domain.diary.dto.DiaryDto;
-import com.elice.ustory.domain.diary.dto.DiaryListResponse;
-import com.elice.ustory.domain.diary.dto.DiaryResponse;
+import com.elice.ustory.domain.diary.dto.*;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -110,9 +107,8 @@ public class DiaryController {
 
     @Operation(summary = "Exit Diary", description = "다이어리 나가기")
     @GetMapping("/{diaryId}/exit")
-    public ResponseEntity<Void> exitDiary(@JwtAuthorization Long userId,
+    public ResponseEntity<ExitResponse> exitDiary(@JwtAuthorization Long userId,
                                           @PathVariable("diaryId") Long diaryId) {
-        diaryService.exitDiary(userId, diaryId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(diaryService.exitDiary(userId, diaryId));
     }
 }
