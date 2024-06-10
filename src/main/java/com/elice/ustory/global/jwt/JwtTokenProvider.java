@@ -4,6 +4,7 @@ import com.elice.ustory.domain.user.entity.Users;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.Date;
 
 @Component
 @Slf4j
+@Getter
 public class JwtTokenProvider {
     private final long ACCESSTOKEN_VALID_MILISECOND = 1000L * 60 * 30;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
@@ -67,42 +69,5 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESHTOKEN_VALID_MILISECOND))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    public Long getUserPk(String token) {
-        log.info("[getUserPk] 토큰 기반 회원 구별 정보 추출");
-        return Long.parseLong(Jwts.parserBuilder().setSigningKey(secretKey).build()
-                .parseClaimsJws(token).getBody().get("userId").toString());
-    }
-
-    public boolean validateToken(String jwtToken) {
-        log.info("[validateToken] 토큰 유효 체크 시작 ");
-        try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
-                    .parseClaimsJws(jwtToken);
-
-            return !claims.getBody().getExpiration().before(new Date(System.currentTimeMillis()));
-        } catch (ExpiredJwtException e) {
-            log.info("[validateToken] 토큰 유효 시간 만료");
-            return false;
-        } catch (SignatureException e){
-            log.info("[validateToken] 올바르지 않은 토큰 형식");
-            return false;
-        }
-    }
-
-    public long getRemainingTTL(String jwtToken) {
-        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
-                .parseClaimsJws(jwtToken);
-        Date expiration = claims.getBody().getExpiration();
-        Date now = new Date();
-        long remainingMillis = expiration.getTime() - now.getTime();
-        return Math.max(remainingMillis, 0) / 1000;
-    }
-
-    public String getKakaoToken(String jwtToken){
-        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
-                .parseClaimsJws(jwtToken);
-        return claims.getBody().get("kakao").toString();
     }
 }
