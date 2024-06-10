@@ -71,10 +71,16 @@ public class UserService {
         // TODO: null 체크는 dto에서 미리 처리되므로 제거(dto-pattern)
 
         // 1-0. 입력값 유효성 체크 시작. 유효하지 않은 값은 차례로 하나씩 반환.
-        // TODO: 닉네임, 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
-        // 1-1. TODO: 닉네임 null 체크(중복여부는 확인된 상태로 넘어옴)
+        // TODO: 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
+        String nickname = signUpRequest.getNickname();
 
         // 1-2. TODO: 이메일 null 체크(인증 및 중복 여부는 확인된 상태로 넘어옴)
+        // 1-1. 닉네임 중복 재확인
+        ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
+        validateNicknameRequest.setNickname(nickname);
+        if (isValidNickname(validateNicknameRequest).getIsDuplicate() == true) {
+            throw new ValidationException("이미 존재하는 닉네임입니다.");
+        };
 
         // 1-3. 이름 null 체크(현재 별도 조건 없음)
         String name = signUpRequest.getName();
@@ -91,9 +97,7 @@ public class UserService {
         // 1-6. 입력값 유효성 체크 끝
 
         // 인증된 값으로 유저 생성
-        String email = signUpRequest.getEmail();
         Users.LoginType loginType = Users.LoginType.BASIC;
-        String nickname = signUpRequest.getNickname();
         String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
         String profileImgUrl = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
