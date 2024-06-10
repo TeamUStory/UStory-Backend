@@ -80,7 +80,7 @@ public class KakaoService {
                 .build();
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
-        response.addHeader("Authorization", "Bearer " + accessToken);
+        response.addHeader("Authorization", accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
         kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken, accessToken);

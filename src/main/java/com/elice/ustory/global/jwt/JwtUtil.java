@@ -51,7 +51,7 @@ public class JwtUtil {
             log.info("[refreshToken] AccessToken이 재발급 되었습니다: {}", newAccessToken);
             log.info("[refreshToken] RefreshToken이 재발급 되었습니다: {}", newRefreshToken);
 
-            response.addHeader("Authorization", "Bearer " + newAccessToken);
+            response.addHeader("Authorization", newAccessToken);
             return true;
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
