@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.elice.ustory.domain.notice.entity.QNotice.notice;
 
 @Tag(name = "notice", description = "Notice API")
 @RestController
@@ -51,10 +50,9 @@ public class NoticeController {
         }
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        List<Notice> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
-        List<NoticeResponse> list = notices.stream().map(NoticeResponse::new).toList();
+        List<NoticeResponse> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
 
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(notices);
     }
 
 
