@@ -37,7 +37,7 @@ public class DiaryResponse {
             "      \"nickname\": \"친구2\",\n" +
             "      \"profileImgUrl\": \"http://imgae2.com\"\n" +
             "    }]")
-    private List<DiaryFriend> diaryFriends;
+    private List<DiaryFriend> users;
 
     public DiaryResponse(Long id, String name, String imgUrl, String diaryCategory, String description, String color, List<DiaryFriend> diaryFriends) {
         this.id = id;
@@ -46,7 +46,7 @@ public class DiaryResponse {
         this.diaryCategory = diaryCategory;
         this.description = description;
         this.color = color;
-        this.diaryFriends = diaryFriends;
+        this.users = diaryFriends;
     }
 
     public static DiaryResponse toDiaryResponse(Diary diary, List<DiaryFriend> diaryFriends) {
