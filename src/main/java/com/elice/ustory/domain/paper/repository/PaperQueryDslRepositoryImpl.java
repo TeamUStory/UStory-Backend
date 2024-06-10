@@ -5,7 +5,6 @@ import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.entity.QPaper;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,26 +14,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.elice.ustory.domain.paper.entity.QPaper.paper;
-
 @Repository
 @RequiredArgsConstructor
 public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
 
+    private static final QPaper paper = QPaper.paper;
     private final JPAQueryFactory queryFactory;
-
     @Override
     public List<Paper> findAllByDiaryIdAndDateRange(Long diaryId, LocalDateTime requestTime, Pageable pageable, LocalDate startDate, LocalDate endDate) {
-        JPQLQuery<Paper> query = queryFactory.selectFrom(paper)
+        return queryFactory.selectFrom(paper)
                 .where(paper.diary.id.eq(diaryId),
                         startDateCondition(startDate),
                         endDateCondition(endDate),
-                        paper.createdAt.loe(requestTime))
+                        paper.createdAt.loe(requestTime),
+                        paper.deletedAt.isNull())
                 .orderBy(paper.createdAt.desc())
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
-
-        return query.fetch();
+                .limit(pageable.getPageSize())
+                .fetch();
     }
 
     private BooleanExpression startDateCondition(LocalDate startDate) {
@@ -47,25 +44,26 @@ public class PaperQueryDslRepositoryImpl implements PaperQueryDslRepository {
 
     @Override
     public List<Paper> findAllPapersByUserId(Long userId) {
-        QPaper paper = QPaper.paper;
         QDiaryUser diaryUser = QDiaryUser.diaryUser;
 
         return queryFactory.selectFrom(paper)
                 .where(paper.diary.id.in(
-                        JPAExpressions.select(diaryUser.id.diary.id)
-                                .from(diaryUser)
-                                .where(diaryUser.id.users.id.eq(userId))
-                ))
+                                JPAExpressions.select(diaryUser.id.diary.id)
+                                        .from(diaryUser)
+                                        .where(diaryUser.id.users.id.eq(userId))
+                        ),
+                        paper.deletedAt.isNull()
+                )
                 .orderBy(paper.createdAt.desc())
                 .fetch();
     }
 
     @Override
     public List<Paper> findByWriterId(Long writerId, LocalDateTime requestTime, Pageable pageable) {
-        QPaper paper = QPaper.paper;
-
         return queryFactory.selectFrom(paper)
-                .where(paper.writer.id.eq(writerId), paper.createdAt.loe(requestTime))
+                .where(paper.writer.id.eq(writerId),
+                        paper.createdAt.loe(requestTime),
+                        paper.deletedAt.isNull())
                 .orderBy(paper.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
