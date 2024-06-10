@@ -1,7 +1,6 @@
 package com.elice.ustory.global.config;
 
 import com.elice.ustory.global.interceptor.JwtInterceptor;
-import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.resolver.JwtAuthorizationArgumentResolver;
 import lombok.RequiredArgsConstructor;
