@@ -3,8 +3,10 @@ package com.elice.ustory.domain.user.service;
 import com.elice.ustory.domain.user.dto.AuthCodeCreateResponse;
 import com.elice.ustory.domain.user.dto.AuthCodeVerifyRequest;
 import com.elice.ustory.domain.user.dto.AuthCodeVerifyResponse;
+import com.elice.ustory.domain.user.dto.signUp.EmailVerifyResponse;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.redis.email.AuthCode;
 import com.elice.ustory.global.redis.email.AuthCodeRepository;
 import jakarta.annotation.PostConstruct;
@@ -25,7 +27,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final AuthCodeRepository authCodeRepository;
-    private final EmailConfig emailConfig; // TODO: 이렇게 Config를 끌고와도 되는건지?
+    private final EmailConfig emailConfig;
     private String fromEmail;
 
     @PostConstruct
@@ -59,16 +61,9 @@ public class EmailService {
 
     public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
         // 0. 이메일 중복 체크
-        if (userRepository.existsByEmail(toEmail)) {
-            String DUPLICATE = "duplicate";
-            return AuthCodeCreateResponse.builder()
-                    .isSuccess(false)
-                    .fromMail(DUPLICATE)
-                    .toMail(DUPLICATE)
-                    .title(DUPLICATE)
-                    .authCode(DUPLICATE)
-                    .build();
-        }
+        if (validateEmail(toEmail).getIsSuccess() == false) {
+            throw new ValidationException("이미 가입된 이메일입니다.");
+        };
 
         // 1. 메일 내용 생성
         String authCode = generateAuthCode();
@@ -92,7 +87,6 @@ public class EmailService {
         // 4. api 결괏값 반환
         log.info("[sendValidateSigunupResult] 인증코드 메일이 발송됨. 수신자 id : {}", userRepository.findByEmail(toEmail));
         AuthCodeCreateResponse authCodeCreateResponse = AuthCodeCreateResponse.builder()
-                .isSuccess(true)
                 .fromMail(fromEmail)
                 .toMail(toEmail)
                 .title(title)
@@ -126,5 +120,19 @@ public class EmailService {
                     .message("인증 코드 요청이 오지 않은 이메일입니다.")
                     .build();
         }
+    }
+
+    public EmailVerifyResponse validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            return EmailVerifyResponse.builder()
+                    .isSuccess(false)
+                    .status("EMAIL_DUPLICATE")
+                    .build();
+        }
+
+        return EmailVerifyResponse.builder()
+                .isSuccess(true)
+                .status("SUCCESS")
+                .build();
     }
 }

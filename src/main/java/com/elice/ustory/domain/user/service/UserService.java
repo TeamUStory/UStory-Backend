@@ -11,6 +11,7 @@ import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.InternalServerException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -40,9 +41,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
-    private static final String NO_AUTHORIZATION_IN_HEADER_MESSAGE = "헤더에 토큰을 입력해주세요.";
-    private static final String PASSWORD_MATCH_CHECK_ERROR_MESSAGE = "비밀번호가 일치하지 않습니다.";
-
     public Users findById(Long userId) {
         return userRepository.findById(userId).orElseThrow();
     }
@@ -71,18 +69,32 @@ public class UserService {
 
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
+        // TODO: null 체크는 dto에서 미리 처리되므로 제거(dto-pattern)
 
-        // 1-0. 입력값 유효성 체크 시작.
-        // TODO: 닉네임, 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
-        // 1-1. TODO: 닉네임 null 체크(중복여부는 확인된 상태로 넘어옴)
+        // 1-0. 입력값 유효성 체크 시작. 유효하지 않은 값은 차례로 하나씩 반환.
+        // TODO: 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
+        String nickname = signUpRequest.getNickname();
 
-        // 1-2. TODO: 이메일 null 체크(인증 및 중복 여부는 확인된 상태로 넘어옴)
+        // 1-1. 닉네임 유효 재확인
+        ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
+        validateNicknameRequest.setNickname(nickname);
+        if (isValidNickname(validateNicknameRequest).getIsValid() == false) {
+            throw new ValidationException("사용할 수 없는 닉네임입니다.");
+        };
 
-        // TODO: 1-3. 이름 null 체크(현재 별도 조건 없음)
+        // 1-2. 이메일 중복 재확인
+        String email = signUpRequest.getEmail();
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new ValidationException("이미 가입된 이메일입니다.");
+        }
+
+        // 1-3. 이름 null 체크(현재 별도 조건 없음)
+        String name = signUpRequest.getName();
+        checkUsernameRule(name);
 
         // 1-4. 비밀번호 형식 체크
         String password = signUpRequest.getPassword();
-        passwordValidate(password);
+        checkPasswordRule(password);
 
         // 1-5. 비밀번호 일치 체크
         String passwordCheck = signUpRequest.getPasswordCheck();
@@ -91,13 +103,11 @@ public class UserService {
         // 1-6. 입력값 유효성 체크 끝
 
         // 인증된 값으로 유저 생성
-        String email = signUpRequest.getEmail();
         Users.LoginType loginType = Users.LoginType.BASIC;
-        String name = signUpRequest.getName();
-        String nickname = signUpRequest.getNickname();
         String encodedPassword = passwordEncoder.encode(password); // 비밀번호 암호화
-        String profileImg = signUpRequest.getProfileImgUrl();
+        String profileImgUrl = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
+        String diaryImgUrl = signUpRequest.getDiaryImgUrl();
 
         Users builtUser = Users.addUserBuilder()
                 .email(email)
@@ -105,22 +115,26 @@ public class UserService {
                 .name(name)
                 .nickname(nickname)
                 .password(encodedPassword)
-                .profileImgUrl(profileImg)
+                .profileImgUrl(profileImgUrl)
                 .profileDescription(profileDescription)
                 .build();
 
         Users newUser = userRepository.save(builtUser);
 
         // 개인 다이어리 생성
-        Diary userDiary = new Diary(
-                String.format("%s의 다이어리", builtUser.getNickname()),
-                "기본 DiaryImgUrl",
-                DiaryCategory.INDIVIDUAL,
-                String.format("%s의 개인 다이어리", builtUser.getNickname()),
-                Color.RED
-        );
-        diaryRepository.save(userDiary);
-        diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
+        try {
+            Diary userDiary = new Diary(
+                    String.format("%s의 다이어리", builtUser.getNickname()),
+                    diaryImgUrl,
+                    DiaryCategory.INDIVIDUAL,
+                    String.format("%s의 개인 다이어리", builtUser.getNickname()),
+                    Color.RED
+            );
+            diaryRepository.save(userDiary);
+            diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
+        } catch (Exception e) {
+            throw new InternalServerException("개인 다이어리를 생성하는 과정에서 문제가 발생하였습니다.");
+        }
 
         return newUser;
     }
@@ -135,7 +149,7 @@ public class UserService {
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
         String password = updateRequest.getPassword();
-        String profileImg = updateRequest.getProfileImgUrl();
+        String profileImgUrl = updateRequest.getProfileImgUrl();
         String profileDescription = updateRequest.getProfileDescription();
 
         if (name != null) {
@@ -147,8 +161,8 @@ public class UserService {
         if (password != null) {
             user.setPassword(password);
         }
-        if (profileImg != null) {
-            user.setProfileImgUrl(profileImg);
+        if (profileImgUrl != null) {
+            user.setProfileImgUrl(profileImgUrl);
         }
         if (profileDescription != null) {
             user.setProfileDescription(profileDescription);
@@ -199,7 +213,6 @@ public class UserService {
                 .refreshToken(refreshToken)
                 .build();
 
-
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
         response.addHeader("Authorization", accessToken);
 
@@ -214,7 +227,7 @@ public class UserService {
         String token = request.getHeader("Authorization");
 
         if (token == null) {
-            throw new UnauthorizedException(NO_AUTHORIZATION_IN_HEADER_MESSAGE);
+            throw new UnauthorizedException("헤더에 토큰을 입력해주세요.");
         }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
@@ -247,15 +260,17 @@ public class UserService {
     public ValidateNicknameResponse isValidNickname(ValidateNicknameRequest validateNicknameRequest) {
         String nickname = validateNicknameRequest.getNickname();
 
-        // 중복 여부 확인(false면 합격)
-        Boolean isDuplicate = userRepository.findByNickname(nickname).isPresent();
-
-        // 최종, 닉네임 유효 여부 반환
-        ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
-                .isDuplicate(isDuplicate)
-                .build();
-
-        return validateNicknameResponse;
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            return ValidateNicknameResponse.builder()
+                    .isValid(false)
+                    .isDuplicate(true)
+                    .build();
+        } else {
+            return ValidateNicknameResponse.builder()
+                    .isValid(true)
+                    .isDuplicate(false)
+                    .build();
+        }
     }
 
     public boolean checkExistByEmail(String email) {
@@ -264,11 +279,11 @@ public class UserService {
 
     public void checkNewPasswordMatch(String firstEnter, String secondEnter) {
         if (!firstEnter.equals(secondEnter)) {
-            throw new ValidationException(PASSWORD_MATCH_CHECK_ERROR_MESSAGE);
+            throw new ValidationException("비밀번호가 일치하지 않습니다.");
         }
     }
 
-    public void passwordValidate(String password){
+    public void checkPasswordRule(String password) {
         // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
         // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
         final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
@@ -281,5 +296,11 @@ public class UserService {
             throw new ValidationException("비밀번호 형식이 맞지 않습니다.");
         }
 
+    }
+
+    public void checkUsernameRule(String username) {
+        if (username == null) {
+            throw new ValidationException("사용자 이름을 입력해주세요.");
+        }
     }
 }
