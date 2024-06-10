@@ -49,7 +49,9 @@ public class PaperResponse {
             example = "1")
     private Integer unlocked;
 
-    public PaperResponse(Paper paper, Boolean bookmarked) {
+    private Integer isUpdatable;
+
+    public PaperResponse(Paper paper, Boolean bookmarked, Long userId) {
 
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
@@ -69,6 +71,12 @@ public class PaperResponse {
             this.imageUrls = paper.getImages().stream()
                     .map(Image::getImageUrl)
                     .collect(Collectors.toList());
+        }
+
+        if (paper.getWriter().getId() == userId) {
+            this.isUpdatable = 1;
+        } else {
+            this.isUpdatable = 0;
         }
     }
 
