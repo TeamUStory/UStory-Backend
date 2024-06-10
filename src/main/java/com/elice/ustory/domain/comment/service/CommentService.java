@@ -32,7 +32,6 @@ public class CommentService {
     public List<Comment> getComments(Long paperId, Long userId) {
         Paper paper = paperService.getPaperById(paperId);
         List<Comment> comments = commentRepository.findByPaper(paper);
-        comments.forEach(comment -> comment.setIsUpdatable(userId));
         return comments;
     }
 
