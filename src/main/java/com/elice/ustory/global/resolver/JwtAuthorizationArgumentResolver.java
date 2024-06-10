@@ -1,7 +1,6 @@
 package com.elice.ustory.global.resolver;
 
 import com.elice.ustory.global.jwt.JwtAuthorization;
-import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthorizationArgumentResolver implements HandlerMethodArgumentResolver {
-    private final JwtTokenProvider jwtTokenProvider;
     private final JwtUtil jwtUtil;
 
     @Override
