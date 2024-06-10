@@ -21,13 +21,13 @@ public class CommentListResponse {
     @JsonSerialize(using = LocalDateConverter.class)
     private LocalDate createdAt;
 
-    public CommentListResponse(Comment comment){
+    public CommentListResponse(Comment comment, Long userId){
         this.id = comment.getId();
         this.content = comment.getContent();
         this.userId = comment.getUser().getId();
         this.userNickname = comment.getUser().getNickname();
         this.profileImg = comment.getUser().getProfileImgUrl();
-        this.isUpdatable = comment.getIsUpdatable();
         this.createdAt = LocalDate.now();
+        this.isUpdatable = this.userId == userId ? 1 : 0;
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,10 +36,12 @@ public class CommentController {
     @GetMapping("/paper/{paperId}")   // 시험용이라 uri 더러운건 무시하셔도 됩니다.
     public ResponseEntity<List<CommentListResponse>> getComments(@PathVariable Long paperId, @JwtAuthorization Long userId) {
         List<Comment> comments = commentService.getComments(paperId, userId);
-        List<CommentListResponse> commentListResponses = comments.stream()
-                .map(CommentListResponse::new)
+
+        List<CommentListResponse> response = comments.stream()
+                .map(comment -> new CommentListResponse(comment, userId))
                 .toList();
-        return ResponseEntity.ok().body(commentListResponses);
+
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "Post Comment API", description = "댓글을 생성함")
