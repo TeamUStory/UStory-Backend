@@ -74,12 +74,11 @@ public class UserService {
         // TODO: 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
         String nickname = signUpRequest.getNickname();
 
-        // 1-2. TODO: 이메일 null 체크(인증 및 중복 여부는 확인된 상태로 넘어옴)
-        // 1-1. 닉네임 중복 재확인
+        // 1-1. 닉네임 유효 재확인
         ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
         validateNicknameRequest.setNickname(nickname);
-        if (isValidNickname(validateNicknameRequest).getIsDuplicate() == true) {
-            throw new ValidationException("이미 존재하는 닉네임입니다.");
+        if (isValidNickname(validateNicknameRequest).getIsValid() == true) {
+            throw new ValidationException("사용할 수 없는 닉네임입니다.");
         };
 
         // 1-3. 이름 null 체크(현재 별도 조건 없음)
@@ -250,15 +249,17 @@ public class UserService {
     public ValidateNicknameResponse isValidNickname(ValidateNicknameRequest validateNicknameRequest) {
         String nickname = validateNicknameRequest.getNickname();
 
-        // 중복 여부 확인(false면 합격)
-        Boolean isDuplicate = userRepository.findByNickname(nickname).isPresent();
-
-        // 최종, 닉네임 유효 여부 반환
-        ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
-                .isDuplicate(isDuplicate)
-                .build();
-
-        return validateNicknameResponse;
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            return ValidateNicknameResponse.builder()
+                    .isValid(false)
+                    .isDuplicate(true)
+                    .build();
+        } else {
+            return ValidateNicknameResponse.builder()
+                    .isValid(true)
+                    .isDuplicate(false)
+                    .build();
+        }
     }
 
     public boolean checkExistByEmail(String email) {
