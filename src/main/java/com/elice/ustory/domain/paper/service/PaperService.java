@@ -6,6 +6,7 @@ import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.image.ImageRepository;
@@ -61,8 +62,11 @@ public class PaperService {
         paper.addWriter(writer);
 
         // Diary 주입
-        Diary diary = diaryRepository.findById(request.getDiaryId())
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, request.getDiaryId())));
+        DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(writerId, request.getDiaryId());
+        Diary diary = diaryUser.getId().getDiary();
+        if (diary == null) {
+            throw new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, request.getDiaryId()));
+        }
         paper.addDiary(diary);
 
         // 개인 다이어리인 경우 Paper 해금상태로 변경
