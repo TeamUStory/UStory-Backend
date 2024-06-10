@@ -2,7 +2,6 @@ package com.elice.ustory.global.interceptor;
 
 import com.elice.ustory.global.exception.model.AccessTokenExpiredException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
-import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +19,6 @@ import java.lang.reflect.Parameter;
 @Component
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
-    private final JwtTokenProvider jwtTokenProvider;
     private final JwtUtil jwtUtil;
 
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler)
@@ -46,7 +44,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 log.info("[preHandle] accessToken 값 추출 완료, token: {}", accessToken);
                 log.info("[preHandle] accessToken 값 유효성 체크 시작");
 
-                if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+                if (accessToken != null && jwtUtil.validateToken(accessToken)) {
                     log.info("[preHandle] accessToken 값 유효성 체크 완료");
                     response.addHeader("Authorization", accessToken);
                     return HandlerInterceptor.super.preHandle(request, response, handler);
