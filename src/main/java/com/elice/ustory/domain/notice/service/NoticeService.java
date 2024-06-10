@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,8 +38,9 @@ public class NoticeService {
      * @param userId 조회할 사용자의 ID
      * @return 알림 목록
      */
-    public List<Notice> getAllNoticesByUserId(Long userId, LocalDateTime requestTime, Pageable pageable) {
-        return noticeRepository.findAllNoticesByUserId(userId, requestTime, pageable);
+    public List<NoticeResponse> getAllNoticesByUserId(Long userId, LocalDateTime requestTime, Pageable pageable) {
+        List<Notice> notices = noticeRepository.findAllNoticesByUserId(userId, requestTime, pageable);
+        return notices.stream().map(NoticeResponse::new).collect(Collectors.toList());
     }
 
 
@@ -112,13 +114,13 @@ public class NoticeService {
     /**
      * 알림을 ID로 삭제합니다.
      * @param userId 로그인한 사용자의 아이디
-     * @param id 삭제할 알림의 ID
+     * @param noticeId 삭제할 알림의 ID
      */
-    public void deleteNoticeById(Long userId, Long id) {
-        if (id == null) {
+    public void deleteNoticeById(Long userId, Long noticeId) {
+        if (noticeId == null) {
             throw new ValidationException("알림 ID가 null입니다.");
         }
-        Notice notice = noticeRepository.findById(id)
+        Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new NotFoundException("알림을 찾을 수 없습니다."));
         if (notice.getResponseId() != userId) {
             throw new UnauthorizedException("해당 알림을 삭제할 권한이 없습니다.");
