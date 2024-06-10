@@ -46,4 +46,5 @@ public class Comment extends BaseEntity {
             paper.getComments().add(this);
         }
     }
+
 }

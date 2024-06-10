@@ -1,7 +1,6 @@
 package com.elice.ustory.global.config;
 
 import com.elice.ustory.global.interceptor.JwtInterceptor;
-import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.resolver.JwtAuthorizationArgumentResolver;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +15,12 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
-    private final JwtTokenProvider jwtTokenProvider;
     private final JwtUtil jwtUtil;
     private final JwtAuthorizationArgumentResolver jwtAuthorizationArgumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new JwtInterceptor(jwtTokenProvider, jwtUtil))
+        registry.addInterceptor(new JwtInterceptor(jwtUtil))
                 .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**",
                         "/user/sign-up/**", "/user/login", "/user/validate-nickname");
         //TODO: 로그인 관련 엔드포인트는 제외시켜야함

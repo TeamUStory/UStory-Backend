@@ -10,6 +10,7 @@ import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.ForbiddenException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -34,14 +35,14 @@ import static org.springframework.util.StringUtils.hasText;
 public class DiaryService {
     private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
     private static final String NOT_FOUND_USER_MESSAGE = "%d: 해당하는 사용자가 존재하지 않습니다.";
-    private static final String UNAUTHORIZED_DIARY_MESSAGE = "%d: 해당 다이어리에 대한 권한이 없습니다.";
+    private static final String FORBIDDEN_DIARY_MESSAGE = "%d: 해당 다이어리에 대한 권한이 없습니다.";
 
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
     private final UserRepository userRepository;
 
     @Transactional
-    public DiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
+    public AddDiaryResponse createDiary(Long userId, Diary diary, List<String> userList) {
         if (diary.getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             throw new ValidationException("개인 다이어리는 생성할 수 없습니다.");
         }
@@ -70,13 +71,13 @@ public class DiaryService {
         }
         diaryFriends.add(new DiaryFriend(user.getNickname(),user.getProfileImgUrl()));
 
-        return DiaryResponse.toDiaryResponse(savedDiary, diaryFriends);
+        return new AddDiaryResponse(savedDiary.getId());
     }
 
     public DiaryResponse getDiaryDetailById(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if (diaryUser == null) {
-            throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
+            throw new ForbiddenException(String.format(FORBIDDEN_DIARY_MESSAGE, diaryId));
         }
 
         List<DiaryFriend> diaryFriends = diaryUserRepository.findUsersByDiaryId(userId, diaryId);
@@ -91,11 +92,11 @@ public class DiaryService {
     }
 
     @Transactional
-    public DiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
+    public AddDiaryResponse updateDiary(Long userId, Long diaryId, Diary diary, List<String> userList) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if (diaryUser == null) {
             // 사용자가 속한 다이어리가 아닌 경우
-            throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
+            throw new ForbiddenException(String.format(FORBIDDEN_DIARY_MESSAGE, diaryId));
         }
 
         Diary updatedDiary = diaryUser.getId().getDiary();
@@ -134,9 +135,8 @@ public class DiaryService {
                 }
             }
         }
-        List<DiaryFriend> diaryFriends = diaryUserRepository.findUsersByDiaryId(userId,diaryId);
 
-        return DiaryResponse.toDiaryResponse(updatedDiary,diaryFriends);
+        return new AddDiaryResponse(diaryId);
     }
 
     public List<DiaryListResponse> getUserDiaries(Long userId, Pageable pageable, DiaryCategory diaryCategory, LocalDateTime dateTime, String searchWord) {
@@ -168,16 +168,15 @@ public class DiaryService {
         diaryRepository.delete(diary);
     }
 
-    public void exitDiary(Long userId, Long diaryId) {
+    public ExitResponse exitDiary(Long userId, Long diaryId) {
         DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(userId, diaryId);
         if (diaryUser == null) {
             // 사용자가 속한 다이어리가 아닌 경우
-            throw new UnauthorizedException(String.format(UNAUTHORIZED_DIARY_MESSAGE, diaryId));
+            throw new ForbiddenException(String.format(FORBIDDEN_DIARY_MESSAGE, diaryId));
         }
 
         if (diaryUser.getId().getDiary().getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
-            throw new UnauthorizedException("개인 다이어리는 삭제할 수 없습니다.");
-            // TODO : 삭제 후 재생성(?)
+            return new ExitResponse(false);
         } else {
             diaryUserRepository.delete(diaryUser);
         }
@@ -186,6 +185,7 @@ public class DiaryService {
         if (diaryUserRepository.countUserByDiary(diaryId) == 0) {
 
         }
+        return new ExitResponse(true);
     }
 
 }

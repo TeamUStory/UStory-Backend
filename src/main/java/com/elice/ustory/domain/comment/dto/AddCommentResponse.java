@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AddCommentResponse {
     private Long id;
-    private Long pageId;
+    private Long paperId;
     private Long userId;
     private LocalDateTime createdAt;
 }

@@ -6,6 +6,7 @@ import com.elice.ustory.domain.comment.entity.Comment;
 import com.elice.ustory.domain.comment.repository.CommentRepository;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.repository.DiaryRepository;
+import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.image.Image;
 import com.elice.ustory.domain.image.ImageRepository;
@@ -38,7 +39,6 @@ public class PaperService {
     private static final String NOT_FOUND_DIARY_MESSAGE = "%d: 해당하는 다이어리가 존재하지 않습니다.";
     private static final String NOT_FOUND_USER_MESSAGE = "%d: 해당하는 사용자가 존재하지 않습니다.";
     private static final String NOT_FOUND_IN_DIARY_MESSAGE = "%s: 해당하는 사용자가 다이어리 내에 존재하지 않습니다.";
-    private static final String ORDER_BY_UPDATED_AT = "updatedAt";
 
     private final PaperRepository paperRepository;
     private final AddressRepository addressRepository;
@@ -61,8 +61,13 @@ public class PaperService {
         paper.addWriter(writer);
 
         // Diary 주입
-        Diary diary = diaryRepository.findById(request.getDiaryId())
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_DIARY_MESSAGE, request.getDiaryId())));
+        DiaryUser diaryUser = diaryUserRepository.findDiaryUserById(writerId, request.getDiaryId());
+
+        if (diaryUser == null) {
+            throw new ForbiddenException("해당 다이어리에 속해 있는 사용자가 아닙니다.");
+        }
+
+        Diary diary = diaryUser.getId().getDiary();
         paper.addDiary(diary);
 
         // 개인 다이어리인 경우 Paper 해금상태로 변경

@@ -1,8 +1,6 @@
 package com.elice.ustory.domain.diary.controller;
 
-import com.elice.ustory.domain.diary.dto.DiaryDto;
-import com.elice.ustory.domain.diary.dto.DiaryListResponse;
-import com.elice.ustory.domain.diary.dto.DiaryResponse;
+import com.elice.ustory.domain.diary.dto.*;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -29,14 +27,14 @@ public class DiaryController {
 
     @Operation(summary = "Create Diary API", description = "다이어리 생성 및 링크 테이블에 등록")
     @PostMapping
-    public ResponseEntity<DiaryResponse> createDiary(@JwtAuthorization Long userId,
+    public ResponseEntity<AddDiaryResponse> createDiary(@JwtAuthorization Long userId,
                                                      @Valid @RequestBody DiaryDto diaryDto) {
-        DiaryResponse diary = diaryService.createDiary(userId, diaryDto.toDiary(), diaryDto.getUsers());
-        if (diary == null) {
+        AddDiaryResponse addDiaryResponse = diaryService.createDiary(userId, diaryDto.toDiary(), diaryDto.getUsers());
+        if (addDiaryResponse == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(diary);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addDiaryResponse);
     }
 
     @Operation(summary = "Get User's Diary By User API", description = "유저가 속한 다이어리 목록 불러오기")
@@ -69,15 +67,15 @@ public class DiaryController {
 
     @Operation(summary = "Update Diary", description = "다이어리 정보 변경")
     @PutMapping("/{diaryId}")
-    public ResponseEntity<DiaryResponse> updateDiary(@JwtAuthorization Long userId,
+    public ResponseEntity<AddDiaryResponse> updateDiary(@JwtAuthorization Long userId,
                                                      @PathVariable("diaryId") Long diaryId,
                                                      @Valid @RequestBody DiaryDto diaryDto) {
         if (diaryId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        DiaryResponse diaryResponse = diaryService.updateDiary(userId, diaryId, diaryDto.toDiary(), diaryDto.getUsers());
+        AddDiaryResponse addDiaryResponse = diaryService.updateDiary(userId, diaryId, diaryDto.toDiary(), diaryDto.getUsers());
 
-        return ResponseEntity.ok(diaryResponse);
+        return ResponseEntity.ok(addDiaryResponse);
     }
 
     @Operation(summary = "Get Diary By DiaryId", description = "다이어리 상세 페이지 불러오기")
@@ -109,9 +107,8 @@ public class DiaryController {
 
     @Operation(summary = "Exit Diary", description = "다이어리 나가기")
     @GetMapping("/{diaryId}/exit")
-    public ResponseEntity<Void> exitDiary(@JwtAuthorization Long userId,
+    public ResponseEntity<ExitResponse> exitDiary(@JwtAuthorization Long userId,
                                           @PathVariable("diaryId") Long diaryId) {
-        diaryService.exitDiary(userId, diaryId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(diaryService.exitDiary(userId, diaryId));
     }
 }

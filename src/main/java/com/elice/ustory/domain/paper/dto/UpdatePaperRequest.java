@@ -35,10 +35,6 @@ public class UpdatePaperRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
     private LocalDate visitedAt;
 
-    @Schema(description = "다이어리 Id", example = "12345678", required = true)
-    @NotNull(message = "다이어리 지정은 필수입니다. 다이어리를 지정해 주세요.")
-    private Long diaryId;
-
     @Schema(description = "도로 주소", example = "서울특별시 마포구 독막로3길 21", required = true)
     @NotNull(message = "장소는 필수입니다. 장소를 지정해 주세요.")
     private String city;
@@ -54,23 +50,6 @@ public class UpdatePaperRequest {
     @Schema(description = "Y좌표", example = "126.9169", required = true)
     @NotNull(message = "좌표값은 필수입니다. 좌표를 지정해 주세요.")
     private Double coordinateY;
-
-    public Paper toPageEntity() {
-        return Paper.createBuilder()
-                .title(this.title)
-                .thumbnailImageUrl(this.thumbnailImageUrl)
-                .visitedAt(this.visitedAt)
-                .build();
-    }
-
-    public Address toAddressEntity() {
-        return Address.createBuilder()
-                .city(this.city)
-                .store(this.store)
-                .coordinateX(this.coordinateX)
-                .coordinateY(this.coordinateY)
-                .build();
-    }
 
     public List<Image> toImagesEntity() {
 

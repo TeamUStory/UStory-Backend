@@ -49,18 +49,21 @@ public class PaperResponse {
             example = "1")
     private Integer unlocked;
 
-    public PaperResponse(Paper paper, Boolean bookmarked) {
-        setDefault(paper);
-        setBookmarked(bookmarked);
+    @Schema(description =
+            "수정 및 삭제 가능 여부 <br>" +
+                    "0을 반환하는 경우 수정 및 삭제 권한이 없는 상태이다. <br>" +
+                    "1을 반환하는 경우 수정 및 삭제가 가능한 상태이다.",
+            example = "1")
+    private Integer isUpdatable;
 
-        if (paper.isUnlocked()) {
-            this.imageUrls = paper.getImages().stream()
-                    .map(Image::getImageUrl)
-                    .collect(Collectors.toList());
-        }
-    }
+    @Schema(description = "X좌표", example = "37.5494")
+    private Double coordinateX;
 
-    private void setDefault(Paper paper) {
+    @Schema(description = "Y좌표", example = "126.9169")
+    private Double coordinateY;
+
+    public PaperResponse(Paper paper, Boolean bookmarked, Long userId) {
+
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
         this.visitedAt = paper.getVisitedAt();
@@ -68,14 +71,26 @@ public class PaperResponse {
         this.store = paper.getAddress().getStore();
         this.unlocked = paper.getUnLocked();
         this.diaryName = paper.getDiary().getName();
-    }
+        this.coordinateX = paper.getAddress().getCoordinateX();
+        this.coordinateY = paper.getAddress().getCoordinateY();
 
-    private void setBookmarked(Boolean bookmarked) {
         if (bookmarked) {
             this.bookmarked = 1;
-            return;
+        } else {
+            this.bookmarked = 0;
         }
 
-        this.bookmarked = 0;
+        if (paper.isUnlocked()) {
+            this.imageUrls = paper.getImages().stream()
+                    .map(Image::getImageUrl)
+                    .collect(Collectors.toList());
+        }
+
+        if (paper.getWriter().getId() == userId) {
+            this.isUpdatable = 1;
+        } else {
+            this.isUpdatable = 0;
+        }
     }
+
 }
