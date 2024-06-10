@@ -21,7 +21,7 @@ public class NoticeResponse {
     @NotNull
     private String message;
 
-    @Schema(description = "알림 생성시간", example = "2024-06-03T18:02:59.529Z")
+    @Schema(description = "알림 생성시간", example = "2024-06-03T18:02:59")
     @NotNull
     private LocalDateTime time;
 
