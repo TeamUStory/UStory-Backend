@@ -68,6 +68,7 @@ public class UserService {
 
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
+        // TODO: null 체크는 dto에서 미리 처리되므로 제거(dto-pattern)
 
         // 1-0. 입력값 유효성 체크 시작. 유효하지 않은 값은 차례로 하나씩 반환.
         // TODO: 닉네임, 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
@@ -197,7 +198,6 @@ public class UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
         response.addHeader("Authorization", "Bearer " + accessToken);
