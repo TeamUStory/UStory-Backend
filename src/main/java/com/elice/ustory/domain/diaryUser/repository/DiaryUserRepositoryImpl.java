@@ -4,6 +4,7 @@ import com.elice.ustory.domain.diary.dto.DiaryFriend;
 import com.elice.ustory.domain.diary.dto.DiaryList;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
+import com.elice.ustory.domain.friend.entity.FriendStatus;
 import com.elice.ustory.domain.user.entity.Users;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
@@ -105,6 +106,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                 .fetch();
     }
 
+    // Diary Update 시
     @Override
     public List<Tuple> findUsersByDiary(Long userId, Long diaryId, List<String> userList) {
         return queryFactory
@@ -116,6 +118,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                         .and(diaryUser.id.diary.id.eq(diaryId)))
                 .where(
                         friend.user.id.eq(userId)
+                                .and(friend.status.eq(FriendStatus.ACCEPTED))
                                 .and(
                                         friend.friendUser.nickname.in(userList)
                                 )
@@ -134,6 +137,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                 ).fetchOne();
     }
 
+    // Diary Create 시
     @Override
     public List<Users> findFriendUsersByList(Long userId, List<String> userList) {
         return queryFactory
@@ -141,6 +145,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                 .from(friend)
                 .where( friend.user.id.eq(userId)
                     .and(friend.friendUser.nickname.in(userList))
+                        .and(friend.status.eq(FriendStatus.ACCEPTED))
                 )
                 .fetch();
     }
