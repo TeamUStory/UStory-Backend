@@ -2,6 +2,10 @@ package com.elice.ustory.domain.user.controller;
 
 import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeCreateRequest;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeCreateResponse;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyRequest;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyResponse;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;

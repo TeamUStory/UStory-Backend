@@ -1,9 +1,9 @@
 package com.elice.ustory.domain.user.service;
 
-import com.elice.ustory.domain.user.dto.AuthCodeCreateResponse;
-import com.elice.ustory.domain.user.dto.AuthCodeVerifyRequest;
-import com.elice.ustory.domain.user.dto.AuthCodeVerifyResponse;
-import com.elice.ustory.domain.user.dto.signUp.EmailVerifyResponse;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeCreateResponse;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyRequest;
+import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyResponse;
+import com.elice.ustory.domain.user.dto.auth.EmailVerifyResponse;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.ValidationException;
