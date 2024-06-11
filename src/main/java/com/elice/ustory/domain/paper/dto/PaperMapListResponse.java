@@ -30,6 +30,9 @@ public class PaperMapListResponse {
     @Schema(description = "다이어리 이미지 URL", example = "https://~~~~")
     private String diaryImageUrl;
 
+    @Schema(description = "다이어리 마커 URL", example = "https://ustory-bucket.s3.ap-northeast-2.amazonaws.com/common/black-marker.png")
+    private String diaryMarkerUrl;
+
     public PaperMapListResponse(Paper paper) {
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
@@ -38,5 +41,6 @@ public class PaperMapListResponse {
         this.coordinateY = paper.getAddress().getCoordinateY();
         this.diaryColor = paper.getDiary().getColor().getHexCode();
         this.diaryImageUrl = paper.getDiary().getImgUrl();
+        this.diaryMarkerUrl = paper.getDiary().getColor().getMarkerUrl();
     }
 }
