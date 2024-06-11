@@ -29,7 +29,7 @@ public class JwtUtil {
     public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request);
         RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
-                .orElseThrow();
+                .orElseThrow((() -> new InvalidTokenException("토큰이 없거나 형식에 맞지 않습니다.")));
         Users loginUser = userService.findById(Long.valueOf(refreshToken.getId()));
 
         log.info("redis안의 Refresh Token: {}", refreshToken.getRefreshToken());
