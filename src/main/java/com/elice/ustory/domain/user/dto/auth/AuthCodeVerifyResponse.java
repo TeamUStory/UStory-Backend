@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.user.dto;
+package com.elice.ustory.domain.user.dto.auth;
 
 import lombok.Builder;
 import lombok.Data;
