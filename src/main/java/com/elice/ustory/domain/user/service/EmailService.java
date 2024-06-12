@@ -5,6 +5,8 @@ import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.redis.email.AuthCode;
+import com.elice.ustory.global.redis.email.AuthCodeForChangePwd;
+import com.elice.ustory.global.redis.email.AuthCodeForChangePwdRepository;
 import com.elice.ustory.global.redis.email.AuthCodeRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
@@ -24,6 +26,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final AuthCodeRepository authCodeRepository;
+    private final AuthCodeForChangePwdRepository authCodeForChangePwdRepository;
     private final EmailConfig emailConfig;
     private String fromEmail;
 
@@ -73,7 +76,7 @@ public class EmailService {
                 .append("</code>입니다.<br>")
                 .append("인증 코드를 바르게 입력해주세요.");
 
-        String content = contentBuilder.toString();//TODO: StringBuilder로 변경
+        String content = contentBuilder.toString();
 
         // 2. 인증코드를 Redis에 저장
         AuthCode authCodeObject = AuthCode.builder()
@@ -137,6 +140,49 @@ public class EmailService {
                 .build();
     }
 
-    public void verifyChangePwdCode(ChangePwdRequest changePwdRequest) {
+    public ChangePwdCallResponse verifyChangePwdCode(ChangePwdCallRequest changePwdCallRequest) throws MessagingException {
+        // 0. 이메일 유효 체크
+        String toEmail = changePwdCallRequest.getToEmail();
+        if (!userRepository.existsByEmail(toEmail)) {
+            return ChangePwdCallResponse.builder()
+                    .message("가입된 이메일이라면 인증코드가 발송됩니다.")
+                    .fromEmail(null)
+                    .toEmail("가입되지 않은 이메일이므로 메일이 발송되지 않았습니다. 보안을 위해, 사용자에게 해당 이메일의 가입 여부를 반환하지 않습니다.")
+                    .title(null)
+                    .authCode(null)
+                    .build();
+        }
+
+        // 1. 메일 내용 생성
+        String authCode = generateAuthCode();
+        String title = "UStory 비밀번호 변경을 위한 인증코드입니다.";
+
+        StringBuilder contentBuilder = new StringBuilder();
+        contentBuilder.append("UStory에 방문해주셔서 감사합니다.<br><br>")
+                .append("인증 코드는 <code>")
+                .append(authCode)
+                .append("</code>입니다.<br>")
+                .append("인증 코드를 바르게 입력해주세요.");
+
+        String content = contentBuilder.toString();
+
+        // 2. 인증코드를 Redis에 저장
+        AuthCodeForChangePwd authCodeForChangePwd = AuthCodeForChangePwd.builder()
+                .toEmail(toEmail)
+                .authCode(authCode)
+                .build();
+        authCodeForChangePwdRepository.save(authCodeForChangePwd);
+
+        // 3. 메일 발송
+        sendMail(toEmail, title, content);
+
+        // 4. api 결괏값 반환
+        return ChangePwdCallResponse.builder()
+                .message("가입된 이메일이라면 인증코드가 발송됩니다.")
+                .fromEmail(fromEmail)
+                .toEmail(toEmail)
+                .title(title)
+                .authCode(authCode)
+                .build();
     }
 }
