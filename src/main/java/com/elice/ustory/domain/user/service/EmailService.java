@@ -65,11 +65,15 @@ public class EmailService {
         // 1. 메일 내용 생성
         String authCode = generateAuthCode();
         String title = "UStory 회원가입 인증코드입니다.";
-        String content =
-                "UStory에 방문해주셔서 감사합니다.<br><br>"
-                        + "인증 코드는 <code>" + authCode + "</code>입니다.<br>"
-                        + "인증 코드를 바르게 입력해주세요."
-                ; //TODO: StringBuilder로 변경
+
+        StringBuilder contentBuilder = new StringBuilder();
+        contentBuilder.append("UStory에 방문해주셔서 감사합니다.<br><br>")
+                .append("인증 코드는 <code>")
+                .append(authCode)
+                .append("</code>입니다.<br>")
+                .append("인증 코드를 바르게 입력해주세요.");
+
+        String content = contentBuilder.toString();//TODO: StringBuilder로 변경
 
         // 2. 인증코드를 Redis에 저장
         AuthCode authCodeObject = AuthCode.builder()
