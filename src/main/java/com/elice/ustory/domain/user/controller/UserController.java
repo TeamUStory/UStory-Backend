@@ -106,7 +106,7 @@ public class UserController {
     @Operation(summary = "Send Mail To Validate User For Change-Password API")
     @PostMapping("/change-password/send-validate")
     public ResponseEntity<ChangePwdCallResponse> sendMailToValidateForChangePwd(@Valid @RequestBody ChangePwdCallRequest changePwdCallRequest) throws MessagingException {
-        ChangePwdCallResponse changePwdResponse = emailService.verifyChangePwdCode(changePwdCallRequest);
+        ChangePwdCallResponse changePwdResponse = emailService.sendValidateUserMailForPwd(changePwdCallRequest);
         return ResponseEntity.ok(changePwdResponse);
     }
 }
