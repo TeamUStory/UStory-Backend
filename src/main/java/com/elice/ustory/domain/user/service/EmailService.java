@@ -185,4 +185,8 @@ public class EmailService {
                 .authCode(authCode)
                 .build();
     }
+
+    public ChangePwdVerifyResponse verifyChangePwdCode() {
+        return verifyChangePwdCode();
+    }
 }
