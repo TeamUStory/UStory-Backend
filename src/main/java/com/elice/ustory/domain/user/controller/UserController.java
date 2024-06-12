@@ -2,10 +2,7 @@ package com.elice.ustory.domain.user.controller;
 
 import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
-import com.elice.ustory.domain.user.dto.auth.AuthCodeCreateRequest;
-import com.elice.ustory.domain.user.dto.auth.AuthCodeCreateResponse;
-import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyRequest;
-import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyResponse;
+import com.elice.ustory.domain.user.dto.auth.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
@@ -70,7 +67,7 @@ public class UserController {
         return ResponseEntity.ok().body(logoutResponse);
     }
 
-    @Operation(summary = "Search User by Nickname", description = "닉네임이 일치하는 사용자를 검색합니다.")
+    @Operation(summary = "Search User by Nickname API", description = "닉네임이 일치하는 사용자를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<FindByNicknameResponse> searchUserByNickname(@RequestParam(name = "nickname") String nickname) {
         FindByNicknameResponse findByNicknameResponse = userService.searchUserByNickname(nickname);
@@ -85,25 +82,31 @@ public class UserController {
         return ResponseEntity.ok(myPageResponse);
     }
 
-    @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 닉네임 중복 여부를 검증한다. (글자 수 등 조건은 삭제됨)")
+    @Operation(summary = "Validate Nickname API", description = "회원가입 및 회원정보 수정 시, 닉네임 중복 여부를 검증한다. (글자 수 등 조건은 삭제됨)")
     @PostMapping("/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
         ValidateNicknameResponse validateNicknameResponse = userService.isValidNickname(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
-    @Operation(summary = "Send Mail To Validate Email", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 예외 발생.")
+    @Operation(summary = "Send Mail To Validate Email For Sign-Up API", description = "회원가입 시 이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 예외 발생.")
     @PostMapping("/sign-up/send-validate")
-    public ResponseEntity<AuthCodeCreateResponse> SendMailToValidate(@Valid @RequestBody AuthCodeCreateRequest authCodeCreateRequest) throws MessagingException {
+    public ResponseEntity<AuthCodeCreateResponse> SendMailToValidateForSignUp(@Valid @RequestBody AuthCodeCreateRequest authCodeCreateRequest) throws MessagingException {
         AuthCodeCreateResponse authCodeCreateResponse = emailService.sendValidateSignupMail(authCodeCreateRequest.getEmail());
         return ResponseEntity.ok(authCodeCreateResponse);
     }
 
-    @Operation(summary = "Verify Validate Code", description = "사용자가 입력한 인증코드의 유효성을 검증한다.")
+    @Operation(summary = "Verify Validate Code For Sign-Up API", description = "사용자가 입력한 회원가입 인증코드의 유효성을 검증한다.")
     @PostMapping("/sign-up/verify-validate")
-    public ResponseEntity<AuthCodeVerifyResponse> verifyAuthCode(@Valid @RequestBody AuthCodeVerifyRequest authCodeVerifyRequest) {
+    public ResponseEntity<AuthCodeVerifyResponse> verifyAuthCodeForSignUp(@Valid @RequestBody AuthCodeVerifyRequest authCodeVerifyRequest) {
         AuthCodeVerifyResponse authCodeVerifyResponse = emailService.verifySignupAuthCode(authCodeVerifyRequest);
         return ResponseEntity.ok(authCodeVerifyResponse);
     }
 
+    @Operation(summary = "Send Mail To Validate Code For Change-Password API")
+    @PostMapping("/change-password/send-validate")
+    public void sendMailToValidateForChangePwd(@Valid @RequestBody ChangePwdRequest changePwdRequest) {
+//        ChangePwdResponse changePwdResponse = emailService.verifyChangePwdCode(changePwdRequest);
+//        return ResponseEntity.ok(changePwdResponse);
+    }
 }

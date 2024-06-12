@@ -1,9 +1,6 @@
 package com.elice.ustory.domain.user.service;
 
-import com.elice.ustory.domain.user.dto.auth.AuthCodeCreateResponse;
-import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyRequest;
-import com.elice.ustory.domain.user.dto.auth.AuthCodeVerifyResponse;
-import com.elice.ustory.domain.user.dto.auth.EmailVerifyResponse;
+import com.elice.ustory.domain.user.dto.auth.*;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -134,5 +131,8 @@ public class EmailService {
                 .isSuccess(true)
                 .status("SUCCESS")
                 .build();
+    }
+
+    public void verifyChangePwdCode(ChangePwdRequest changePwdRequest) {
     }
 }
