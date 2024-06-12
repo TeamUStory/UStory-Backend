@@ -103,10 +103,17 @@ public class UserController {
         return ResponseEntity.ok(authCodeVerifyResponse);
     }
 
-    @Operation(summary = "Send Mail To Validate User For Change-Password API")
+    @Operation(summary = "Send Mail To Validate User For Change-Password API", description = "로그인한 사용자가 비밀번호 변경을 위해, 이메일 인증 코드 발송을 요청한다.")
     @PostMapping("/change-password/send-validate")
     public ResponseEntity<ChangePwdCallResponse> sendMailToValidateForChangePwd(@Valid @RequestBody ChangePwdCallRequest changePwdCallRequest) throws MessagingException {
         ChangePwdCallResponse changePwdResponse = emailService.sendValidateUserMailForPwd(changePwdCallRequest);
         return ResponseEntity.ok(changePwdResponse);
+    }
+
+    @Operation(summary = "Verify Validate Code For Change-Password API", description = "비밀번호 변경을 위해 입력된 인증 코드를 검증한다.")
+    @PostMapping("/change-password/verify-validate")
+    public ResponseEntity verifyAuthCodeForChangePwd(@Valid @RequestBody ChangePwdVerifyRequest changePwdVerifyRequest) {
+        ChangePwdVerifyResponse changePwdVerifyResponse = emailService.verifyChangePwdCode(changePwdVerifyRequest);
+        return ResponseEntity.ok(changePwdVerifyResponse);
     }
 }

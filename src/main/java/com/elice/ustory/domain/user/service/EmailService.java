@@ -185,4 +185,30 @@ public class EmailService {
                 .authCode(authCode)
                 .build();
     }
+
+    public ChangePwdVerifyResponse verifyChangePwdCode(ChangePwdVerifyRequest changePwdVerifyRequest) {
+        String givenAuthCode = changePwdVerifyRequest.getAuthCode();
+        String toMail = changePwdVerifyRequest.getToEmail();
+
+        Optional<AuthCodeForChangePwd> foundAuthCodeOptional = authCodeForChangePwdRepository.findById(toMail);
+
+        if (foundAuthCodeOptional.isPresent()) {
+            String foundAuthCode = foundAuthCodeOptional.get().getAuthCode();
+            if (!foundAuthCode.equals(givenAuthCode)) {
+                return ChangePwdVerifyResponse.builder()
+                        .isValid(false)
+                        .message("인증 코드 요청이 주어진 이메일이지만, 인증 코드가 일치하지 않습니다. 보안을 위해, 사용자에게 해당 이메일의 가입 여부를 반환하지 않습니다.")
+                        .build();
+            }
+            return ChangePwdVerifyResponse.builder()
+                    .isValid(true)
+                    .message("이메일과 인증 코드가 일치하여, 유효한 인증 코드로 검증되었습니다.")
+                    .build();
+        } else {
+            return ChangePwdVerifyResponse.builder()
+                    .isValid(false)
+                    .message("인증 코드 요청이 오지 않은 이메일입니다. 보안을 위해, 사용자에게 해당 이메일의 가입 여부를 반환하지 않습니다.")
+                    .build();
+        }
+    }
 }
