@@ -140,7 +140,7 @@ public class EmailService {
                 .build();
     }
 
-    public ChangePwdCallResponse verifyChangePwdCode(ChangePwdCallRequest changePwdCallRequest) throws MessagingException {
+    public ChangePwdCallResponse sendValidateUserMailForPwd(ChangePwdCallRequest changePwdCallRequest) throws MessagingException {
         // 0. 이메일 유효 체크
         String toEmail = changePwdCallRequest.getToEmail();
         if (!userRepository.existsByEmail(toEmail)) {
