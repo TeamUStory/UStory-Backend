@@ -113,7 +113,7 @@ public class UserController {
     @Operation(summary = "Verify Validate Code For Change-Password API", description = "비밀번호 변경을 위해 입력된 인증 코드를 검증한다.")
     @PostMapping("/change-password/verify-validate")
     public ResponseEntity verifyAuthCodeForChangePwd(@Valid @RequestBody ChangePwdVerifyRequest changePwdVerifyRequest) {
-        ChangePwdVerifyResponse changePwdVerifyResponse = emailService.verifyChangePwdCode();
+        ChangePwdVerifyResponse changePwdVerifyResponse = emailService.verifyChangePwdCode(changePwdVerifyRequest);
         return ResponseEntity.ok(changePwdVerifyResponse);
     }
 }
