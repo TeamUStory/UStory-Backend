@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -170,7 +169,7 @@ public class UserService {
         return updatedUser;
     }
 
-    public ChangePwdResponse updatePassword(Long userId, ChangePwdRequest changePwdRequest) {
+    public ChangePwdResponse updateLostPassword(Long userId, ChangePwdRequest changePwdRequest) {
         Users currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
 
