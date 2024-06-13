@@ -145,7 +145,6 @@ public class UserService {
 
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
-        String password = updateRequest.getPassword();
         String profileImgUrl = updateRequest.getProfileImgUrl();
         String profileDescription = updateRequest.getProfileDescription();
 
@@ -154,9 +153,6 @@ public class UserService {
         }
         if (nickname != null) {
             user.setNickname(nickname);
-        }
-        if (password != null) {
-            user.setPassword(password);
         }
         if (profileImgUrl != null) {
             user.setProfileImgUrl(profileImgUrl);
