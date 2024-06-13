@@ -7,13 +7,13 @@
 ## ✨️ Keyword
 ### 📒 다이어리
 
-- 추억들을 기록할 수 있는 다이어리에요.
+- 추억들을 기록할 수 있는 다이어리예요.
 - 다이어리의 종류는 개인, 애인, 친구, 가족, 단체 다양하게 존재해요.
-- 다이어리의 색상과 이미지를 지정해서 개성있는 다이어리를 만들어봐요!
+- 다이어리의 색상과 이미지를 지정해서 개성 있는 다이어리를 만들어봐요!
 
 ### 📄 페이퍼
 
-- 추억들을 작성할 수 있는 기록지에요.
+- 추억들을 작성할 수 있는 기록지예요.
 - 사진과, 장소를 사용해서 그때의 추억을 작성할 수 있어요.
 - 모두가 즐거운 재미있는 사진을 남겨봐요!
 
@@ -47,9 +47,13 @@
 ## 👥 Backend Team Members
 |                                                                  **고경아**                                                                  |                                                                  **임준용**                                                                  |                                                                                                  **정재원**                                                                                                  |
 |:-----------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <img src="https://i.namu.wiki/i/l0x04r27DjSQmS-WgYk6I5x6IkKMyvZjRMyK5dI3EMoMikzCd2Kfl2SMRdvL3-y4zpxI_qLP-fs3QToSR7AU3g.webp" width="100"> | <img src="https://i.namu.wiki/i/GTnpTVODp_oyQDbDTmkHYHduBH5QIkpSk_Eu7FgcOfEyGG3zpq211gdfqefqNZt3BHYWei4XumV10DfkbeUWAw.webp" width="100"> | <img src="https://i.namu.wiki/i/8-r9BgfPYasUYDiWms-PCwuAJfVcv3npodctFKWxpOpeiPN8m_HF_v3Weh4OgpHUstAQN6SFkXgIIkYHneNiqyy06frIQD5bqG3ITLkGPnMR4KpDh6-EXXG-Gt_zcE4tDvbgfiXVjK40bfUt0YQzKA.webp" width="100"> |
+| <a href="https://github.com/GyungA"><img src="https://i.namu.wiki/i/l0x04r27DjSQmS-WgYk6I5x6IkKMyvZjRMyK5dI3EMoMikzCd2Kfl2SMRdvL3-y4zpxI_qLP-fs3QToSR7AU3g.webp" width="100"></a> | <a href="https://github.com/wambatcodeeee"><img src="https://i.namu.wiki/i/GTnpTVODp_oyQDbDTmkHYHduBH5QIkpSk_Eu7FgcOfEyGG3zpq211gdfqefqNZt3BHYWei4XumV10DfkbeUWAw.webp" width="100"></a> | <a href="https://github.com/jaewon0926"><img src="https://i.namu.wiki/i/8-r9BgfPYasUYDiWms-PCwuAJfVcv3npodctFKWxpOpeiPN8m_HF_v3Weh4OgpHUstAQN6SFkXgIIkYHneNiqyy06frIQD5bqG3ITLkGPnMR4KpDh6-EXXG-Gt_zcE4tDvbgfiXVjK40bfUt0YQzKA.webp" width="100"></a> |
 
 |                                                                                                  **박기중**                                                                                                  |                                                                                                  **박진희**                                                                                                  |                                                                                                  **최윤기**                                                                                                  |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <img src="https://i.namu.wiki/i/U2TtaVH9bz8DykOSx5pA6971dxGwwzMPbQzFe4CvFdTFTzVEk9xJWF6TjMGQ0IiIQejl6XkbMvGvdYUUdD0mc_C-Yp3PKZSQruMCBU3PoVCi2jbwh3flj2FfULXpw_62-LtcjBz8l9KALPCZmFRnCQ.webp" width="100"> | <img src="https://i.namu.wiki/i/SK_oMahBUbHREWPHHIDNUbXPbSLR7ylgZOMNcwrTXk3I2oslWi8RkhEKO824DnZkf7rPTT3DqM-SSh0NI_wxJDd4oJqXTrIdbk5gqfUYvdaw_-CF3GFMlzBmdBelTb97nyBEud8Sj4Dp7Jn3vdmB7g.webp" width="100"> | <img src="https://i.namu.wiki/i/V6iDOavGqNeYqdc-0pGVVkJw-cqH3Oob-RIqdh9tS5vUQCEcHDF4GRSm7tK9EaXorRZmDUcO76HqWLksq8JYarCZ1LIEjgL3TJE_cCvwyfeQzUu8pF072WB2yCbuwOF9KxXx9o62decCc1d-qC6XEw.webp" width="100"> |
+| <a href="https://github.com/GiJungPark"><img src="https://i.namu.wiki/i/U2TtaVH9bz8DykOSx5pA6971dxGwwzMPbQzFe4CvFdTFTzVEk9xJWF6TjMGQ0IiIQejl6XkbMvGvdYUUdD0mc_C-Yp3PKZSQruMCBU3PoVCi2jbwh3flj2FfULXpw_62-LtcjBz8l9KALPCZmFRnCQ.webp" width="100"></a> | <a href="https://github.com/bellra-jin"><img src="https://i.namu.wiki/i/SK_oMahBUbHREWPHHIDNUbXPbSLR7ylgZOMNcwrTXk3I2oslWi8RkhEKO824DnZkf7rPTT3DqM-SSh0NI_wxJDd4oJqXTrIdbk5gqfUYvdaw_-CF3GFMlzBmdBelTb97nyBEud8Sj4Dp7Jn3vdmB7g.webp" width="100"></a> | <a href="https://github.com/yungic"><img src="https://i.namu.wiki/i/V6iDOavGqNeYqdc-0pGVVkJw-cqH3Oob-RIqdh9tS5vUQCEcHDF4GRSm7tK9EaXorRZmDUcO76HqWLksq8JYarCZ1LIEjgL3TJE_cCvwyfeQzUu8pF072WB2yCbuwOF9KxXx9o62decCc1d-qC6XEw.webp" width="100"></a> |
 
+## 👥 Frontend Team Members
+|                                                                                                  **강경림**                                                                                                  |                                                                                                  **양혜지**                                                                                                  |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| <a href="https://github.com/KangKyungRim"><img src="https://i.namu.wiki/i/TlyPubxjKlSXuj0iA7vuvph0m9BoCZa0Jr1HiHzdD_0luwrqKvnhuR9QMf4w_01iqAtfOQkE38wCvgGccJPPtdBOlgWCUBKUns4te3b1ouSgNAA86hYt5qbquq80ecDEGtt5s3_n0ZFUE99b1rEU4w.webp" width="100"></a> | <a href="https://github.com/hyeji17"><img src="https://i.namu.wiki/i/ouLHXY13jKD3CIkyB9_-0CUyGMEBBkrmfvP8NtmXYFx0r9YVk_U9Ciz3I5xeb6CG7idy_eUzHbDrCYrUzPd3YwEMeAg1vPrLT965Is4bLwyQHmRYpzw90nraPgKU6MLzV7CXjVwrJfgzFEsxvuJbZA.webp" width="100"></a> |
