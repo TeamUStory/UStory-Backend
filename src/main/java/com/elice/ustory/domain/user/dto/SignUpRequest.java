@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.user.dto;
 
+import com.elice.ustory.domain.user.entity.RegexPatterns;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -9,7 +10,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 @Data
 public class SignUpRequest {
     @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$", message = "이메일 형식이 올바르지 않습니다.")
+    @Pattern(regexp = RegexPatterns.EMAIL_REG, message = "이메일 형식이 올바르지 않습니다.")
     @Schema(requiredMode = REQUIRED, example = "example@email.com")
     private String email; // 인증 여부: done
 
@@ -22,7 +23,7 @@ public class SignUpRequest {
     private String nickname; // 인증 여부: done
 
     @NotEmpty
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$", message = "비밀번호 형식이 올바르지 않습니다.")
+    @Pattern(regexp = RegexPatterns.PASSWORD_REG, message = "비밀번호 형식이 올바르지 않습니다.")
     @Schema(requiredMode = REQUIRED, description = "형식 조건에 유의하세요.", example = "password!!11")
     private String password; // 인증 여부: to do
 

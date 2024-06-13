@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -92,15 +91,12 @@ public class UserService {
         String name = signUpRequest.getName();
         checkUsernameRule(name);
 
-        // 1-4. 비밀번호 형식 체크
+        // 1-4. 비밀번호 일치 체크
         String password = signUpRequest.getPassword();
-        checkPasswordRule(password);
-
-        // 1-5. 비밀번호 일치 체크
         String passwordCheck = signUpRequest.getPasswordCheck();
         checkNewPasswordMatch(password, passwordCheck);
 
-        // 1-6. 입력값 유효성 체크 끝
+        // 1-5. 입력값 유효성 체크 끝
 
         // 인증된 값으로 유저 생성
         Users.LoginType loginType = Users.LoginType.BASIC;
@@ -139,6 +135,7 @@ public class UserService {
         return newUser;
     }
 
+    @Transactional
     public Users updateUser(UpdateRequest updateRequest, Long userId) {
         //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
         //TODO: Optional 예외처리
@@ -148,7 +145,6 @@ public class UserService {
 
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
-        String password = updateRequest.getPassword();
         String profileImgUrl = updateRequest.getProfileImgUrl();
         String profileDescription = updateRequest.getProfileDescription();
 
@@ -157,9 +153,6 @@ public class UserService {
         }
         if (nickname != null) {
             user.setNickname(nickname);
-        }
-        if (password != null) {
-            user.setPassword(password);
         }
         if (profileImgUrl != null) {
             user.setProfileImgUrl(profileImgUrl);
@@ -170,6 +163,23 @@ public class UserService {
 
         Users updatedUser = userRepository.save(user);
         return updatedUser;
+    }
+
+    public void updateLostPassword(Long userId, ChangePwdRequest changePwdRequest) {
+        Users currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+
+        // 입력된 비밀번호 두 개의 일치 여부 확인 후, 다르면 에러 반환
+        String password = changePwdRequest.getPassword();
+        String passwordCheck = changePwdRequest.getPasswordCheck();
+        checkNewPasswordMatch(password, passwordCheck);
+
+        // 수정(암호화해서 저장)
+        String encodedPassword = passwordEncoder.encode(password);
+        currentUser.setPassword(encodedPassword);
+        userRepository.save(currentUser);
+
+        //토큰 만료
     }
 
     public Users deleteUser(Long userId) {
@@ -241,7 +251,7 @@ public class UserService {
 
     public MyPageResponse showMyPage(Long userId) {
         Users currentUser = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
         String nickname = currentUser.getNickname();
         String name = currentUser.getName();
         String profileDescription = currentUser.getProfileDescription();
@@ -281,21 +291,6 @@ public class UserService {
         if (!firstEnter.equals(secondEnter)) {
             throw new ValidationException("비밀번호가 일치하지 않습니다.");
         }
-    }
-
-    public void checkPasswordRule(String password) {
-        // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
-        // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
-        final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
-        final Pattern passwordPattern = Pattern.compile(PASSWORD_REG);
-
-        if (password == null) {
-            throw new ValidationException("비밀번호를 입력해주세요.");
-        }
-        if (!passwordPattern.matcher(password).matches()) {
-            throw new ValidationException("비밀번호 형식이 맞지 않습니다.");
-        }
-
     }
 
     public void checkUsernameRule(String username) {

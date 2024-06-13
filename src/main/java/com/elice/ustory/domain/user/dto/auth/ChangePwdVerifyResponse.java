@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ChangePwdVerifyResponse {
+    String accessToken;
     Boolean isValid;
     String message;
 }
