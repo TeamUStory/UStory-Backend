@@ -77,7 +77,7 @@
 
 ## 📄 API (Swagger)
 
-### [API 명세서 바로 확인하기](https://api.ustory.me/api/swagger-ui/index.html#/)
+### [API 명세서 바로 확인하기](http://34.64.93.16:8080/swagger-ui/index.html)
 
 ## 🥽 테스트 데이터
 
