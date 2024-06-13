@@ -3,7 +3,12 @@ package com.elice.ustory.global.oauth.kakao;
 import com.elice.ustory.domain.user.dto.LoginResponse;
 import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.service.UserService;
+import com.elice.ustory.global.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +35,11 @@ public class KakaoController {
     private final KakaoService kakaoService;
 
     @Operation(summary = "KAKAO LOGIN API", description = "카카오 로그인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @RequestMapping(value = "/login/oauth2/code/kakao", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
@@ -49,6 +59,11 @@ public class KakaoController {
     }
 
     @Operation(summary = "KAKAO LOGOUT API", description = "카카오 로그아웃")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LogoutResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @RequestMapping(value = "/auth/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request) {
         LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
