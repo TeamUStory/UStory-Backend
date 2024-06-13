@@ -92,15 +92,12 @@ public class UserService {
         String name = signUpRequest.getName();
         checkUsernameRule(name);
 
-        // 1-4. 비밀번호 형식 체크
+        // 1-4. 비밀번호 일치 체크
         String password = signUpRequest.getPassword();
-        checkPasswordRule(password);
-
-        // 1-5. 비밀번호 일치 체크
         String passwordCheck = signUpRequest.getPasswordCheck();
         checkNewPasswordMatch(password, passwordCheck);
 
-        // 1-6. 입력값 유효성 체크 끝
+        // 1-5. 입력값 유효성 체크 끝
 
         // 인증된 값으로 유저 생성
         Users.LoginType loginType = Users.LoginType.BASIC;
@@ -139,6 +136,7 @@ public class UserService {
         return newUser;
     }
 
+    @Transactional
     public Users updateUser(UpdateRequest updateRequest, Long userId) {
         //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
         //TODO: Optional 예외처리
@@ -178,6 +176,11 @@ public class UserService {
 
         //비밀번호 두 개 받아서 일치 여부, 조건 확인
         //수정(인코딩해서 저장)
+        // 입력된 비밀번호 두 개의 일치 여부 (규칙 확인은 dto에서)
+        String password = changePwdRequest.getPassword();
+        String passwordCheck = changePwdRequest.getPasswordCheck();
+        checkNewPasswordMatch(password, passwordCheck);
+
         //토큰 만료
         return ChangePwdResponse.builder().build();
     }
@@ -291,21 +294,6 @@ public class UserService {
         if (!firstEnter.equals(secondEnter)) {
             throw new ValidationException("비밀번호가 일치하지 않습니다.");
         }
-    }
-
-    public void checkPasswordRule(String password) {
-        // 비밀번호 규칙: 숫자, 영문, 특수문자 각 1개를 포함한 8~16자.
-        // 보안상 SQL 인젝션을 막기 위해, 특수문자는 `~!@#%^*`만 허용.
-        final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#%^*]).{8,16}$";
-        final Pattern passwordPattern = Pattern.compile(PASSWORD_REG);
-
-        if (password == null) {
-            throw new ValidationException("비밀번호를 입력해주세요.");
-        }
-        if (!passwordPattern.matcher(password).matches()) {
-            throw new ValidationException("비밀번호 형식이 맞지 않습니다.");
-        }
-
     }
 
     public void checkUsernameRule(String username) {
