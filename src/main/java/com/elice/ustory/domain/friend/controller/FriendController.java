@@ -1,13 +1,20 @@
 package com.elice.ustory.domain.friend.controller;
 
+import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
 import com.elice.ustory.domain.friend.dto.FriendRequestDto;
 import com.elice.ustory.domain.friend.dto.FriendRequestListDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
 import com.elice.ustory.domain.friend.dto.FriendResponseDto;
 import com.elice.ustory.domain.friend.service.FriendService;
+import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-@Tag(name = "friend", description = "Friend API")
+@Tag(name = "Friend API")
 @RestController
 @RequestMapping("/friend")
 public class FriendController {
@@ -38,6 +45,12 @@ public class FriendController {
      * @return 친구 목록 또는 검색된 친구 목록
      */
     @Operation(summary = "Get / Friends", description = "사용자의 전체 친구 리스트를 조회하거나 닉네임으로 친구를 검색합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserFriendDTO.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/search")
     public ResponseEntity<List<UserFriendDTO>> getFriends(
             @JwtAuthorization Long userId,
@@ -49,7 +62,7 @@ public class FriendController {
         if (page < 1) {
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
         }
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -66,6 +79,13 @@ public class FriendController {
      * @return 요청 성공 여부
      */
     @Operation(summary = "Post / Friend Request", description = "친구 추가 요청을 보냅니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping
     public ResponseEntity<Void> sendFriendRequest(@JwtAuthorization Long userId, @Valid @RequestBody FriendRequestDto friendRequestDto) {
         validateNickname(friendRequestDto.getReceiverNickname());
@@ -80,7 +100,14 @@ public class FriendController {
      * @param userId 사용자의 ID
      * @return 친구 요청 목록
      */
-    @Operation(summary = "Get / Friend received", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
+    @Operation(summary = "Get / Friend received", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다. <br> 친구 요청 받은 기록이 없다면 빈 리스트를 출력합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = FriendRequestListDTO.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/received")
     public ResponseEntity<List<FriendRequestListDTO>> getFriendRequests(@JwtAuthorization Long userId,
                                                                         @RequestParam(name = "page", defaultValue = "1") int page,
@@ -89,7 +116,7 @@ public class FriendController {
         if (page < 1) {
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
         }
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -105,6 +132,13 @@ public class FriendController {
      * @return 응답 메시지
      */
     @Operation(summary = "Post / Friend approve", description = "친구 요청에 응답합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("/approve")
     public ResponseEntity<String> respondToFriendRequest(@JwtAuthorization Long userId, @Valid @RequestBody FriendResponseDto friendResponseDto) {
         validateNickname(friendResponseDto.getSenderNickname());
@@ -120,6 +154,13 @@ public class FriendController {
      * @return 요청 성공 여부
      */
     @Operation(summary = "Delete / Delete Friend", description = "친구 관계를 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/{friendNickname}")
     public ResponseEntity<Void> deleteFriend(@JwtAuthorization Long userId, @PathVariable String friendNickname) {
         friendService.deleteFriendById(userId, friendNickname);

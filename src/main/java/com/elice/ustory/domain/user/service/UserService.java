@@ -186,7 +186,7 @@ public class UserService {
 
         //TODO: 예외처리
         Users user = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
 
         user.setDeletedAt(LocalDateTime.now());
 

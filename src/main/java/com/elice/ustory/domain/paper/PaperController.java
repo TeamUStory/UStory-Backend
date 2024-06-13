@@ -11,9 +11,15 @@ import com.elice.ustory.domain.paper.dto.UpdatePaperRequest;
 import com.elice.ustory.domain.paper.dto.UpdatePaperResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
+import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +50,14 @@ public class PaperController {
     private final BookmarkService bookmarkService;
 
     @Operation(summary = "Create Paper API", description = "페이퍼를 생성한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddPaperResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping
     public ResponseEntity<AddPaperResponse> create(@JwtAuthorization Long userId,
                                                    @Valid @RequestBody AddPaperRequest addPaperRequest) {
@@ -54,6 +68,14 @@ public class PaperController {
     }
 
     @Operation(summary = "Update Paper API", description = "페이퍼를 수정한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UpdatePaperResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping("/{paperId}")
     public ResponseEntity<UpdatePaperResponse> update(@PathVariable Long paperId,
                                                       @JwtAuthorization Long userId,
@@ -65,6 +87,13 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Paper API", description = "페이퍼를 불러온다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaperResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/{paperId}")
     public ResponseEntity<PaperResponse> getPaper(@PathVariable Long paperId,
                                                   @JwtAuthorization Long userId) {
@@ -75,7 +104,15 @@ public class PaperController {
         return ResponseEntity.ok(new PaperResponse(paper, bookmarked, userId));
     }
 
-    @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다.</br>(우선 사용되지 않을 API)</br>사용된다면 관리자 페이지에서 사용될 듯 함")
+    @Operation(summary = "Delete Paper API", description = "페이퍼를 삭제한다. <br> 작성자만이 삭제할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/{paperId}")
     public ResponseEntity<Void> delete(@PathVariable Long paperId,
                                        @JwtAuthorization Long userId) {
@@ -87,6 +124,12 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Papers By User API", description = "유저가 작성한 페이퍼 리스트를 불러온다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PaperListResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/written")
     public ResponseEntity<List<PaperListResponse>> getPapersByUser(@JwtAuthorization Long userId,
                                                                    @RequestParam(name = "page", defaultValue = "1") int page,
@@ -96,7 +139,7 @@ public class PaperController {
         if (page < 1) {
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
         }
 
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size, requestTime);
@@ -109,6 +152,13 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Papers By Diary API", description = "다이어리에 포함된 페이퍼 리스트를 불러온다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PaperListResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/diary/{diaryId}")
     public ResponseEntity<List<PaperListResponse>> getPapersByDiary(
             @PathVariable Long diaryId,
@@ -122,7 +172,7 @@ public class PaperController {
         if (page < 1) {
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
         }
 
         List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate, requestTime);
@@ -135,6 +185,12 @@ public class PaperController {
     }
 
     @Operation(summary = "Read Papers for Map API", description = "유저와 관련된 모든 리스트를 불러온다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PaperListResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/map")
     public ResponseEntity<List<PaperMapListResponse>> getPapersByUserForMap(@JwtAuthorization Long userId) {
 
@@ -148,6 +204,12 @@ public class PaperController {
     }
 
     @Operation(summary = "Count Write Paper By Specific User API", description = "특정 유저가 작성한 모든 페이퍼의 갯수를 불러온다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaperCountResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/count")
     public ResponseEntity<PaperCountResponse> countPapersByUser(@JwtAuthorization Long userId) {
         int count = paperService.countPapersByWriterId(userId);
