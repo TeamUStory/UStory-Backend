@@ -92,7 +92,7 @@ public class BookmarkController {
 
     @Operation(summary = "Delete Bookmark API", description = "북마크를 해제한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = BookmarkListResponse.class)))),
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
