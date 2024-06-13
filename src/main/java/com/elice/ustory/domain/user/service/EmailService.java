@@ -2,8 +2,11 @@ package com.elice.ustory.domain.user.service;
 
 import com.elice.ustory.domain.user.dto.auth.*;
 import com.elice.ustory.domain.user.entity.EmailConfig;
+import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.ValidationException;
+import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.email.AuthCode;
 import com.elice.ustory.global.redis.email.AuthCodeForChangePwd;
 import com.elice.ustory.global.redis.email.AuthCodeForChangePwdRepository;
@@ -25,6 +28,7 @@ import java.util.Random;
 public class EmailService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
     private final AuthCodeRepository authCodeRepository;
     private final AuthCodeForChangePwdRepository authCodeForChangePwdRepository;
     private final EmailConfig emailConfig;
@@ -199,11 +203,20 @@ public class EmailService {
                         .isValid(false)
                         .message("인증 코드 요청이 주어진 이메일이지만, 인증 코드가 일치하지 않습니다. 보안을 위해, 사용자에게 해당 이메일의 가입 여부를 반환하지 않습니다.")
                         .build();
+            } else {
+                // jwt 발급 시작: 이메일 인증 성공 시, 비밀번호 재설정을 위한 임시 토큰 발급
+                Users currentUser = userRepository.findByEmail(toMail)
+                        .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니디"));
+                Long userId = currentUser.getId();
+                String accessToken = jwtTokenProvider.createAccessToken(userId);
+                // jwt 발급 끝
+
+                return ChangePwdVerifyResponse.builder()
+                        .accessToken(accessToken)
+                        .isValid(true)
+                        .message("이메일과 인증 코드가 일치하여, 유효한 인증 코드로 검증되었습니다.")
+                        .build();
             }
-            return ChangePwdVerifyResponse.builder()
-                    .isValid(true)
-                    .message("이메일과 인증 코드가 일치하여, 유효한 인증 코드로 검증되었습니다.")
-                    .build();
         } else {
             return ChangePwdVerifyResponse.builder()
                     .isValid(false)

@@ -106,14 +106,21 @@ public class UserController {
     @Operation(summary = "Send Mail To Validate User For Change-Password API", description = "로그인한 사용자가 비밀번호 변경을 위해, 이메일 인증 코드 발송을 요청한다.")
     @PostMapping("/change-password/send-validate")
     public ResponseEntity<ChangePwdCallResponse> sendMailToValidateForChangePwd(@Valid @RequestBody ChangePwdCallRequest changePwdCallRequest) throws MessagingException {
-        ChangePwdCallResponse changePwdResponse = emailService.sendValidateUserMailForPwd(changePwdCallRequest);
-        return ResponseEntity.ok(changePwdResponse);
+        ChangePwdCallResponse changePwdCallResponse = emailService.sendValidateUserMailForPwd(changePwdCallRequest);
+        return ResponseEntity.ok(changePwdCallResponse);
     }
 
     @Operation(summary = "Verify Validate Code For Change-Password API", description = "비밀번호 변경을 위해 입력된 인증 코드를 검증한다.")
     @PostMapping("/change-password/verify-validate")
-    public ResponseEntity verifyAuthCodeForChangePwd(@Valid @RequestBody ChangePwdVerifyRequest changePwdVerifyRequest) {
+    public ResponseEntity<ChangePwdVerifyResponse> verifyAuthCodeForChangePwd(@Valid @RequestBody ChangePwdVerifyRequest changePwdVerifyRequest) {
         ChangePwdVerifyResponse changePwdVerifyResponse = emailService.verifyChangePwdCode(changePwdVerifyRequest);
         return ResponseEntity.ok(changePwdVerifyResponse);
+    }
+
+    @Operation(summary = "Change Password For Current-User API", description = "비밀번호를 잊어버린 유저의 비밀번호를 재설정한다. 인증 이메일 발송을 거친 후 임시 토큰과 함께 호출되어야 한다.")
+    @PutMapping("/change-password")
+    public ResponseEntity changeLostPassword(@JwtAuthorization Long userId, @Valid @RequestBody ChangePwdRequest changePwdRequest) {
+        userService.updateLostPassword(userId, changePwdRequest);
+        return ResponseEntity.ok().body("비밀번호가 재설정되었습니다.");
     }
 }
