@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.diary.controller;
 
-import com.elice.ustory.domain.comment.dto.AddCommentResponse;
 import com.elice.ustory.domain.diary.dto.*;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;

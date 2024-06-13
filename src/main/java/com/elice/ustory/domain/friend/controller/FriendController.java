@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-@Tag(name = "friend", description = "Friend API")
+@Tag(name = "Friend API")
 @RestController
 @RequestMapping("/friend")
 public class FriendController {

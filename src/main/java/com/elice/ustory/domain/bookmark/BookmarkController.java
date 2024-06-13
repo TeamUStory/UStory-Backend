@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.bookmark;
 
-import com.amazonaws.services.ec2.model.ResponseError;
 import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
 import com.elice.ustory.domain.bookmark.dto.BookmarkResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
@@ -51,7 +50,7 @@ public class BookmarkController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "Read Papers Bookmarked API", description = "북마크된 Paper 리스트를 불러온다.")
+    @Operation(summary = "Read Papers Bookmarked API", description = "북마크된 Paper 리스트를 불러온다. <br> 북마크가 존재하지 않는 경우 빈리스트를 반환한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = BookmarkListResponse.class)))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
