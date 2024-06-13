@@ -172,7 +172,13 @@ public class UserService {
         return updatedUser;
     }
 
-    public ChangePwdResponse updatePassword(ChangePwdRequest changePwdRequest) {
+    public ChangePwdResponse updatePassword(Long userId, ChangePwdRequest changePwdRequest) {
+        Users currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+
+        //비밀번호 두 개 받아서 일치 여부, 조건 확인
+        //수정(인코딩해서 저장)
+        //토큰 만료
         return ChangePwdResponse.builder().build();
     }
 
@@ -245,7 +251,7 @@ public class UserService {
 
     public MyPageResponse showMyPage(Long userId) {
         Users currentUser = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
         String nickname = currentUser.getNickname();
         String name = currentUser.getName();
         String profileDescription = currentUser.getProfileDescription();

@@ -119,8 +119,8 @@ public class UserController {
 
     @Operation(summary = "Change Password For Current-User API", description = "현재 로그인한 유저의 비밀번호를 변경한다. 인증 이메일 발송을 거친 후 호출되어야 한다.")
     @PutMapping("/change-password")
-    public ResponseEntity changePassword(@Valid @RequestBody ChangePwdRequest changePwdRequest) {
-        ChangePwdResponse changePwdResponse = userService.updatePassword(changePwdRequest);
+    public ResponseEntity changePassword(@JwtAuthorization Long userId, @Valid @RequestBody ChangePwdRequest changePwdRequest) {
+        ChangePwdResponse changePwdResponse = userService.updatePassword(userId, changePwdRequest);
         return ResponseEntity.ok(changePwdResponse);
     }
 }
