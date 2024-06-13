@@ -169,19 +169,21 @@ public class UserService {
         return updatedUser;
     }
 
-    public ChangePwdResponse updateLostPassword(Long userId, ChangePwdRequest changePwdRequest) {
+    public void updateLostPassword(Long userId, ChangePwdRequest changePwdRequest) {
         Users currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
 
-        //비밀번호 두 개 받아서 일치 여부, 조건 확인
-        //수정(인코딩해서 저장)
-        // 입력된 비밀번호 두 개의 일치 여부 (규칙 확인은 dto에서)
+        // 입력된 비밀번호 두 개의 일치 여부 확인 후, 다르면 에러 반환
         String password = changePwdRequest.getPassword();
         String passwordCheck = changePwdRequest.getPasswordCheck();
         checkNewPasswordMatch(password, passwordCheck);
 
+        // 수정(암호화해서 저장)
+        String encodedPassword = passwordEncoder.encode(password);
+        currentUser.setPassword(encodedPassword);
+        userRepository.save(currentUser);
+
         //토큰 만료
-        return ChangePwdResponse.builder().build();
     }
 
     public Users deleteUser(Long userId) {

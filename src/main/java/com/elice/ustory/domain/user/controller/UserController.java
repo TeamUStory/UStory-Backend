@@ -120,7 +120,7 @@ public class UserController {
     @Operation(summary = "Change Password For Current-User API", description = "비밀번호를 잊어버린 유저의 비밀번호를 재설정한다. 인증 이메일 발송을 거친 후 임시 토큰과 함께 호출되어야 한다.")
     @PutMapping("/change-password")
     public ResponseEntity changeLostPassword(@JwtAuthorization Long userId, @Valid @RequestBody ChangePwdRequest changePwdRequest) {
-        ChangePwdResponse changePwdResponse = userService.updateLostPassword(userId, changePwdRequest);
-        return ResponseEntity.ok(changePwdResponse);
+        userService.updateLostPassword(userId, changePwdRequest);
+        return ResponseEntity.ok().body("비밀번호가 재설정되었습니다.");
     }
 }
