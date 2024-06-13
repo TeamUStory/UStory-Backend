@@ -62,7 +62,7 @@ public class FriendController {
         if (page < 1) {
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
         }
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -100,7 +100,7 @@ public class FriendController {
      * @param userId 사용자의 ID
      * @return 친구 요청 목록
      */
-    @Operation(summary = "Get / Friend received", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다.")
+    @Operation(summary = "Get / Friend received", description = "특정 사용자가 받은 친구 요청 목록을 조회합니다. <br> 친구 요청 받은 기록이 없다면 빈 리스트를 출력합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = FriendRequestListDTO.class)))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -116,7 +116,7 @@ public class FriendController {
         if (page < 1) {
             throw new ValidationException("페이지는 1 이상이어야 합니다.");
         } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야합니다.");
+            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
         }
         Pageable pageable = PageRequest.of(page - 1, size);
 
