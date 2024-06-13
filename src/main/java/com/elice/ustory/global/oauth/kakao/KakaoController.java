@@ -29,14 +29,6 @@ public class KakaoController {
     private final UserService userService;
     private final KakaoService kakaoService;
 
-    @GetMapping("/login")
-    public String showLogInForm(Model model) {
-        model.addAttribute("kakaoApiKey", kakaoOauth.getKakaoApiKey());
-        model.addAttribute("redirectUri", kakaoOauth.getKakaoLoginRedirectUri());
-        model.addAttribute("redirectLogoutUri", kakaoOauth.getKakaoLogoutRedirectUri());
-        return "login/login";
-    }
-
     @Operation(summary = "KAKAO LOGIN API", description = "카카오 로그인")
     @RequestMapping(value = "/login/oauth2/code/kakao", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
