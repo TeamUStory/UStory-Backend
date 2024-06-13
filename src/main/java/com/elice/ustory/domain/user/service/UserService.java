@@ -172,6 +172,10 @@ public class UserService {
         return updatedUser;
     }
 
+    public ChangePwdResponse updatePassword(ChangePwdRequest changePwdRequest) {
+        return ChangePwdResponse.builder().build();
+    }
+
     public Users deleteUser(Long userId) {
 
         //TODO: 예외처리
