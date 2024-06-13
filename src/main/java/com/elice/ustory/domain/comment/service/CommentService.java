@@ -72,6 +72,8 @@ public class CommentService {
     }
 
     public void deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                ()-> new NotFoundException(id + "해당하는 댓글이 존재하지 않습니다."));
         commentRepository.deleteById(id);
     }
 }
