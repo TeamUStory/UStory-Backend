@@ -2,7 +2,6 @@ package com.elice.ustory.global.oauth.kakao;
 
 import com.elice.ustory.domain.user.dto.LoginResponse;
 import com.elice.ustory.domain.user.dto.LogoutResponse;
-import com.elice.ustory.domain.user.dto.auth.ChangePwdVerifyResponse;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
