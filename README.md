@@ -7,6 +7,7 @@
 > ### 추억이 담긴 장소들을 지도로 쉽게 확인하고, 그때의 감정들을 떠올려봐요.
 
 ### [UStory 바로가기](https://ustory.me)
+<br>
 
 ---
 ## ✨️ Keyword
@@ -27,6 +28,8 @@
 - 사진과 장소 만으로 추억을 떠올리기 어려울 수도 있어요.
 - 간단하게 글 한 줄을 남겨볼까요?
 
+<br>
+
 ---
 
 ## 📌 Feature
@@ -35,6 +38,8 @@
 - 🤼 친구 추가를 하고, 소중한 사람들과 다이어리를 만들고 작성해보세요.
 - 🔓 페이퍼에 전원 코멘트를 작성하지 않으면 즐거웠던 추억을 확인할 수 없어요. 얼른 작성하고 확인해보세요!
 - 🔔 페이퍼가 언제 열리는지, 친구 요청이 있는지 알림으로 바로 확인해보세요!
+
+<br>
 
 ---
 
@@ -47,10 +52,14 @@
 - **IDE**: ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=flat&logo=intellij-idea&logoColor=white)
 - **ETC**: <img src="https://img.shields.io/badge/git-F05032?style=flat&logo=git&logoColor=white"/> ![GitLab](https://img.shields.io/badge/gitlab-%23181717.svg?style=flat&logo=gitlab&logoColor=white) ![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=flat&logo=discord&logoColor=white) ![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=flat&logo=notion&logoColor=white)
 
+<br>
+
 ---
 
 ## 🛠 System Architecture
 <img src="https://kdt-gitlab.elice.io/cloud_track/class_02/web_project3/team02/ustory-backend/uploads/4edb9e6899ca3de17311ca3e8ae84282/SystemArchitecture.png" width="1000"/>
+
+<br>
 
 ---
 
@@ -72,6 +81,8 @@
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | <a href="https://github.com/KangKyungRim"><img src="https://i.namu.wiki/i/TlyPubxjKlSXuj0iA7vuvph0m9BoCZa0Jr1HiHzdD_0luwrqKvnhuR9QMf4w_01iqAtfOQkE38wCvgGccJPPtdBOlgWCUBKUns4te3b1ouSgNAA86hYt5qbquq80ecDEGtt5s3_n0ZFUE99b1rEU4w.webp" width="100"></a> | <a href="https://github.com/hyeji17"><img src="https://i.namu.wiki/i/ouLHXY13jKD3CIkyB9_-0CUyGMEBBkrmfvP8NtmXYFx0r9YVk_U9Ciz3I5xeb6CG7idy_eUzHbDrCYrUzPd3YwEMeAg1vPrLT965Is4bLwyQHmRYpzw90nraPgKU6MLzV7CXjVwrJfgzFEsxvuJbZA.webp" width="100"></a> |
 |                                                                                                          [@KangKyungRim](https://github.com/KangKyungRim)                                                                                                           |                                                                                                                    [@hyeji17](https://github.com/hyeji17)                                                                                                                    |
+
+<br>
 
 ---
 
