@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,10 +44,10 @@ public class Address {
     @Column(name = "store", nullable = false, columnDefinition = "varchar(50)")
     private String store;
 
-    @Column(name = "coordinate_x", nullable = false, columnDefinition = "decimal(15,13)")
+    @Column(name = "coordinate_x", nullable = false, columnDefinition = "decimal(17,15)")
     private Double coordinateX;
 
-    @Column(name = "coordinate_y", nullable = false, columnDefinition = "decimal(16,13)")
+    @Column(name = "coordinate_y", nullable = false, columnDefinition = "decimal(18,15)")
     private Double coordinateY;
 
     /**
@@ -131,8 +130,8 @@ public class Address {
         int indexOfDecimal = coordinateStr.indexOf('.');
         if (indexOfDecimal != -1) {
             int decimalPlaces = coordinateStr.length() - indexOfDecimal - 1;
-            if (decimalPlaces > 13) {
-                throw new ValidationException("소수점 자릿수가 13자리를 초과합니다: ", ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
+            if (decimalPlaces > 15) {
+                throw new ValidationException("소수점 자릿수가 15자리를 초과합니다: ", ErrorCode.VALIDATION_PARAMETER_EXCEPTION);
             }
         }
     }
