@@ -1,8 +1,12 @@
 # UStory
-<img src="https://kdt-gitlab.elice.io/cloud_track/class_02/web_project3/team02/ustory-backend/uploads/b5d777e60b7568f100165140c8df1198/KakaoTalk_Photo_2024-06-14-04-59-05.png" width="400">
+<p align="center">
+    <img src="https://kdt-gitlab.elice.io/cloud_track/class_02/web_project3/team02/ustory-backend/uploads/b5d777e60b7568f100165140c8df1198/KakaoTalk_Photo_2024-06-14-04-59-05.png" width="400">
+</p>
 
 > ### 나 혼자만의 추억 또는 소중한 사람들과의 추억을 저장해요. <br>
 > ### 추억이 담긴 장소들을 지도로 쉽게 확인하고, 그때의 감정들을 떠올려봐요.
+
+### [UStory 바로가기](https://ustory.me)
 
 ---
 ## ✨️ Keyword
@@ -67,7 +71,7 @@
 |                                                                                                                         **강경림**                                                                                                                         |                                                                                                                      **양혜지**                                                                                                                       |
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | <a href="https://github.com/KangKyungRim"><img src="https://i.namu.wiki/i/TlyPubxjKlSXuj0iA7vuvph0m9BoCZa0Jr1HiHzdD_0luwrqKvnhuR9QMf4w_01iqAtfOQkE38wCvgGccJPPtdBOlgWCUBKUns4te3b1ouSgNAA86hYt5qbquq80ecDEGtt5s3_n0ZFUE99b1rEU4w.webp" width="100"></a> | <a href="https://github.com/hyeji17"><img src="https://i.namu.wiki/i/ouLHXY13jKD3CIkyB9_-0CUyGMEBBkrmfvP8NtmXYFx0r9YVk_U9Ciz3I5xeb6CG7idy_eUzHbDrCYrUzPd3YwEMeAg1vPrLT965Is4bLwyQHmRYpzw90nraPgKU6MLzV7CXjVwrJfgzFEsxvuJbZA.webp" width="100"></a> |
-|                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                    |
+|                                                                                                          [@KangKyungRim](https://github.com/KangKyungRim)                                                                                                           |                                                                                                                    [@hyeji17](https://github.com/hyeji17)                                                                                                                    |
 
 ---
 
