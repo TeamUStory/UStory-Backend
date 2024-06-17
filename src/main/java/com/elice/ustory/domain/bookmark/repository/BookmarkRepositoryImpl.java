@@ -20,8 +20,9 @@ public class BookmarkRepositoryImpl implements BookmarkQueryDslRepository{
     public boolean existsByUserIdAndPaperId(Long userId, Long paperId) {
         return queryFactory.selectOne()
                 .from(bookmark)
-                .where(bookmark.user.id.eq(userId)
-                        .and(bookmark.paper.id.eq(paperId)))
+                .where(bookmark.user.id.eq(userId),
+                        bookmark.paper.id.eq(paperId),
+                        bookmark.paper.deletedAt.isNull())
                 .fetchFirst() != null;
     }
 
@@ -29,7 +30,8 @@ public class BookmarkRepositoryImpl implements BookmarkQueryDslRepository{
     public List<Paper> findPapersByUserId(Long userId, Pageable pageable) {
         return queryFactory.select(bookmark.paper)
                 .from(bookmark)
-                .where(bookmark.user.id.eq(userId))
+                .where(bookmark.user.id.eq(userId),
+                        bookmark.paper.deletedAt.isNull())
                 .orderBy(bookmark.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

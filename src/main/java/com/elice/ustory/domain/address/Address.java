@@ -34,14 +34,14 @@ public class Address {
     private Paper paper;
 
     // TODO : 이거 패턴으로 하던가, 아니면 정규식 메서드를 쓰던가
-    @Pattern(
-            regexp = "^([가-힣]+(도|특별시|광역시|시|군|구)\\s)+([가-힣0-9]+(읍|면|동|리|로|길)\\s)+\\d+(-\\d+)*$",
-            message = "잘못된 주소 형식입니다. 주소를 확인해 주세요."
-            )
-    @Column(name = "city", nullable = false, columnDefinition = "varchar(70)")
+//    @Pattern(
+//            regexp = "^([가-힣]+(도|특별시|광역시|시|군|구)\\s)+([가-힣0-9]+(읍|면|동|리|로|길)\\s)+\\d+(-\\d+)*$",
+//            message = "잘못된 주소 형식입니다. 주소를 확인해 주세요."
+//            )
+    @Column(name = "city", nullable = false, columnDefinition = "varchar(300)")
     private String city;
 
-    @Column(name = "store", nullable = false, columnDefinition = "varchar(50)")
+    @Column(name = "store", nullable = false, columnDefinition = "varchar(200)")
     private String store;
 
     @Column(name = "coordinate_x", nullable = false, columnDefinition = "decimal(17,15)")
@@ -60,8 +60,8 @@ public class Address {
      */
     @Builder(builderMethodName = "createBuilder")
     public Address(String city, String store, double coordinateX, double coordinateY) {
-        this.city = validateAddressSize(city, 30, "주소");
-        this.store = validateAddressSize(store, 20, "상호명");
+        this.city = validateAddressSize(city, 80, "주소");
+        this.store = validateAddressSize(store, 80, "상호명");
         this.coordinateX = validateCoordinateX(coordinateX);
         this.coordinateY = validateCoordinateY(coordinateY);
     }
@@ -76,8 +76,8 @@ public class Address {
      * @return 업데이트 된 객체
      */
     public Address update(String city, String store, double coordinateX, double coordinateY) {
-        this.city = validateAddressSize(city, 30, "주소");
-        this.store = validateAddressSize(store, 20, "상호명");
+        this.city = validateAddressSize(city, 80, "주소");
+        this.store = validateAddressSize(store, 80, "상호명");
         this.coordinateX = validateCoordinateX(coordinateX);
         this.coordinateY = validateCoordinateY(coordinateY);
 

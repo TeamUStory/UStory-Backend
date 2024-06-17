@@ -200,11 +200,15 @@ public class PaperService {
 
         Paper findPaper = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAPER_MESSAGE));
 
-        if (findPaper.getWriter().getId().equals(userId)) {
-            findPaper.softDelete();
+        if (findPaper.getWriter().getId() == userId) {
+            if (!findPaper.softDelete()) {
+               throw new NotFoundException(paperId + ": 이미 삭제된 Paper 입니다.");
+            }
         } else {
             throw new ForbiddenException("페이퍼는 작성자만 지울 수 있습니다.");
         }
+
+        paperRepository.save(findPaper);
     }
 
     public Paper validatePaper(Long paperId) {
@@ -220,6 +224,11 @@ public class PaperService {
 
     public Integer countPapersByWriterId(Long userId) {
         List<Paper> findByWriterId = paperRepository.findByWriterId(userId);
+        for(Paper paper : findByWriterId) {
+            if (paper.isDeleted()) {
+                findByWriterId.remove(paper);
+            }
+        }
         return findByWriterId.size();
     }
 

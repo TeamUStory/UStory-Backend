@@ -7,6 +7,9 @@ import lombok.Getter;
 @Getter
 public class PaperMapListResponse {
 
+    @Schema(description = "PaperId", example = "123456")
+    private Long paperId;
+
     @Schema(description = "타이틀", example = "여기 놀러갔었어요")
     private String title;
 
@@ -34,6 +37,7 @@ public class PaperMapListResponse {
     private String diaryMarkerUrl;
 
     public PaperMapListResponse(Paper paper) {
+        this.paperId = paper.getId();
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
         this.store = paper.getAddress().getStore();
