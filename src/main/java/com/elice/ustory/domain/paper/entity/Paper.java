@@ -77,14 +77,14 @@ public class Paper extends BaseEntity {
 
     @Builder(builderMethodName = "createBuilder")
     public Paper(String title, String thumbnailImageUrl, LocalDate visitedAt) {
-        this.title = validateParam(title, 20, "^[가-힣a-zA-Z0-9\\s!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?~`]+$", "타이틀");
+        this.title = validateParam(title, 20, "^[가-힣a-zA-Z0-9\\s!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?~`\\u3131-\\u3163]+$", "타이틀");
         this.thumbnailImageUrl = validateUrl(validateParam(thumbnailImageUrl, 1000, "^.+$", "썸네일"));
         this.visitedAt = visitedAt;
         this.unLocked = 0;
     }
 
     public Paper update(String title, String thumbnailImageUrl, LocalDate visitedAt) {
-        this.title = validateParam(title, 20, "^[가-힣a-zA-Z0-9\\s!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?~`]+$", "타이틀");
+        this.title = validateParam(title, 20, "^[가-힣a-zA-Z0-9\\s!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?~`\\u3131-\\u3163]+$", "타이틀");
         this.thumbnailImageUrl = validateParam(thumbnailImageUrl, 1000, "^.+$", "썸네일");
         this.visitedAt = visitedAt;
 
