@@ -142,4 +142,13 @@ public class NoticeService {
         noticeRepository.findByRequestIdAndResponseIdAndMessageType(requestId, responseId, messageType)
                 .ifPresent(noticeRepository::delete);
     }
+
+    /**
+     ** 유저의 모든 알림을 일괄 삭제합니다**.
+     * @param userId
+     */
+    public void deleteAllNoticesByUserId(Long userId) {
+        noticeRepository.deleteByResponseId(userId);
+    }
+
 }

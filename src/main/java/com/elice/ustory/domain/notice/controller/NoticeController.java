@@ -87,5 +87,24 @@ public class NoticeController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 사용자의 모든 알림을 삭제합니다.
+     * @param userId
+     * @return* *요청 성공 여부*
+     **/
+    @Operation(summary = "Delete All Notices", description = "사용자의 모든 알림을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/all")
+    public ResponseEntity<Void> deleteAllNotices(@JwtAuthorization Long userId) {
+        noticeService.deleteAllNoticesByUserId(userId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
