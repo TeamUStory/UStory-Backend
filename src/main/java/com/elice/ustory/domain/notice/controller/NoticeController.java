@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.notice.controller;
 
+import com.elice.ustory.domain.notice.dto.NoticeDeleteRequest;
 import com.elice.ustory.domain.notice.dto.NoticeResponse;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -103,6 +105,27 @@ public class NoticeController {
     @DeleteMapping("/all")
     public ResponseEntity<Void> deleteAllNotices(@JwtAuthorization Long userId) {
         noticeService.deleteAllNoticesByUserId(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    /**
+     * 선택된 알림을 삭제합니다.
+     *
+     * @param noticeIds 삭제할 알림의 ID 목록
+     * @return 요청 성공 여부
+     */
+    @Operation(summary = "Delete Selected Notices", description = "선택된 알림을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/selected")
+    public ResponseEntity<Void> deleteSelectedNotices(@JwtAuthorization Long userId, @RequestBody @Valid NoticeDeleteRequest noticeDeleteRequest) {
+        noticeService.deleteSelectedNotices(userId, noticeDeleteRequest);
         return ResponseEntity.noContent().build();
     }
 
