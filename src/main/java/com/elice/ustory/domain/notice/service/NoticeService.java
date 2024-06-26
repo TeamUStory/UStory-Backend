@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.notice.service;
 
+import com.elice.ustory.domain.notice.dto.NoticeDeleteRequest;
 import com.elice.ustory.domain.notice.dto.NoticeRequest;
 import com.elice.ustory.domain.notice.dto.NoticeResponse;
 import com.elice.ustory.domain.notice.entity.Notice;
@@ -7,6 +8,7 @@ import com.elice.ustory.domain.notice.repository.NoticeRepository;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.InternalServerException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.exception.model.UnauthorizedException;
 import com.elice.ustory.global.exception.model.ValidationException;
@@ -142,4 +144,64 @@ public class NoticeService {
         noticeRepository.findByRequestIdAndResponseIdAndMessageType(requestId, responseId, messageType)
                 .ifPresent(noticeRepository::delete);
     }
+
+    /**
+     * 유저의 모든 알림을 일괄 삭제합니다.
+     * @param userId
+     */
+    public void deleteAllNoticesByUserId(Long userId) {
+        if (userId == null) {
+            throw new ValidationException("유효하지 않는 유저 Id 입니다.");
+        }
+
+        // 유저가 존재하는지 확인
+        Users user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
+
+        // 해당 유저의 알림 목록 조회
+        List<Notice> notices = noticeRepository.findByResponseId(userId);
+        if (notices.isEmpty()) {
+            throw new NotFoundException("해당 유저의 알림을 찾을 수 없습니다.");
+        }
+        // 모든 알림 삭제
+        try {
+            noticeRepository.deleteByResponseId(userId);
+        } catch (Exception e) {
+            throw new InternalServerException("알림 삭제 중 오류가 발생했습니다.");
+        }
+
+    }
+
+    /**
+     * 특정 사용자의 선택된 알림을 삭제합니다.
+     *
+     * @param userId 로그인한 사용자의 아이디
+     * @param noticeDeleteRequest 삭제할 알림의 ID 목록
+     */
+    public void deleteSelectedNotices(Long userId, NoticeDeleteRequest noticeDeleteRequest) {
+        List<Long> noticeIds = noticeDeleteRequest.getNoticeIds();
+
+        if (noticeIds == null || noticeIds.isEmpty()) {
+            throw new ValidationException("알림 ID 목록이 비어 있습니다.");
+        }
+
+        List<Notice> notices = noticeRepository.findAllById(noticeIds);
+        if (notices.isEmpty()) {
+            throw new NotFoundException("해당 ID로 알림을 찾을 수 없습니다.");
+        }
+
+        for (Notice notice : notices) {
+            if (notice.getResponseId() != userId) {
+                throw new UnauthorizedException("해당 알림을 삭제할 권한이 없습니다. 알림 ID: " + notice.getId());
+            }
+        }
+
+        try {
+            noticeRepository.deleteAll(notices);
+        } catch (Exception e) {
+            throw new InternalServerException("알림 삭제 중 오류가 발생하였습니다.");
+        }
+    }
+
+
 }

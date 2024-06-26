@@ -9,6 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long>, NoticeQueryDslRepository {
+
     Optional<Notice> findByRequestIdAndResponseIdAndMessageType(Long requestId, Long responseId, int messageType);
+
     List<Notice> findByResponseId(Long responseId);
+
+    void deleteByResponseId(Long responseId);
 }
