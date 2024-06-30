@@ -50,7 +50,7 @@ jobs:
 
       ## gradle build
       - name: Build with Gradle
-        run: ./gradlew build -x test -x ktlintCheck -x ktlintTestSourceSetCheck -x ktlintMainSourceSetCheck -x ktlintKotlinScriptCheck
+        run: ./gradlew build -x test
 
       ## docker build & push
       - name: Docker build & push to prod
