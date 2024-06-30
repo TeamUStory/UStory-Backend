@@ -78,9 +78,10 @@ jobs:
             sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
             sudo docker rm -f $(sudo docker ps --filter 'status=exited' -a -q)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/ustory
-#            sudo docker run --name github-actions-demo --rm -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/ustory
             sudo docker-compose up -d 
             sudo docker image prune -a -f
+#            sudo docker run --name github-actions-demo --rm -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/ustory
+      
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
