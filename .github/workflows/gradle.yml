@@ -68,7 +68,7 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: 22
           script: |
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
             sudo docker pull ${{ secrets.DOCKER_REPO }}/ustory
             sudo docker run --name github-actions-demo --rm -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/ustory
