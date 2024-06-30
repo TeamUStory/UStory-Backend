@@ -85,7 +85,7 @@ public class BookmarkController {
                     "isBookmarked가 0인 경우 북마크로 지정되지 않았음을 의미한다. <br>" +
                     "isBookmarked가 1인 경우 북마크로 지정되어 있음을 의미한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = BookmarkListResponse.class)))),
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = BookmarkResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
