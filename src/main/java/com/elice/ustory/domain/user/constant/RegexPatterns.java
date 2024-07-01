@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.user.entity;
+package com.elice.ustory.domain.user.constant;
 
 public class RegexPatterns {
     public static final String EMAIL_REG = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$";
