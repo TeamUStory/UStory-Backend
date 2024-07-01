@@ -4,8 +4,8 @@ import com.elice.ustory.domain.user.dto.auth.*;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.ConflictException;
 import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.email.AuthCode;
 import com.elice.ustory.global.redis.email.AuthCodeForChangePwd;
@@ -65,8 +65,10 @@ public class EmailService {
 
     public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
         // 0. 이메일 중복 체크
-        if (validateEmail(toEmail).getIsSuccess() == false) {
-            throw new ValidationException("이미 가입된 이메일입니다.");
+
+        EmailVerifyResponse emailVerifyResponse = validateEmail(toEmail);
+        if (emailVerifyResponse.getIsSuccess() == false) {
+            throw new ConflictException(emailVerifyResponse.getStatus());
         };
 
         // 1. 메일 내용 생성
@@ -134,7 +136,15 @@ public class EmailService {
         if (userRepository.existsByEmail(email)) {
             return EmailVerifyResponse.builder()
                     .isSuccess(false)
-                    .status("EMAIL_DUPLICATE")
+                    .status("사용중인_이메일")
+                    .build();
+        }
+
+        int emailCountWithSoftDeleted = userRepository.existsByEmailWithSoftDeleted(email);
+        if (emailCountWithSoftDeleted > 0) {
+            return EmailVerifyResponse.builder()
+                    .isSuccess(false)
+                    .status("탈퇴된_이메일")
                     .build();
         }
 
