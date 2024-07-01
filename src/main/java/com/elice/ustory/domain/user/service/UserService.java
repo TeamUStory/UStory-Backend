@@ -74,13 +74,10 @@ public class UserService {
 
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
-        // TODO: null 체크는 dto에서 미리 처리되므로 제거(dto-pattern)
-
-        // 1-0. 입력값 유효성 체크 시작. 유효하지 않은 값은 차례로 하나씩 반환.
-        // TODO: 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
-        String nickname = signUpRequest.getNickname();
+        // 1-0. 입력값 유효성 체크 시작
 
         // 1-1. 닉네임 유효 재확인
+        String nickname = signUpRequest.getNickname();
         ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
         validateNicknameRequest.setNickname(nickname);
         if (isValidNickname(validateNicknameRequest).getIsValid() == false) {
@@ -93,9 +90,8 @@ public class UserService {
             throw new ConflictException(String.format(DUPLICATE_EMAIL_MESSAGE, email));
         }
 
-        // 1-3. 이름 null 체크(현재 별도 조건 없음)
+        // 1-3. 이름 확인 (현재 별도 조건 없음)
         String name = signUpRequest.getName();
-        checkUsernameRule(name);
 
         // 1-4. 비밀번호 일치 체크
         String password = signUpRequest.getPassword();
@@ -296,9 +292,4 @@ public class UserService {
         }
     }
 
-    public void checkUsernameRule(String username) {
-        if (username == null) {
-            throw new ValidationException("사용자 이름을 입력해주세요.");
-        }
-    }
 }
