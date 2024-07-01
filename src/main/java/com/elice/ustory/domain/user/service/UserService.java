@@ -11,10 +11,7 @@ import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.global.exception.model.InternalServerException;
-import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.UnauthorizedException;
-import com.elice.ustory.global.exception.model.ValidationException;
+import com.elice.ustory.global.exception.model.*;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,8 +37,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
+    private static final String NOT_FOUND_USER_ID_MESSAGE = "존재하지 않는 userId입니다: %d";
+    private static final String NOT_FOUND_USER_EMAIL_MESSAGE = "존재하지 않는 email입니다: %s";
+    private static final String NOT_VALID_NICKNAME_MESSAGE = "사용할 수 없는 nickname입니다: %s";
+    private static final String DUPLICATE_EMAIL_MESSAGE = "이미 가입된 email입니다: %s";
+    private static final String NOT_CREATED_DIARY_MESSAGE = "다음의 email로 가입 중인 유저의, 개인 다이어리를 생성하는 과정에서 문제가 발생하였습니다. 가입 정보는 저장되지 않습니다: %s";
+    private static final String UNAUTHORIZED_MESSAGE = "헤더에 토큰이 입력되지 않았습니다.";
+    private static final String NOT_VALID_PASSWORD_MESSAGE = "비밀번호 확인이 일치하지 않습니다.";
+
     public Users findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_ID_MESSAGE, userId)));
     }
 
     public FindByNicknameResponse searchUserByNickname(String nickname) {
@@ -78,13 +84,13 @@ public class UserService {
         ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
         validateNicknameRequest.setNickname(nickname);
         if (isValidNickname(validateNicknameRequest).getIsValid() == false) {
-            throw new ValidationException("사용할 수 없는 닉네임입니다.");
+            throw new ValidationException(String.format(NOT_VALID_NICKNAME_MESSAGE, nickname));
         };
 
         // 1-2. 이메일 중복 재확인
         String email = signUpRequest.getEmail();
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new ValidationException("이미 가입된 이메일입니다.");
+            throw new ConflictException(String.format(DUPLICATE_EMAIL_MESSAGE, email));
         }
 
         // 1-3. 이름 null 체크(현재 별도 조건 없음)
@@ -129,7 +135,7 @@ public class UserService {
             diaryRepository.save(userDiary);
             diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
         } catch (Exception e) {
-            throw new InternalServerException("개인 다이어리를 생성하는 과정에서 문제가 발생하였습니다.");
+            throw new InternalServerException(String.format(NOT_CREATED_DIARY_MESSAGE, email));
         }
 
         return newUser;
@@ -138,10 +144,9 @@ public class UserService {
     @Transactional
     public Users updateUser(UpdateRequest updateRequest, Long userId) {
         //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
-        //TODO: Optional 예외처리
         Users user = userRepository
                 .findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_ID_MESSAGE, userId)));
 
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
@@ -167,7 +172,7 @@ public class UserService {
 
     public void updateLostPassword(Long userId, ChangePwdRequest changePwdRequest) {
         Users currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_ID_MESSAGE, userId)));
 
         // 입력된 비밀번호 두 개의 일치 여부 확인 후, 다르면 에러 반환
         String password = changePwdRequest.getPassword();
@@ -184,9 +189,8 @@ public class UserService {
 
     public Users deleteUser(Long userId) {
 
-        //TODO: 예외처리
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_ID_MESSAGE, userId)));
 
         user.setDeletedAt(LocalDateTime.now());
 
@@ -199,9 +203,8 @@ public class UserService {
         String rawPassword = loginRequest.getPassword();
         LoginResponse loginResponse = new LoginResponse();
 
-        //TODO: 예외처리
         Users loginUser = userRepository.findByEmail(id)
-                .orElseThrow(() -> new NotFoundException("해당 이메일을 가진 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_EMAIL_MESSAGE, id)));
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
@@ -237,7 +240,7 @@ public class UserService {
         String token = request.getHeader("Authorization");
 
         if (token == null) {
-            throw new UnauthorizedException("헤더에 토큰을 입력해주세요.");
+            throw new UnauthorizedException(UNAUTHORIZED_MESSAGE);
         }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
@@ -251,7 +254,7 @@ public class UserService {
 
     public MyPageResponse showMyPage(Long userId) {
         Users currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_USER_ID_MESSAGE, userId)));
         String nickname = currentUser.getNickname();
         String name = currentUser.getName();
         String profileDescription = currentUser.getProfileDescription();
@@ -289,7 +292,7 @@ public class UserService {
 
     public void checkNewPasswordMatch(String firstEnter, String secondEnter) {
         if (!firstEnter.equals(secondEnter)) {
-            throw new ValidationException("비밀번호가 일치하지 않습니다.");
+            throw new ValidationException(NOT_VALID_PASSWORD_MESSAGE);
         }
     }
 
