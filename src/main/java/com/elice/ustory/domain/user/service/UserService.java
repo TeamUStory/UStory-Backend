@@ -260,9 +260,11 @@ public class UserService {
     }
 
     public ValidateNicknameResponse isValidNickname(ValidateNicknameRequest validateNicknameRequest) {
+        // TODO: 닉네임, 이메일 중복여부 회원가입 단계에서 한 번 더 확인
         String nickname = validateNicknameRequest.getNickname();
 
-        if (userRepository.findByNickname(nickname).isPresent()) {
+        int nicknameCountWithSoftDeleted = userRepository.countByNicknameWithSoftDeleted(nickname);
+        if (nicknameCountWithSoftDeleted > 0) {
             return ValidateNicknameResponse.builder()
                     .isValid(false)
                     .isDuplicate(true)
