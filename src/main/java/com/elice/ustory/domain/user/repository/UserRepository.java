@@ -14,6 +14,6 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByEmail(String loginEmail);
     boolean existsByEmail(String loginEmail);
 
-    @Query(value = "SELECT COUNT(*) > 0 FROM Users u WHERE u.email = :email", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM users u WHERE u.email = :email", nativeQuery = true)
     int existsByEmailWithSoftDeleted(@Param("email") String email);
 }

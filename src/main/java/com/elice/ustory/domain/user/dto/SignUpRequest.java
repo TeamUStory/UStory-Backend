@@ -1,6 +1,6 @@
 package com.elice.ustory.domain.user.dto;
 
-import com.elice.ustory.domain.user.entity.RegexPatterns;
+import com.elice.ustory.domain.user.constant.RegexPatterns;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
