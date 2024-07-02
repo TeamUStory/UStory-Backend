@@ -142,7 +142,7 @@ public class EmailService {
                     .build();
         }
 
-        int emailCountWithSoftDeleted = userRepository.existsByEmailWithSoftDeleted(email);
+        int emailCountWithSoftDeleted = userRepository.countByEmailWithSoftDeleted(email);
         if (emailCountWithSoftDeleted > 0) {
             return EmailVerifyResponse.builder()
                     .isSuccess(false)
