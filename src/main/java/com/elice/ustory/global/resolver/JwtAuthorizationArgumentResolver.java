@@ -1,5 +1,6 @@
 package com.elice.ustory.global.resolver;
 
+import com.elice.ustory.global.exception.model.InvalidTokenException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,16 +38,13 @@ public class JwtAuthorizationArgumentResolver implements HandlerMethodArgumentRe
                 return jwtUtil.getUserPk(accessToken);
             }
 
-            // 토큰은 없지만 필수가 아닌 경우 체크
             JwtAuthorization annotation = parameter.getParameterAnnotation(JwtAuthorization.class);
             if (annotation != null && !annotation.required()) {
-                // 필수가 아닌 경우 기본 객체 리턴
                 return jwtUtil.getUserPk(accessToken);
             }
         }
 
-        // 토큰 값이 없으면 에러
-        throw new RuntimeException("권한 없음.");
+        throw new InvalidTokenException("토큰 형식이 잘못되었습니다.");
     }
 
 }
