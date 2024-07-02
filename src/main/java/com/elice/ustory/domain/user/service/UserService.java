@@ -79,7 +79,9 @@ public class UserService {
 
         // 1-2. 이메일 중복 재확인
         String email = signUpRequest.getEmail();
-        if (userRepository.findByEmail(email).isPresent()) {
+
+        int emailCountWithSoftDeleted = userRepository.countByEmailWithSoftDeleted(email);
+        if (emailCountWithSoftDeleted > 0) {
             throw new ConflictException(String.format(UserMessageConstants.DUPLICATE_EMAIL_MESSAGE, email));
         }
 
@@ -260,7 +262,6 @@ public class UserService {
     }
 
     public ValidateNicknameResponse isValidNickname(ValidateNicknameRequest validateNicknameRequest) {
-        // TODO: 닉네임, 이메일 중복여부 회원가입 단계에서 한 번 더 확인
         String nickname = validateNicknameRequest.getNickname();
 
         int nicknameCountWithSoftDeleted = userRepository.countByNicknameWithSoftDeleted(nickname);
