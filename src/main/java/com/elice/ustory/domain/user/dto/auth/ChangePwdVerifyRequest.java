@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.user.dto.auth;
 
-import com.elice.ustory.domain.user.entity.RegexPatterns;
+import com.elice.ustory.domain.user.constant.RegexPatterns;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 

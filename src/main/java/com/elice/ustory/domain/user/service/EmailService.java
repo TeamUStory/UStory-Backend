@@ -1,11 +1,12 @@
 package com.elice.ustory.domain.user.service;
 
+import com.elice.ustory.domain.user.constant.EmailMessageConstants;
 import com.elice.ustory.domain.user.dto.auth.*;
 import com.elice.ustory.domain.user.entity.EmailConfig;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
+import com.elice.ustory.global.exception.model.ConflictException;
 import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.email.AuthCode;
 import com.elice.ustory.global.redis.email.AuthCodeForChangePwd;
@@ -32,6 +33,7 @@ public class EmailService {
     private final AuthCodeRepository authCodeRepository;
     private final AuthCodeForChangePwdRepository authCodeForChangePwdRepository;
     private final EmailConfig emailConfig;
+
     private String fromEmail;
 
     @PostConstruct
@@ -65,8 +67,10 @@ public class EmailService {
 
     public AuthCodeCreateResponse sendValidateSignupMail(String toEmail) throws MessagingException {
         // 0. 이메일 중복 체크
-        if (validateEmail(toEmail).getIsSuccess() == false) {
-            throw new ValidationException("이미 가입된 이메일입니다.");
+
+        EmailVerifyResponse emailVerifyResponse = validateEmail(toEmail);
+        if (emailVerifyResponse.getIsSuccess() == false) {
+            throw new ConflictException(emailVerifyResponse.getStatus());
         };
 
         // 1. 메일 내용 생성
@@ -115,17 +119,17 @@ public class EmailService {
             if (!foundAuthCode.equals(givenAuthCode)) {
                 return AuthCodeVerifyResponse.builder()
                         .isValid(false)
-                        .message("인증 코드 요청이 주어진 이메일이지만, 인증 코드가 일치하지 않습니다.")
+                        .message(EmailMessageConstants.EMAIL_CODE_NOT_MATCH)
                         .build();
             }
             return AuthCodeVerifyResponse.builder()
                     .isValid(true)
-                    .message("이메일과 인증 코드가 일치하여, 유효한 인증 코드로 검증되었습니다.")
+                    .message(EmailMessageConstants.EMAIL_CODE_VALID)
                     .build();
         } else {
             return AuthCodeVerifyResponse.builder()
                     .isValid(false)
-                    .message("인증 코드 요청이 오지 않은 이메일입니다.")
+                    .message(EmailMessageConstants.EMAIL_CODE_NONE)
                     .build();
         }
     }
@@ -134,13 +138,21 @@ public class EmailService {
         if (userRepository.existsByEmail(email)) {
             return EmailVerifyResponse.builder()
                     .isSuccess(false)
-                    .status("EMAIL_DUPLICATE")
+                    .status(EmailMessageConstants.EMAIL_IN_USE)
+                    .build();
+        }
+
+        int emailCountWithSoftDeleted = userRepository.countByEmailWithSoftDeleted(email);
+        if (emailCountWithSoftDeleted > 0) {
+            return EmailVerifyResponse.builder()
+                    .isSuccess(false)
+                    .status(EmailMessageConstants.EMAIL_SOFT_DELETED)
                     .build();
         }
 
         return EmailVerifyResponse.builder()
                 .isSuccess(true)
-                .status("SUCCESS")
+                .status(EmailMessageConstants.SUCCESS)
                 .build();
     }
 
@@ -149,9 +161,9 @@ public class EmailService {
         String toEmail = changePwdCallRequest.getToEmail();
         if (!userRepository.existsByEmail(toEmail)) {
             return ChangePwdCallResponse.builder()
-                    .message("가입된 이메일이라면 인증코드가 발송됩니다.")
+                    .message(EmailMessageConstants.EMAIL_VERIFICATION_SENT)
                     .fromEmail(null)
-                    .toEmail("가입되지 않은 이메일이므로 메일이 발송되지 않았습니다. 보안을 위해, 사용자에게 해당 이메일의 가입 여부를 반환하지 않습니다.")
+                    .toEmail(EmailMessageConstants.EMAIL_VERIFICATION_FAILED)
                     .title(null)
                     .authCode(null)
                     .build();
@@ -182,7 +194,7 @@ public class EmailService {
 
         // 4. api 결괏값 반환
         return ChangePwdCallResponse.builder()
-                .message("가입된 이메일이라면 인증코드가 발송됩니다.")
+                .message(EmailMessageConstants.EMAIL_VERIFICATION_SENT)
                 .fromEmail(fromEmail)
                 .toEmail(toEmail)
                 .title(title)
@@ -206,7 +218,7 @@ public class EmailService {
             } else {
                 // jwt 발급 시작: 이메일 인증 성공 시, 비밀번호 재설정을 위한 임시 토큰 발급
                 Users currentUser = userRepository.findByEmail(toMail)
-                        .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니디"));
+                        .orElseThrow(() -> new NotFoundException(String.format(EmailMessageConstants.NOT_FOUND_USER_EMAIL, toMail)));
                 Long userId = currentUser.getId();
                 String accessToken = jwtTokenProvider.createAccessToken(userId);
                 // jwt 발급 끝
@@ -214,13 +226,13 @@ public class EmailService {
                 return ChangePwdVerifyResponse.builder()
                         .accessToken(accessToken)
                         .isValid(true)
-                        .message("이메일과 인증 코드가 일치하여, 유효한 인증 코드로 검증되었습니다.")
+                        .message(EmailMessageConstants.EMAIL_CODE_VALID)
                         .build();
             }
         } else {
             return ChangePwdVerifyResponse.builder()
                     .isValid(false)
-                    .message("인증 코드 요청이 오지 않은 이메일입니다. 보안을 위해, 사용자에게 해당 이메일의 가입 여부를 반환하지 않습니다.")
+                    .message(EmailMessageConstants.EMAIL_CODE_NONE_DETAIL)
                     .build();
         }
     }

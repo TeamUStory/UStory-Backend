@@ -140,7 +140,9 @@ public class UserController {
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
-    @Operation(summary = "Send Mail To Validate Email For Sign-Up API", description = "회원가입 시 이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 예외 발생.")
+    @Operation(summary = "Send Mail To Validate Email For Sign-Up API",
+            description = "회원가입 시 이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 예외 발생." +
+            "<br>detailMessage는 둘 중 하나: '사용중인\\_이메일' 또는 '탈퇴된\\_이메일'")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthCodeCreateResponse.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

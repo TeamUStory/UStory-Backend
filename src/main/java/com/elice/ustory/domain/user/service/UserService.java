@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.user.service;
 
+import com.elice.ustory.domain.user.constant.UserMessageConstants;
 import com.elice.ustory.domain.diary.entity.Color;
 import com.elice.ustory.domain.diary.entity.Diary;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
@@ -11,10 +12,7 @@ import com.elice.ustory.domain.user.dto.FindByNicknameResponse;
 import com.elice.ustory.domain.user.dto.*;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.global.exception.model.InternalServerException;
-import com.elice.ustory.global.exception.model.NotFoundException;
-import com.elice.ustory.global.exception.model.UnauthorizedException;
-import com.elice.ustory.global.exception.model.ValidationException;
+import com.elice.ustory.global.exception.model.*;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +39,8 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
 
     public Users findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format(UserMessageConstants.NOT_FOUND_USER_ID_MESSAGE, userId)));
     }
 
     public FindByNicknameResponse searchUserByNickname(String nickname) {
@@ -68,28 +67,26 @@ public class UserService {
 
     @Transactional
     public Users signUp(SignUpRequest signUpRequest) {
-        // TODO: null 체크는 dto에서 미리 처리되므로 제거(dto-pattern)
-
-        // 1-0. 입력값 유효성 체크 시작. 유효하지 않은 값은 차례로 하나씩 반환.
-        // TODO: 이메일을 인증된 값으로 넘겨준 게 맞는지 한 번 더 확인
-        String nickname = signUpRequest.getNickname();
+        // 1-0. 입력값 유효성 체크 시작
 
         // 1-1. 닉네임 유효 재확인
+        String nickname = signUpRequest.getNickname();
         ValidateNicknameRequest validateNicknameRequest = new ValidateNicknameRequest();
         validateNicknameRequest.setNickname(nickname);
         if (isValidNickname(validateNicknameRequest).getIsValid() == false) {
-            throw new ValidationException("사용할 수 없는 닉네임입니다.");
+            throw new ValidationException(String.format(UserMessageConstants.NOT_VALID_NICKNAME_MESSAGE, nickname));
         };
 
         // 1-2. 이메일 중복 재확인
         String email = signUpRequest.getEmail();
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new ValidationException("이미 가입된 이메일입니다.");
+
+        int emailCountWithSoftDeleted = userRepository.countByEmailWithSoftDeleted(email);
+        if (emailCountWithSoftDeleted > 0) {
+            throw new ConflictException(String.format(UserMessageConstants.DUPLICATE_EMAIL_MESSAGE, email));
         }
 
-        // 1-3. 이름 null 체크(현재 별도 조건 없음)
+        // 1-3. 이름 확인 (현재 별도 조건 없음)
         String name = signUpRequest.getName();
-        checkUsernameRule(name);
 
         // 1-4. 비밀번호 일치 체크
         String password = signUpRequest.getPassword();
@@ -129,7 +126,7 @@ public class UserService {
             diaryRepository.save(userDiary);
             diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary, builtUser)));
         } catch (Exception e) {
-            throw new InternalServerException("개인 다이어리를 생성하는 과정에서 문제가 발생하였습니다.");
+            throw new InternalServerException(String.format(UserMessageConstants.NOT_CREATED_DIARY_MESSAGE, email));
         }
 
         return newUser;
@@ -138,10 +135,9 @@ public class UserService {
     @Transactional
     public Users updateUser(UpdateRequest updateRequest, Long userId) {
         //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
-        //TODO: Optional 예외처리
         Users user = userRepository
                 .findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException(String.format(UserMessageConstants.NOT_FOUND_USER_ID_MESSAGE, userId)));
 
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
@@ -167,7 +163,7 @@ public class UserService {
 
     public void updateLostPassword(Long userId, ChangePwdRequest changePwdRequest) {
         Users currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(UserMessageConstants.NOT_FOUND_USER_ID_MESSAGE, userId)));
 
         // 입력된 비밀번호 두 개의 일치 여부 확인 후, 다르면 에러 반환
         String password = changePwdRequest.getPassword();
@@ -184,9 +180,8 @@ public class UserService {
 
     public Users deleteUser(Long userId) {
 
-        //TODO: 예외처리
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(UserMessageConstants.NOT_FOUND_USER_ID_MESSAGE, userId)));
 
         user.setDeletedAt(LocalDateTime.now());
 
@@ -199,9 +194,8 @@ public class UserService {
         String rawPassword = loginRequest.getPassword();
         LoginResponse loginResponse = new LoginResponse();
 
-        //TODO: 예외처리
         Users loginUser = userRepository.findByEmail(id)
-                .orElseThrow(() -> new NotFoundException("해당 이메일을 가진 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(UserMessageConstants.NOT_FOUND_USER_EMAIL_MESSAGE, id)));
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
@@ -237,7 +231,7 @@ public class UserService {
         String token = request.getHeader("Authorization");
 
         if (token == null) {
-            throw new UnauthorizedException("헤더에 토큰을 입력해주세요.");
+            throw new UnauthorizedException(UserMessageConstants.UNAUTHORIZED_MESSAGE);
         }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
@@ -251,7 +245,7 @@ public class UserService {
 
     public MyPageResponse showMyPage(Long userId) {
         Users currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(String.format(UserMessageConstants.NOT_FOUND_USER_ID_MESSAGE, userId)));
         String nickname = currentUser.getNickname();
         String name = currentUser.getName();
         String profileDescription = currentUser.getProfileDescription();
@@ -270,7 +264,8 @@ public class UserService {
     public ValidateNicknameResponse isValidNickname(ValidateNicknameRequest validateNicknameRequest) {
         String nickname = validateNicknameRequest.getNickname();
 
-        if (userRepository.findByNickname(nickname).isPresent()) {
+        int nicknameCountWithSoftDeleted = userRepository.countByNicknameWithSoftDeleted(nickname);
+        if (nicknameCountWithSoftDeleted > 0) {
             return ValidateNicknameResponse.builder()
                     .isValid(false)
                     .isDuplicate(true)
@@ -289,13 +284,8 @@ public class UserService {
 
     public void checkNewPasswordMatch(String firstEnter, String secondEnter) {
         if (!firstEnter.equals(secondEnter)) {
-            throw new ValidationException("비밀번호가 일치하지 않습니다.");
+            throw new ValidationException(UserMessageConstants.NOT_VALID_PASSWORD_MESSAGE);
         }
     }
 
-    public void checkUsernameRule(String username) {
-        if (username == null) {
-            throw new ValidationException("사용자 이름을 입력해주세요.");
-        }
-    }
 }

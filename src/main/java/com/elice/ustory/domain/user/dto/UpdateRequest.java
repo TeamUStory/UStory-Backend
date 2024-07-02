@@ -1,7 +1,5 @@
 package com.elice.ustory.domain.user.dto;
 
-import com.elice.ustory.domain.user.entity.RegexPatterns;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
