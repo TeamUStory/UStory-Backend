@@ -1,4 +1,4 @@
-package com.elice.ustory.global.oauth.kakao;
+package com.elice.ustory.global.oauth.naver;
 
 import com.elice.ustory.domain.user.dto.LoginResponse;
 import com.elice.ustory.domain.user.dto.LogoutResponse;
@@ -22,17 +22,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Map;
+import java.util.HashMap;
 
-@Tag(name = "KAKAO", description = "KAKAO OAUTH API")
+@Tag(name = "NAVER", description = "NAVER OAUTH API")
 @Controller
 @Slf4j
 @RequestMapping
 @RequiredArgsConstructor
-public class KakaoController {
-    private final KakaoOauth kakaoOauth;
+public class NaverController {
+    private final NaverOauth naverOauth;
+    private final NaverService naverService;
     private final UserService userService;
-    private final KakaoService kakaoService;
 
     @Operation(summary = "KAKAO LOGIN API", description = "카카오 로그인")
     @ApiResponses({
@@ -40,33 +40,45 @@ public class KakaoController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestMapping(value = "/login/oauth2/code/kakao", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
-        String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
-        Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(kakaoAccessToken);
+
+    @GetMapping("login")
+    public String login(Model model){
+        model.addAttribute("naverClientId", naverOauth.getNaverClientId());
+        model.addAttribute("redirectUri", naverOauth.getNaverLoginRedirectUri());
+        model.addAttribute("redirectLogoutUri", naverOauth.getNaverLogoutRedirectUri());
+        model.addAttribute("state", "STATE_STRING");
+        return "login/login";
+    }
+
+    @RequestMapping(value = "/login/oauth2/code/naver", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<LoginResponse> naverLogin(@RequestParam(name = "code") String code,
+                                                    @RequestParam(name = "state") String state,
+                                                    HttpServletResponse response) {
+        String naverAccessToken = naverOauth.getNaverToken(code, state);
+        HashMap<String, Object> userInfo = naverOauth.getUserInfoFromNaverToken(naverAccessToken);
 
         String id = (String) userInfo.get("id");
         String nickname = (String) userInfo.get("nickname");
 
         if(!userService.checkExistByEmail(id + "@ustory.com")){
-            kakaoService.kakaoSignUp(id, nickname);
+            naverService.naverSignUp(id, nickname);
         }
 
-        LoginResponse loginResponse = kakaoService.kakaoLogin(id, response, kakaoAccessToken);
+        LoginResponse loginResponse = naverService.naverLogin(id, response, naverAccessToken);
 
-        log.info("[kakaoLogin] 카카오 닉네임: {}", nickname);
+        log.info("[naverLogin] 네이버 닉네임: {}", nickname);
         return ResponseEntity.ok().body(loginResponse);
     }
 
-    @Operation(summary = "KAKAO LOGOUT API", description = "카카오 로그아웃")
+    @Operation(summary = "NAVER LOGOUT API", description = "카카오 로그아웃")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LogoutResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestMapping(value = "/auth/logout/kakao", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<LogoutResponse> kakaoLogout(HttpServletRequest request) {
-        LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
+    @RequestMapping(value = "/auth/logout/naver", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<LogoutResponse> naverLogout(HttpServletRequest request) {
+        LogoutResponse logoutResponse = naverService.naverLogout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
 }
