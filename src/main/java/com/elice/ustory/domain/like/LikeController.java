@@ -4,8 +4,8 @@ import com.elice.ustory.domain.like.dto.LikeListResponse;
 import com.elice.ustory.domain.like.dto.LikeResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
-import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
+import com.elice.ustory.global.Validation.PageableValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LikeController {
 
+    private final PageableValidation pageableValidation;
     private final LikeService likeService;
 
     @Operation(summary = "Create Like API", description = "좋아요로 지정한다.")
@@ -65,11 +66,7 @@ public class LikeController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
 
-        if (page < 1) {
-            throw new ValidationException("페이지는 1 이상이어야 합니다.");
-        } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
-        }
+        pageableValidation.pageValidate(page, size);
 
         List<Paper> papers = likeService.getLikesByUser(userId, page, size);
 

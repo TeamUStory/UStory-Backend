@@ -4,8 +4,8 @@ import com.elice.ustory.domain.diary.dto.*;
 import com.elice.ustory.domain.diary.entity.DiaryCategory;
 import com.elice.ustory.domain.diary.service.DiaryService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
-import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
+import com.elice.ustory.global.Validation.PageableValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +28,8 @@ import java.util.List;
 @RequestMapping("/diary")
 @RequiredArgsConstructor
 public class DiaryController {
+
+    private final PageableValidation pageableValidation;
     private final DiaryService diaryService;
 
     @Operation(summary = "Create Diary API", description = "다이어리 생성 및 링크 테이블에 등록")
@@ -67,12 +68,8 @@ public class DiaryController {
             @RequestParam(name = "diaryCategory", required = false) DiaryCategory diaryCategory,
             @RequestParam(name = "requestTime") LocalDateTime requestTime,
             @RequestParam(name = "searchWord", required = false) String searchWord) {
-        if(page<1){
-            throw new ValidationException("페이지는 1 이상이어야 합니다.");
-        }else if(size<1){
-            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
-        }
-        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Pageable pageable = pageableValidation.madePageable(page, size);
 
         List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, requestTime, searchWord);
 
