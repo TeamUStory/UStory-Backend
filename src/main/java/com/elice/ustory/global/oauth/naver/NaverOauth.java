@@ -1,5 +1,6 @@
 package com.elice.ustory.global.oauth.naver;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Getter;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
 
 @Slf4j
 @Component
@@ -30,8 +33,11 @@ public class NaverOauth {
     @Value("${naver.logoutRedirectUri}")
     private String naverLogoutRedirectUri;
 
-    @Value("${naver.requestTokenUri}")
+    @Value("${naver.tokenUri}")
     private String naverTokenUri;
+
+    @Value("${naver.userInfo}")
+    private String userInfoUri;
 
     public String getNaverToken(String code, String state){
         RestTemplate restTemplate = new RestTemplate();
@@ -51,5 +57,28 @@ public class NaverOauth {
         JsonObject asJsonObject = null;
         if(responseBody != null) asJsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
         return asJsonObject.get("access_token").getAsString();
+    }
+
+    public HashMap<String, Object> getUserInfoFromNaverToken(String accessToken){
+        HashMap<String, Object> userInfo = new HashMap<>();
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<MultiValueMap<String, String>> naverUserInfoRequest = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(userInfoUri, HttpMethod.POST, naverUserInfoRequest, String.class);
+        log.info("response = {}", response);
+
+        JsonElement element = JsonParser.parseString(response.getBody());
+
+        String id = element.getAsJsonObject().get("response").getAsJsonObject().get("id").getAsString();
+        String nickname = element.getAsJsonObject().get("response").getAsJsonObject().get("id").getAsString();
+
+        userInfo.put("id", id);
+        userInfo.put("nickname", nickname);
+
+        return userInfo;
     }
 }
