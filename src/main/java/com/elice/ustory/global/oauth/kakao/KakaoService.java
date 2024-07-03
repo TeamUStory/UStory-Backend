@@ -72,7 +72,7 @@ public class KakaoService {
         Users loginUser = userRepository.findByEmail(kakaoUserId+"@ustory.com")
                 .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
 
-        String accessToken = jwtTokenProvider.createAccessTokenKakao(loginUser.getId(), kakaoToken, loginUser.getLoginType());
+        String accessToken = jwtTokenProvider.createAccessTokenSocial(loginUser.getId(), kakaoToken, loginUser.getLoginType());
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
         LoginResponse loginResponse = LoginResponse.builder()
@@ -92,7 +92,7 @@ public class KakaoService {
 
     public LogoutResponse kakaoLogout(HttpServletRequest request) {
         String accessToken = jwtUtil.getTokenFromRequest(request);
-        String kakaoToken = jwtUtil.getKakaoToken(accessToken);
+        String kakaoToken = jwtUtil.getSocialToken(accessToken);
         kakaoOauth.expireKakaoToken(kakaoToken);
         kakaoTokenService.removeKakaoTokenInfo(accessToken);
         userService.logout(request);

@@ -44,11 +44,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createAccessTokenKakao(Long userId, String kakaoAccessToken, Users.LoginType loginType) {
+    public String createAccessTokenSocial(Long userId, String accessToken, Users.LoginType loginType) {
         Claims claims = Jwts.claims();
         Date now = new Date();
         claims.put("userId", userId);
-        claims.put("kakao", kakaoAccessToken);
+        claims.put("soicalToken", accessToken);
         claims.put("loginType", loginType);
         log.info("[createKakaoAccessToken] access 토큰(kakao 로그인) 생성 완료");
         return Jwts.builder()

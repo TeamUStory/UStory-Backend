@@ -100,9 +100,9 @@ public class JwtUtil {
         return Math.max(remainingMillis, 0) / 1000;
     }
 
-    public String getKakaoToken(String jwtToken){
+    public String getSocialToken(String jwtToken){
         Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtTokenProvider.getSecretKey()).build()
                 .parseClaimsJws(jwtToken);
-        return claims.getBody().get("kakao").toString();
+        return claims.getBody().get("socialToken").toString();
     }
 }
