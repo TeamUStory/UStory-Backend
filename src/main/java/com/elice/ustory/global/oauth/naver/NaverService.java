@@ -40,12 +40,12 @@ public class NaverService {
     private final JwtUtil jwtUtil;
     private final RandomGenerator randomGenerator;
 
-    public void naverSignUp(String naverUserId, String naverNickname){
+    public void naverSignUp(String naverNickname){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String generatedNickname = naverNickname + "#" + randomGenerator.generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
-                .email(naverUserId+"@ustory.com")
+                .email(naverNickname+"@ustory.com")
                 .loginType(Users.LoginType.NAVER)
                 .name(naverNickname)
                 .nickname(generatedNickname)
@@ -67,8 +67,8 @@ public class NaverService {
         diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
     }
 
-    public LoginResponse naverLogin(String naverUserId, HttpServletResponse response, String naverToken){
-        Users loginUser = userRepository.findByEmail(naverUserId+"@ustory.com")
+    public LoginResponse naverLogin(String naverNickname, HttpServletResponse response, String naverToken){
+        Users loginUser = userRepository.findByEmail(naverNickname + "@ustory.com")
                 .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
 
         String accessToken = jwtTokenProvider.createAccessTokenSocial(loginUser.getId(), naverToken, loginUser.getLoginType());
@@ -85,7 +85,7 @@ public class NaverService {
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
         naverTokenService.saveNaverTokenInfo(loginUser.getId(), naverToken, accessToken);
 
-        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, toke n : {}", loginUser.getId(), loginResponse.getAccessToken());
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;
     }
 

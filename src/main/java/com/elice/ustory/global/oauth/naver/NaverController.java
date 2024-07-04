@@ -60,11 +60,11 @@ public class NaverController {
         String id = (String) userInfo.get("id");
         String nickname = (String) userInfo.get("nickname");
 
-        if(!userService.checkExistByEmail(id + "@ustory.com")){
-            naverService.naverSignUp(id, nickname);
+        if(!userService.checkExistByEmail(nickname + "@ustory.com")){
+            naverService.naverSignUp(nickname);
         }
 
-        LoginResponse loginResponse = naverService.naverLogin(id, response, naverAccessToken);
+        LoginResponse loginResponse = naverService.naverLogin(nickname, response, naverAccessToken);
 
         log.info("[naverLogin] 네이버 닉네임: {}", nickname);
         return ResponseEntity.ok().body(loginResponse);

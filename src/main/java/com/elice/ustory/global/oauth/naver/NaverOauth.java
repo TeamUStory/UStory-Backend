@@ -15,7 +15,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -70,11 +72,14 @@ public class NaverOauth {
 
         ResponseEntity<String> response = restTemplate.exchange(userInfoUri, HttpMethod.POST, naverUserInfoRequest, String.class);
         log.info("response = {}", response);
-
-        JsonElement element = JsonParser.parseString(response.getBody());
+        String responseBody = response.getBody();
+        if(responseBody != null){
+            responseBody = new String(responseBody.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        }
+        JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseBody));
 
         String id = element.getAsJsonObject().get("response").getAsJsonObject().get("id").getAsString();
-        String nickname = element.getAsJsonObject().get("response").getAsJsonObject().get("id").getAsString();
+        String nickname = element.getAsJsonObject().get("response").getAsJsonObject().get("nickname").getAsString();
 
         userInfo.put("id", id);
         userInfo.put("nickname", nickname);
