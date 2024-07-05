@@ -34,7 +34,7 @@ public class NaverController {
     private final NaverService naverService;
     private final UserService userService;
 
-    @Operation(summary = "KAKAO LOGIN API", description = "카카오 로그인")
+    @Operation(summary = "NAVER LOGIN API", description = "네이버 로그인")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -57,20 +57,20 @@ public class NaverController {
         String naverAccessToken = naverOauth.getNaverToken(code, state);
         HashMap<String, Object> userInfo = naverOauth.getUserInfoFromNaverToken(naverAccessToken);
 
-        String id = (String) userInfo.get("id");
         String nickname = (String) userInfo.get("nickname");
+        String naverEmail = (String) userInfo.get("email");
 
-        if(!userService.checkExistByEmail(nickname + "@ustory.com")){
-            naverService.naverSignUp(nickname);
+        if(!userService.checkExistByEmail(naverEmail)){
+            naverService.naverSignUp(nickname, naverEmail);
         }
 
-        LoginResponse loginResponse = naverService.naverLogin(nickname, response, naverAccessToken);
+        LoginResponse loginResponse = naverService.naverLogin(naverEmail, response, naverAccessToken);
 
         log.info("[naverLogin] 네이버 닉네임: {}", nickname);
         return ResponseEntity.ok().body(loginResponse);
     }
 
-    @Operation(summary = "NAVER LOGOUT API", description = "카카오 로그아웃")
+    @Operation(summary = "NAVER LOGOUT API", description = "네이버 로그아웃")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LogoutResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

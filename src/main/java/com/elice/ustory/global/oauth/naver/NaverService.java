@@ -40,12 +40,12 @@ public class NaverService {
     private final JwtUtil jwtUtil;
     private final RandomGenerator randomGenerator;
 
-    public void naverSignUp(String naverNickname){
+    public void naverSignUp(String naverNickname, String naverEmail){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String generatedNickname = naverNickname + "#" + randomGenerator.generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
-                .email(naverNickname+"@ustory.com")
+                .email(naverEmail)
                 .loginType(Users.LoginType.NAVER)
                 .name(naverNickname)
                 .nickname(generatedNickname)
@@ -67,8 +67,8 @@ public class NaverService {
         diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
     }
 
-    public LoginResponse naverLogin(String naverNickname, HttpServletResponse response, String naverToken){
-        Users loginUser = userRepository.findByEmail(naverNickname + "@ustory.com")
+    public LoginResponse naverLogin(String naverEmail, HttpServletResponse response, String naverToken){
+        Users loginUser = userRepository.findByEmail(naverEmail)
                 .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
 
         String accessToken = jwtTokenProvider.createAccessTokenSocial(loginUser.getId(), naverToken, loginUser.getLoginType());
