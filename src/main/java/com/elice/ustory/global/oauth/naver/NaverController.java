@@ -41,15 +41,6 @@ public class NaverController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
 
-    @GetMapping("login")
-    public String login(Model model){
-        model.addAttribute("naverClientId", naverOauth.getNaverClientId());
-        model.addAttribute("redirectUri", naverOauth.getNaverLoginRedirectUri());
-        model.addAttribute("redirectLogoutUri", naverOauth.getNaverLogoutRedirectUri());
-        model.addAttribute("state", "STATE_STRING");
-        return "login/login";
-    }
-
     @RequestMapping(value = "/login/oauth2/code/naver", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<LoginResponse> naverLogin(@RequestParam(name = "code") String code,
                                                     @RequestParam(name = "state") String state,
