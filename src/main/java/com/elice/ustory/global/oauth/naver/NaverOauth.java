@@ -78,11 +78,11 @@ public class NaverOauth {
         }
         JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseBody));
 
-        String id = element.getAsJsonObject().get("response").getAsJsonObject().get("id").getAsString();
         String nickname = element.getAsJsonObject().get("response").getAsJsonObject().get("nickname").getAsString();
+        String email = element.getAsJsonObject().get("response").getAsJsonObject().get("email").getAsString();
 
-        userInfo.put("id", id);
         userInfo.put("nickname", nickname);
+        userInfo.put("email", email);
 
         return userInfo;
     }
