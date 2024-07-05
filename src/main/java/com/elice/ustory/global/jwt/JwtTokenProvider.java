@@ -44,20 +44,20 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createAccessTokenKakao(Long userId, String kakaoAccessToken, Users.LoginType loginType) {
+    public String createAccessTokenSocial(Long userId, String accessToken, Users.LoginType loginType) {
         Claims claims = Jwts.claims();
         Date now = new Date();
         claims.put("userId", userId);
-        claims.put("kakao", kakaoAccessToken);
+        claims.put("socialToken", accessToken);
         claims.put("loginType", loginType);
-        log.info("[createKakaoAccessToken] access 토큰(kakao 로그인) 생성 완료");
+        log.info("[createSocialAccessToken] access 토큰(소셜 로그인) 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESSTOKEN_VALID_MILISECOND))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
-    } //TODO: 코드 중복 되는 부분이 많아서 리팩토링 예정
+    }
 
     public String createRefreshToken(){
         Claims claims = Jwts.claims();

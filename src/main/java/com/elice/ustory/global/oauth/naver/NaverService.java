@@ -1,4 +1,4 @@
-package com.elice.ustory.global.oauth.kakao;
+package com.elice.ustory.global.oauth.naver;
 
 import com.elice.ustory.domain.diary.entity.Color;
 import com.elice.ustory.domain.diary.entity.Diary;
@@ -15,7 +15,7 @@ import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
-import com.elice.ustory.global.redis.kakao.KakaoTokenService;
+import com.elice.ustory.global.redis.naver.NaverTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import com.elice.ustory.global.util.RandomGenerator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,28 +30,27 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoService {
+public class NaverService {
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenService refreshTokenService;
-    private final KakaoTokenService kakaoTokenService;
-    private final JwtUtil jwtUtil;
-    private final KakaoOauth kakaoOauth;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
+    private final NaverTokenService naverTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
     private final RandomGenerator randomGenerator;
     private final PasswordEncoder passwordEncoder;
 
-    public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
+    public void naverSignUp(String naverNickname, String naverEmail){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
-        String generatedNickname = kakaoNickname + "#" + randomGenerator.generateRandomPostfix();
+        String generatedNickname = naverNickname + "#" + randomGenerator.generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
-                .email(kakaoUserId+"@ustory.com")
-                .loginType(Users.LoginType.KAKAO)
-                .name(kakaoNickname)
+                .email(naverEmail)
+                .loginType(Users.LoginType.NAVER)
+                .name(naverNickname)
                 .nickname(generatedNickname)
                 .password(encodedPassword)
                 .profileImgUrl("")
@@ -71,11 +70,11 @@ public class KakaoService {
         diaryUserRepository.save(new DiaryUser(new DiaryUserId(userDiary,builtUser)));
     }
 
-    public LoginResponse kakaoLogin(String kakaoUserId, HttpServletResponse response, String kakaoToken){
-        Users loginUser = userRepository.findByEmail(kakaoUserId+"@ustory.com")
+    public LoginResponse naverLogin(String naverEmail, HttpServletResponse response, String naverToken){
+        Users loginUser = userRepository.findByEmail(naverEmail)
                 .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
 
-        String accessToken = jwtTokenProvider.createAccessTokenSocial(loginUser.getId(), kakaoToken, loginUser.getLoginType());
+        String accessToken = jwtTokenProvider.createAccessTokenSocial(loginUser.getId(), naverToken, loginUser.getLoginType());
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
         LoginResponse loginResponse = LoginResponse.builder()
@@ -87,17 +86,15 @@ public class KakaoService {
         response.addHeader("Authorization", accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
-        kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken, accessToken);
+        naverTokenService.saveNaverTokenInfo(loginUser.getId(), naverToken, accessToken);
 
-        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, toke n : {}", loginUser.getId(), loginResponse.getAccessToken());
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;
     }
 
-    public LogoutResponse kakaoLogout(HttpServletRequest request) {
+    public LogoutResponse naverLogout(HttpServletRequest request) {
         String accessToken = jwtUtil.getTokenFromRequest(request);
-        String kakaoToken = jwtUtil.getSocialToken(accessToken);
-        kakaoOauth.expireKakaoToken(kakaoToken);
-        kakaoTokenService.removeKakaoTokenInfo(accessToken);
+        naverTokenService.removeNaverTokenInfo(accessToken);
         userService.logout(request);
 
         return LogoutResponse.builder().success(true).build();
