@@ -48,7 +48,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims();
         Date now = new Date();
         claims.put("userId", userId);
-        claims.put("soicalToken", accessToken);
+        claims.put("socialToken", accessToken);
         claims.put("loginType", loginType);
         log.info("[createSocialAccessToken] access 토큰(소셜 로그인) 생성 완료");
         return Jwts.builder()
