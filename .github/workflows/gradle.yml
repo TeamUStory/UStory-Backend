@@ -39,6 +39,12 @@ jobs:
           echo "${{ secrets.APPLICATION_DEV }}" > ./application-dev.yml
         shell: bash
 
+
+      # - name: Build with Gradle (without Test)
+      #   run: /gradlew clean build -x test --stacktrace
+
+      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
+      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
@@ -57,10 +63,7 @@ jobs:
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/ustory .
           docker push ${{ secrets.DOCKER_REPO }}/ustory
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v0.1.10
         with:
