@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -40,9 +41,11 @@ public class KakaoService {
     private final KakaoOauth kakaoOauth;
     private final UserService userService;
     private final RandomGenerator randomGenerator;
+    private final PasswordEncoder passwordEncoder;
 
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
+        String encodedPassword = passwordEncoder.encode(randomPassword);
         String generatedNickname = kakaoNickname + "#" + randomGenerator.generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
@@ -50,7 +53,7 @@ public class KakaoService {
                 .loginType(Users.LoginType.KAKAO)
                 .name(kakaoNickname)
                 .nickname(generatedNickname)
-                .password(randomPassword)
+                .password(encodedPassword)
                 .profileImgUrl("")
                 .profileDescription("자기소개")
                 .build();

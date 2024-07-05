@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -39,9 +40,11 @@ public class NaverService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtUtil jwtUtil;
     private final RandomGenerator randomGenerator;
+    private final PasswordEncoder passwordEncoder;
 
     public void naverSignUp(String naverNickname, String naverEmail){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
+        String encodedPassword = passwordEncoder.encode(randomPassword);
         String generatedNickname = naverNickname + "#" + randomGenerator.generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
@@ -49,7 +52,7 @@ public class NaverService {
                 .loginType(Users.LoginType.NAVER)
                 .name(naverNickname)
                 .nickname(generatedNickname)
-                .password(randomPassword)
+                .password(encodedPassword)
                 .profileImgUrl("")
                 .profileDescription("자기소개")
                 .build();
