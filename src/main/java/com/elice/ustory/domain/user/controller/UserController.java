@@ -8,6 +8,9 @@ import com.elice.ustory.domain.user.service.EmailService;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.jwt.JwtAuthorization;
+import com.elice.ustory.global.jwt.JwtUtil;
+import com.elice.ustory.global.oauth.kakao.KakaoService;
+import com.elice.ustory.global.oauth.naver.NaverService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +35,9 @@ public class UserController {
 
     private final UserService userService;
     private final EmailService emailService;
+    private final KakaoService kakaoService;
+    private final NaverService naverService;
+    private final JwtUtil jwtUtil;
 
     @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다." +
             "<br>비밀번호는 **숫자, 영문, 특수문자 각 1개를 포함한 8~16자** 이며," +
@@ -98,7 +104,16 @@ public class UserController {
     })
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request) {
-        LogoutResponse logoutResponse = userService.logout(request);
+        String accessToken = jwtUtil.getTokenFromRequest(request);
+        String loginType = jwtUtil.getLoginType(accessToken);
+
+        if(loginType.equals("KAKAO")){
+            kakaoService.kakaoLogout(accessToken);
+        }else if(loginType.equals("NAVER")){
+            naverService.naverLogout(accessToken);
+        }
+
+        LogoutResponse logoutResponse = userService.logout(accessToken);
         return ResponseEntity.ok().body(logoutResponse);
     }
 

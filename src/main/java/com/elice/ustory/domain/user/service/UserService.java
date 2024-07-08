@@ -14,8 +14,10 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.*;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
+import com.elice.ustory.global.oauth.kakao.KakaoService;
+import com.elice.ustory.global.oauth.naver.NaverService;
+import com.elice.ustory.global.redis.naver.NaverTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -226,19 +228,8 @@ public class UserService {
         return loginResponse;
     }
 
-    public LogoutResponse logout(HttpServletRequest request) {
-        // 리프레시 토큰 삭제
-        String token = request.getHeader("Authorization");
-
-        if (token == null) {
-            throw new UnauthorizedException(UserMessageConstants.UNAUTHORIZED_MESSAGE);
-        }
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        refreshTokenService.removeTokenInfo(token);
-
+    public LogoutResponse logout(String accessToken) {
+        refreshTokenService.removeTokenInfo(accessToken);
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
         return logoutResponse;
     }
