@@ -12,7 +12,6 @@ import com.elice.ustory.domain.paper.dto.UpdatePaperResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
-import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -39,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.elice.ustory.global.Validation.PageableValidation.pageValidate;
 
 @Tag(name = "Paper API")
 @RestController
@@ -136,11 +137,7 @@ public class PaperController {
                                                                    @RequestParam(name = "size", defaultValue = "20") int size,
                                                                    @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        if (page < 1) {
-            throw new ValidationException("페이지는 1 이상이어야 합니다.");
-        } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
-        }
+        pageValidate(page, size);
 
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size, requestTime);
 
@@ -169,11 +166,7 @@ public class PaperController {
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate
     ) {
 
-        if (page < 1) {
-            throw new ValidationException("페이지는 1 이상이어야 합니다.");
-        } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
-        }
+        pageValidate(page, size);
 
         List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate, requestTime);
 
