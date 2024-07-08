@@ -228,10 +228,9 @@ public class UserService {
         return loginResponse;
     }
 
-    public LogoutResponse logout(String accessToken) {
+    public LogoutResponse logout(String accessToken, String loginType) {
         refreshTokenService.removeTokenInfo(accessToken);
-        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
-        return logoutResponse;
+        return new LogoutResponse(true, loginType);
     }
 
     public MyPageResponse showMyPage(Long userId) {

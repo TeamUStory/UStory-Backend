@@ -113,7 +113,7 @@ public class UserController {
             naverService.naverLogout(accessToken);
         }
 
-        LogoutResponse logoutResponse = userService.logout(accessToken);
+        LogoutResponse logoutResponse = userService.logout(accessToken, loginType);
         return ResponseEntity.ok().body(logoutResponse);
     }
 
