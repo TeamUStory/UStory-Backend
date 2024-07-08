@@ -12,6 +12,7 @@ import com.elice.ustory.global.redis.email.AuthCode;
 import com.elice.ustory.global.redis.email.AuthCodeForChangePwd;
 import com.elice.ustory.global.redis.email.AuthCodeForChangePwdRepository;
 import com.elice.ustory.global.redis.email.AuthCodeRepository;
+import com.elice.ustory.global.exception.model.ConflictException;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
