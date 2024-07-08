@@ -75,6 +75,12 @@ public class JwtUtil {
                 .parseClaimsJws(token).getBody().get("userId").toString());
     }
 
+    public String getLoginType(String token) {
+        log.info("[getLoginType] 현재 로그인 된 유저의 로그인 방식 추출");
+        return Jwts.parserBuilder().setSigningKey(jwtTokenProvider.getSecretKey()).build()
+                .parseClaimsJws(token).getBody().get("loginType").toString();
+    }
+
     public boolean validateToken(String jwtToken) {
         log.info("[validateToken] 토큰 유효 체크 시작 ");
         try {

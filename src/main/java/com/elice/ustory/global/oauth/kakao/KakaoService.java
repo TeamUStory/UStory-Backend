@@ -8,17 +8,14 @@ import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.dto.LoginResponse;
-import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import com.elice.ustory.global.util.RandomGenerator;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +36,6 @@ public class KakaoService {
     private final KakaoTokenService kakaoTokenService;
     private final JwtUtil jwtUtil;
     private final KakaoOauth kakaoOauth;
-    private final UserService userService;
     private final RandomGenerator randomGenerator;
     private final PasswordEncoder passwordEncoder;
 
@@ -93,13 +89,9 @@ public class KakaoService {
         return loginResponse;
     }
 
-    public LogoutResponse kakaoLogout(HttpServletRequest request) {
-        String accessToken = jwtUtil.getTokenFromRequest(request);
+    public void kakaoLogout(String accessToken) {
         String kakaoToken = jwtUtil.getSocialToken(accessToken);
         kakaoOauth.expireKakaoToken(kakaoToken);
         kakaoTokenService.removeKakaoTokenInfo(accessToken);
-        userService.logout(request);
-
-        return LogoutResponse.builder().success(true).build();
     }
 }
