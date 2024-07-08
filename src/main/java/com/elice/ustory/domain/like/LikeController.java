@@ -26,13 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.elice.ustory.global.Validation.PageableValidation.pageValidate;
+
 @Tag(name = "Like API")
 @RestController
 @RequestMapping("/papers")
 @RequiredArgsConstructor
 public class LikeController {
 
-    private final PageableValidation pageableValidation;
     private final LikeService likeService;
 
     @Operation(summary = "Create Like API", description = "좋아요로 지정한다.")
@@ -66,7 +67,7 @@ public class LikeController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
 
-        pageableValidation.pageValidate(page, size);
+        pageValidate(page, size);
 
         List<Paper> papers = likeService.getLikesByUser(userId, page, size);
 

@@ -22,17 +22,17 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.elice.ustory.global.Validation.PageableValidation.madePageable;
+
 
 @Tag(name = "Notice API")
 @RestController
 @RequestMapping("/notices")
 public class NoticeController {
 
-    private PageableValidation pageableValidation;
     private NoticeService noticeService;
 
-    public NoticeController(NoticeService noticeService, PageableValidation pageableValidation) {
-        this.pageableValidation = pageableValidation;
+    public NoticeController(NoticeService noticeService) {
         this.noticeService = noticeService;
     }
 
@@ -56,7 +56,7 @@ public class NoticeController {
                                                                       @RequestParam(name = "page", defaultValue = "1") int page,
                                                                       @RequestParam(name = "size", defaultValue = "10") int size,
                                                                       @RequestParam(name = "requestTime") LocalDateTime requestTime) {
-        Pageable pageable = pageableValidation.madePageable(page, size);
+        Pageable pageable = madePageable(page, size);
 
         List<NoticeResponse> notices = noticeService.getAllNoticesByUserId(userId, requestTime, pageable);
 

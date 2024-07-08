@@ -23,13 +23,14 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.elice.ustory.global.Validation.PageableValidation.madePageable;
+
 @Tag(name = "Diary API")
 @RestController
 @RequestMapping("/diary")
 @RequiredArgsConstructor
 public class DiaryController {
 
-    private final PageableValidation pageableValidation;
     private final DiaryService diaryService;
 
     @Operation(summary = "Create Diary API", description = "다이어리 생성 및 링크 테이블에 등록")
@@ -69,7 +70,7 @@ public class DiaryController {
             @RequestParam(name = "requestTime") LocalDateTime requestTime,
             @RequestParam(name = "searchWord", required = false) String searchWord) {
 
-        Pageable pageable = pageableValidation.madePageable(page, size);
+        Pageable pageable = madePageable(page, size);
 
         List<DiaryListResponse> userDiaries = diaryService.getUserDiaries(userId, pageable, diaryCategory, requestTime, searchWord);
 

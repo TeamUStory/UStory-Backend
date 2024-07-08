@@ -13,7 +13,6 @@ import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.service.PaperService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.jwt.JwtAuthorization;
-import com.elice.ustory.global.Validation.PageableValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,13 +39,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.elice.ustory.global.Validation.PageableValidation.pageValidate;
+
 @Tag(name = "Paper API")
 @RestController
 @RequestMapping("/papers")
 @RequiredArgsConstructor
 public class PaperController {
 
-    private final PageableValidation pageableValidation;
     private final PaperService paperService;
     private final BookmarkService bookmarkService;
 
@@ -137,7 +137,7 @@ public class PaperController {
                                                                    @RequestParam(name = "size", defaultValue = "20") int size,
                                                                    @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        pageableValidation.pageValidate(page, size);
+        pageValidate(page, size);
 
         List<Paper> papers = paperService.getPapersByWriterId(userId, page, size, requestTime);
 
@@ -166,7 +166,7 @@ public class PaperController {
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate endDate
     ) {
 
-        pageableValidation.pageValidate(page, size);
+        pageValidate(page, size);
 
         List<Paper> papers = paperService.getPapersByDiaryId(diaryId, page, size, startDate, endDate, requestTime);
 

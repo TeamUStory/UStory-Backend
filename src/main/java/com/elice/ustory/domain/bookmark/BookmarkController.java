@@ -5,7 +5,6 @@ import com.elice.ustory.domain.bookmark.dto.BookmarkResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.jwt.JwtAuthorization;
-import com.elice.ustory.global.Validation.PageableValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,13 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.elice.ustory.global.Validation.PageableValidation.pageValidate;
+
 @Tag(name = "Bookmark API")
 @RestController
 @RequestMapping("/papers")
 @RequiredArgsConstructor
 public class BookmarkController {
 
-    private final PageableValidation pageableValidation;
     private final BookmarkService bookmarkService;
 
     @Operation(summary = "Create bookmark API", description = "북마크를 지정한다.")
@@ -66,7 +66,7 @@ public class BookmarkController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
 
-        pageableValidation.pageValidate(page, size);
+        pageValidate(page, size);
 
         List<Paper> papers = bookmarkService.getBookmarksByUser(userId, page, size);
 

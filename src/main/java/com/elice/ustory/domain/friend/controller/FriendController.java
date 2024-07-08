@@ -24,17 +24,17 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.elice.ustory.global.Validation.PageableValidation.madePageable;
+
 
 @Tag(name = "Friend API")
 @RestController
 @RequestMapping("/friend")
 public class FriendController {
 
-    private PageableValidation pageableValidation;
     private FriendService friendService;
 
-    public FriendController(FriendService friendService, PageableValidation codeutils) {
-        this.pageableValidation = codeutils;
+    public FriendController(FriendService friendService) {
         this.friendService = friendService;
     }
 
@@ -60,7 +60,7 @@ public class FriendController {
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        Pageable pageable = pageableValidation.madePageable(page, size);
+        Pageable pageable = madePageable(page, size);
 
         List<UserFriendDTO> friends = friendService.getFriends(userId, nickname, requestTime, pageable);
 
@@ -110,7 +110,7 @@ public class FriendController {
                                                                         @RequestParam(name = "size", defaultValue = "10") int size,
                                                                         @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        Pageable pageable = pageableValidation.madePageable(page, size);
+        Pageable pageable = madePageable(page, size);
 
         List<FriendRequestListDTO> friendRequests = friendService.getFriendRequests(userId, requestTime, pageable);
         return ResponseEntity.ok(friendRequests);

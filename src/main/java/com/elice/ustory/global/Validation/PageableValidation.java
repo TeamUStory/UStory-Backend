@@ -20,7 +20,7 @@ public class PageableValidation {
      * Pageable 까지 만들어서 넘기는 버전, 그냥 검증한 하는 버전 두 가지 버전의 메서드를 구현
      * 하나로 만들면 좋았겠다. 하지만 서비스단까지 바꿔야 하는 관계로 패스
      */
-    public void pageValidate(int page, int size) {
+    public static void pageValidate(int page, int size) {
         if (page < 1) {
             throw new ValidationException(AT_LEAST_PAGE);
         } else if (size < 1) {
@@ -28,7 +28,7 @@ public class PageableValidation {
         }
     }
 
-    public Pageable madePageable(int page, int size) {
+    public static Pageable madePageable(int page, int size) {
 
         if (page < 1) {
             throw new ValidationException(AT_LEAST_PAGE);
