@@ -39,6 +39,9 @@ public class UserController {
     private final NaverService naverService;
     private final JwtUtil jwtUtil;
 
+    private static final String KAKAO_LOGIN_TYPE = "KAKAO";
+    private static final String NAVER_LOGIN_TYPE = "NAVER";
+
     @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다." +
             "<br>비밀번호는 **숫자, 영문, 특수문자 각 1개를 포함한 8~16자** 이며," +
             "<br>보안을 위해, 이때 특수문자는 **~!@#%^*** 만 허용한다.")
@@ -107,9 +110,9 @@ public class UserController {
         String accessToken = jwtUtil.getTokenFromRequest(request);
         String loginType = jwtUtil.getLoginType(accessToken);
 
-        if(loginType.equals("KAKAO")){
+        if(loginType.equals(KAKAO_LOGIN_TYPE)){
             kakaoService.kakaoLogout(accessToken);
-        }else if(loginType.equals("NAVER")){
+        }else if(loginType.equals(NAVER_LOGIN_TYPE)){
             naverService.naverLogout(accessToken);
         }
 
