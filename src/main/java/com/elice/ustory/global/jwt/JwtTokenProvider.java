@@ -35,6 +35,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims();
         Date now = new Date();
         claims.put("userId", userId);
+        claims.put("loginType", Users.LoginType.BASIC);
         log.info("[createAccessToken] access 토큰 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
