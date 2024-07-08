@@ -1,6 +1,5 @@
 package com.elice.ustory.domain.friend.controller;
 
-import com.elice.ustory.domain.bookmark.dto.BookmarkListResponse;
 import com.elice.ustory.domain.friend.dto.FriendRequestDto;
 import com.elice.ustory.domain.friend.dto.FriendRequestListDTO;
 import com.elice.ustory.domain.friend.dto.UserFriendDTO;
@@ -9,6 +8,7 @@ import com.elice.ustory.domain.friend.service.FriendService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.exception.model.ValidationException;
 import com.elice.ustory.global.jwt.JwtAuthorization;
+import com.elice.ustory.global.Validation.PageableValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,13 +17,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.elice.ustory.global.Validation.PageableValidation.madePageable;
 
 
 @Tag(name = "Friend API")
@@ -59,12 +60,7 @@ public class FriendController {
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "requestTime") LocalDateTime requestTime) {
 
-        if (page < 1) {
-            throw new ValidationException("페이지는 1 이상이어야 합니다.");
-        } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
-        }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = madePageable(page, size);
 
         List<UserFriendDTO> friends = friendService.getFriends(userId, nickname, requestTime, pageable);
 
@@ -113,12 +109,8 @@ public class FriendController {
                                                                         @RequestParam(name = "page", defaultValue = "1") int page,
                                                                         @RequestParam(name = "size", defaultValue = "10") int size,
                                                                         @RequestParam(name = "requestTime") LocalDateTime requestTime) {
-        if (page < 1) {
-            throw new ValidationException("페이지는 1 이상이어야 합니다.");
-        } else if (size < 1){
-            throw new ValidationException("사이즈는 1 이상이어야 합니다.");
-        }
-        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Pageable pageable = madePageable(page, size);
 
         List<FriendRequestListDTO> friendRequests = friendService.getFriendRequests(userId, requestTime, pageable);
         return ResponseEntity.ok(friendRequests);

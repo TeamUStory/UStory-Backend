@@ -20,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @IdClass(LikeId.class)
-@Table(name = "like")
+@Table(name = "`like`")
 public class Like extends BaseEntity {
 
     @Id
