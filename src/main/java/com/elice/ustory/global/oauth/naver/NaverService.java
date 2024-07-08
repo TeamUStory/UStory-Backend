@@ -8,7 +8,6 @@ import com.elice.ustory.domain.diaryUser.entity.DiaryUser;
 import com.elice.ustory.domain.diaryUser.entity.DiaryUserId;
 import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.dto.LoginResponse;
-import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.domain.user.service.UserService;
@@ -18,7 +17,6 @@ import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.naver.NaverTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import com.elice.ustory.global.util.RandomGenerator;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +32,9 @@ public class NaverService {
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
-    private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final NaverTokenService naverTokenService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtUtil jwtUtil;
     private final RandomGenerator randomGenerator;
     private final PasswordEncoder passwordEncoder;
 
@@ -92,11 +88,7 @@ public class NaverService {
         return loginResponse;
     }
 
-    public LogoutResponse naverLogout(HttpServletRequest request) {
-        String accessToken = jwtUtil.getTokenFromRequest(request);
+    public void naverLogout(String accessToken) {
         naverTokenService.removeNaverTokenInfo(accessToken);
-        userService.logout(request);
-
-        return LogoutResponse.builder().success(true).build();
     }
 }

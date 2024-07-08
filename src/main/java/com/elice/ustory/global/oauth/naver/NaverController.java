@@ -60,16 +60,4 @@ public class NaverController {
         log.info("[naverLogin] 네이버 닉네임: {}", nickname);
         return ResponseEntity.ok().body(loginResponse);
     }
-
-    @Operation(summary = "NAVER LOGOUT API", description = "네이버 로그아웃")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LogoutResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @RequestMapping(value = "/auth/logout/naver", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<LogoutResponse> naverLogout(HttpServletRequest request) {
-        LogoutResponse logoutResponse = naverService.naverLogout(request);
-        return ResponseEntity.ok().body(logoutResponse);
-    }
 }
