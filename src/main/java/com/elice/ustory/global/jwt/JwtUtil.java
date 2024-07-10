@@ -5,6 +5,8 @@ import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.model.InvalidTokenException;
 import com.elice.ustory.global.redis.kakao.KakaoToken;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
+import com.elice.ustory.global.redis.naver.NaverToken;
+import com.elice.ustory.global.redis.naver.NaverTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshToken;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import io.jsonwebtoken.*;
@@ -25,6 +27,7 @@ public class JwtUtil {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final KakaoTokenService kakaoTokenService;
+    private final NaverTokenService naverTokenService;
 
     public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request);
@@ -47,6 +50,11 @@ public class JwtUtil {
                         .orElseThrow();
 
                 kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken.getKakaoToken(), newAccessToken);
+            }else if(loginUser.getLoginType().toString().equals("NAVER")){
+                NaverToken naverToken = naverTokenService.getByAccessToken(accessToken)
+                        .orElseThrow();
+
+                naverTokenService.saveNaverTokenInfo(loginUser.getId(), naverToken.getNaverToken(), newAccessToken);
             }
             log.info("[refreshToken] AccessToken이 재발급 되었습니다: {}", newAccessToken);
             log.info("[refreshToken] RefreshToken이 재발급 되었습니다: {}", newRefreshToken);
