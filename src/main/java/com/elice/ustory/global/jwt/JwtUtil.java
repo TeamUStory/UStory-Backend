@@ -29,6 +29,9 @@ public class JwtUtil {
     private final KakaoTokenService kakaoTokenService;
     private final NaverTokenService naverTokenService;
 
+    private static final String KAKAO_LOGIN_TYPE = "KAKAO";
+    private static final String NAVER_LOGIN_TYPE = "NAVER";
+
     public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request);
         RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
@@ -45,12 +48,12 @@ public class JwtUtil {
 
             refreshTokenService.saveTokenInfo(loginUser.getId(), newRefreshToken, newAccessToken, remainingTTL);
 
-            if(loginUser.getLoginType().toString().equals("KAKAO")){
+            if(loginUser.getLoginType().toString().equals(KAKAO_LOGIN_TYPE)){
                 KakaoToken kakaoToken = kakaoTokenService.getByAccessToken(accessToken)
                         .orElseThrow();
 
                 kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken.getKakaoToken(), newAccessToken);
-            }else if(loginUser.getLoginType().toString().equals("NAVER")){
+            }else if(loginUser.getLoginType().toString().equals(NAVER_LOGIN_TYPE)){
                 NaverToken naverToken = naverTokenService.getByAccessToken(accessToken)
                         .orElseThrow();
 
