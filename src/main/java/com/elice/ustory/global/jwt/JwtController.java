@@ -34,14 +34,14 @@ public class JwtController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/re-issue")
-    public ResponseEntity<String> reIssueAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<JwtRefreshResponse> reIssueAccessToken(HttpServletRequest request, HttpServletResponse response) {
         log.info("[reIssueAccessToken API] AccessToken 재발급 API 시작");
 
-        boolean isRefreshed = jwtUtil.refreshAuthentication(request, response);
+        String refreshedToken = jwtUtil.refreshAuthentication(request, response);
 
-        if (isRefreshed) {
+        if (refreshedToken!= null) {
             log.info("[handleAccessTokenExpiredException] AccessToken 갱신 완료");
-            return ResponseEntity.ok().body(response.getHeader("Authorization"));
+            return ResponseEntity.ok().body(new JwtRefreshResponse(refreshedToken));
         } else {
             log.warn("[handleAccessTokenExpiredException] RefreshToken이 만료되었습니다. 재로그인 필요.");
             throw new RefreshTokenExpiredException("RefreshToken이 만료되었습니다, 재로그인해주세요.");
