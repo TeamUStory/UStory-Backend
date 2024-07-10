@@ -26,7 +26,7 @@ public class JwtUtil {
     private final RefreshTokenService refreshTokenService;
     private final KakaoTokenService kakaoTokenService;
 
-    public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
+    public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request);
         RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
                 .orElseThrow((() -> new InvalidTokenException("토큰이 없거나 형식에 맞지 않습니다.")));
@@ -51,11 +51,10 @@ public class JwtUtil {
             log.info("[refreshToken] AccessToken이 재발급 되었습니다: {}", newAccessToken);
             log.info("[refreshToken] RefreshToken이 재발급 되었습니다: {}", newRefreshToken);
 
-            response.addHeader("Authorization", newAccessToken);
-            return true;
+            return newAccessToken;
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
-            return false;
+            return null;
         }
     }
 
