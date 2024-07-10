@@ -50,12 +50,12 @@ public class JwtUtil {
 
             if(loginUser.getLoginType().toString().equals(KAKAO_LOGIN_TYPE)){
                 KakaoToken kakaoToken = kakaoTokenService.getByAccessToken(accessToken)
-                        .orElseThrow();
+                        .orElseThrow(() -> new InvalidTokenException("토큰이 없거나 토큰 형식이 잘못되었습니다."));
 
                 kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken.getKakaoToken(), newAccessToken);
             }else if(loginUser.getLoginType().toString().equals(NAVER_LOGIN_TYPE)){
                 NaverToken naverToken = naverTokenService.getByAccessToken(accessToken)
-                        .orElseThrow();
+                        .orElseThrow(() -> new InvalidTokenException("토큰이 없거나 토큰 형식이 잘못되었습니다."));
 
                 naverTokenService.saveNaverTokenInfo(loginUser.getId(), naverToken.getNaverToken(), newAccessToken);
             }
