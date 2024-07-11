@@ -196,7 +196,7 @@ public class PaperController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Count Write Paper By Specific User API", description = "특정 유저가 작성한 모든 페이퍼의 갯수를 불러온다.")
+    @Operation(summary = "Count Write Paper By Specific User API", description = "특정 유저가 작성한 모든 페이퍼의 개수를 불러온다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaperCountResponse.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

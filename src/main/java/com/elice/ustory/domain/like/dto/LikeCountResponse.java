@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class LikeCountResponse {
 
-    @Schema(description = "서비스 내에서 해당 페이퍼에 좋아요 총 갯수",  example = "정수 타입으로, 0 부터 시작")
+    @Schema(description = "서비스 내에서 해당 페이퍼에 좋아요 총 개수",  example = "정수 타입으로, 0 부터 시작")
     private int countLike;
 
 }

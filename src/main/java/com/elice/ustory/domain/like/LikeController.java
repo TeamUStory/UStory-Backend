@@ -100,8 +100,8 @@ public class LikeController {
     }
 
     @Operation(summary = "Like Count API",
-            description = "해당 페이퍼에서 좋아요의 총 갯수를 반환한다. <br>" +
-                    "countLike로 갯수를 알 수 있다.")
+            description = "해당 페이퍼에서 좋아요의 총 개수를 반환한다. <br>" +
+                    "countLike로 개수를 알 수 있다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LikeCountResponse.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
