@@ -1,5 +1,6 @@
 package com.elice.ustory.domain.like;
 
+import com.elice.ustory.domain.like.dto.LikeCountResponse;
 import com.elice.ustory.domain.like.dto.LikeListResponse;
 import com.elice.ustory.domain.like.dto.LikeResponse;
 import com.elice.ustory.domain.paper.entity.Paper;
@@ -9,6 +10,7 @@ import com.elice.ustory.global.Validation.PageableValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -95,6 +97,22 @@ public class LikeController {
         boolean isLiked = likeService.isPaperLikedByUser(userId, paperId);
 
         return ResponseEntity.ok(new LikeResponse(isLiked));
+    }
+
+    @Operation(summary = "Like Count API",
+            description = "해당 페이퍼에서 좋아요의 총 갯수를 반환한다. <br>" +
+                    "countLike로 갯수를 알 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LikeCountResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{paperId}/count")
+    public ResponseEntity<LikeCountResponse> countLiked(@PathVariable Long paperId) {
+
+        int count = likeService.countLikedById(paperId);
+
+        return ResponseEntity.ok(new LikeCountResponse(count));
     }
 
     @Operation(summary = "Delete Like API", description = "좋아요를 해제한다.")
