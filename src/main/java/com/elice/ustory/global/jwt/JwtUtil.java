@@ -33,7 +33,7 @@ public class JwtUtil {
     private static final String NAVER_LOGIN_TYPE = "NAVER";
     private static final String INVALID_TOKEN_MESSAGE = "토큰이 없거나 형식에 맞지 않습니다.";
 
-    public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
+    public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = getTokenFromRequest(request);
         RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
                 .orElseThrow((() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE)));
@@ -49,12 +49,12 @@ public class JwtUtil {
 
             refreshTokenService.saveTokenInfo(loginUser.getId(), newRefreshToken, newAccessToken, remainingTTL);
 
-            if(loginUser.getLoginType().toString().equals(KAKAO_LOGIN_TYPE)){
+            if (loginUser.getLoginType().toString().equals(KAKAO_LOGIN_TYPE)) {
                 KakaoToken kakaoToken = kakaoTokenService.getByAccessToken(accessToken)
                         .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE));
 
                 kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken.getKakaoToken(), newAccessToken);
-            }else if(loginUser.getLoginType().toString().equals(NAVER_LOGIN_TYPE)){
+            } else if (loginUser.getLoginType().toString().equals(NAVER_LOGIN_TYPE)) {
                 NaverToken naverToken = naverTokenService.getByAccessToken(accessToken)
                         .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE));
 
@@ -70,12 +70,12 @@ public class JwtUtil {
         }
     }
 
-    public String getTokenFromRequest(HttpServletRequest request){
+    public String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             log.info("이거 베어러 토큰임: {}", bearerToken);
             return bearerToken.substring("Bearer ".length());
-        }else {
+        } else {
             throw new InvalidTokenException(INVALID_TOKEN_MESSAGE);
         }
     }
@@ -117,7 +117,7 @@ public class JwtUtil {
         return Math.max(remainingMillis, 0) / 1000;
     }
 
-    public String getSocialToken(String jwtToken){
+    public String getSocialToken(String jwtToken) {
         Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtTokenProvider.getSecretKey()).build()
                 .parseClaimsJws(jwtToken);
         return claims.getBody().get("socialToken").toString();
