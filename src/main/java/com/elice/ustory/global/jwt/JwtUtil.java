@@ -31,11 +31,12 @@ public class JwtUtil {
 
     private static final String KAKAO_LOGIN_TYPE = "KAKAO";
     private static final String NAVER_LOGIN_TYPE = "NAVER";
+    private static final String INVALID_TOKEN_MESSAGE = "토큰이 없거나 형식에 맞지 않습니다.";
 
     public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response){
         String accessToken = getTokenFromRequest(request);
         RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
-                .orElseThrow((() -> new InvalidTokenException("토큰이 없거나 형식에 맞지 않습니다.")));
+                .orElseThrow((() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE)));
         Users loginUser = userService.findById(Long.valueOf(refreshToken.getId()));
 
         log.info("redis안의 Refresh Token: {}", refreshToken.getRefreshToken());
@@ -50,12 +51,12 @@ public class JwtUtil {
 
             if(loginUser.getLoginType().toString().equals(KAKAO_LOGIN_TYPE)){
                 KakaoToken kakaoToken = kakaoTokenService.getByAccessToken(accessToken)
-                        .orElseThrow(() -> new InvalidTokenException("토큰이 없거나 토큰 형식이 잘못되었습니다."));
+                        .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE));
 
                 kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken.getKakaoToken(), newAccessToken);
             }else if(loginUser.getLoginType().toString().equals(NAVER_LOGIN_TYPE)){
                 NaverToken naverToken = naverTokenService.getByAccessToken(accessToken)
-                        .orElseThrow(() -> new InvalidTokenException("토큰이 없거나 토큰 형식이 잘못되었습니다."));
+                        .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE));
 
                 naverTokenService.saveNaverTokenInfo(loginUser.getId(), naverToken.getNaverToken(), newAccessToken);
             }
@@ -75,7 +76,7 @@ public class JwtUtil {
             log.info("이거 베어러 토큰임: {}", bearerToken);
             return bearerToken.substring("Bearer ".length());
         }else {
-            throw new InvalidTokenException("토큰 형식이 잘못되었습니다.");
+            throw new InvalidTokenException(INVALID_TOKEN_MESSAGE);
         }
     }
 
@@ -101,7 +102,7 @@ public class JwtUtil {
         } catch (ExpiredJwtException e) {
             log.info("[validateToken] 토큰 유효 시간 만료");
             return false;
-        } catch (SignatureException e){
+        } catch (InvalidTokenException e) {
             log.info("[validateToken] 올바르지 않은 토큰 형식");
             return false;
         }
