@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.Random;
 
 @Component
-public class RandomGenerator {
+public class NicknameGenerator {
     public String generateRandomPostfix() {
         int leftLimit = 48; // 숫자 '0'의 ASCII 코드
         int rightLimit = 122; // 알파벳 'z'의 ASCII 코드

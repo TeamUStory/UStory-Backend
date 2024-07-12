@@ -15,7 +15,7 @@ import com.elice.ustory.global.jwt.JwtTokenProvider;
 import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import com.elice.ustory.global.util.RandomGenerator;
+import com.elice.ustory.global.util.NicknameGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +36,13 @@ public class KakaoService {
     private final KakaoTokenService kakaoTokenService;
     private final JwtUtil jwtUtil;
     private final KakaoOauth kakaoOauth;
-    private final RandomGenerator randomGenerator;
+    private final NicknameGenerator nicknameGenerator;
     private final PasswordEncoder passwordEncoder;
 
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
-        String generatedNickname = kakaoNickname + "#" + randomGenerator.generateRandomPostfix();
+        String generatedNickname = kakaoNickname + "#" + nicknameGenerator.generateRandomPostfix();
 
         Users builtUser = Users.addUserBuilder()
                 .email(kakaoUserId+"@ustory.com")
