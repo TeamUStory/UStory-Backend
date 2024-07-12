@@ -33,6 +33,7 @@ public class JwtUtil {
     private static final String KAKAO_LOGIN_TYPE = "KAKAO";
     private static final String NAVER_LOGIN_TYPE = "NAVER";
     private static final String INVALID_TOKEN_MESSAGE = "토큰이 없거나 형식에 맞지 않습니다.";
+    private static final String REFRESH_TOKEN_EXPIRED_MESSAGE = "RefreshToken이 만료되었습니다, 재로그인해주세요.";
 
     public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = getTokenFromRequest(request);
@@ -67,7 +68,7 @@ public class JwtUtil {
             return newAccessToken;
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
-            throw new RefreshTokenExpiredException("RefreshToken이 만료되었습니다, 재로그인해주세요.");
+            throw new RefreshTokenExpiredException(REFRESH_TOKEN_EXPIRED_MESSAGE);
         }
     }
 
