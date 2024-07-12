@@ -3,6 +3,7 @@ package com.elice.ustory.global.jwt;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.model.InvalidTokenException;
+import com.elice.ustory.global.exception.model.RefreshTokenExpiredException;
 import com.elice.ustory.global.redis.kakao.KakaoToken;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.naver.NaverToken;
@@ -66,7 +67,7 @@ public class JwtUtil {
             return newAccessToken;
         } else {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
-            return null;
+            throw new RefreshTokenExpiredException("RefreshToken이 만료되었습니다, 재로그인해주세요.");
         }
     }
 
