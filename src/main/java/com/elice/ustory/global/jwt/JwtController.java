@@ -39,12 +39,12 @@ public class JwtController {
 
         String refreshedToken = jwtUtil.refreshAuthentication(request, response);
 
-        if (refreshedToken!= null) {
-            log.info("[handleAccessTokenExpiredException] AccessToken 갱신 완료");
-            return ResponseEntity.ok().body(new JwtRefreshResponse(refreshedToken));
-        } else {
+        if (refreshedToken == null) {
             log.warn("[handleAccessTokenExpiredException] RefreshToken이 만료되었습니다. 재로그인 필요.");
             throw new RefreshTokenExpiredException("RefreshToken이 만료되었습니다, 재로그인해주세요.");
         }
+
+        log.info("[handleAccessTokenExpiredException] AccessToken 갱신 완료");
+        return ResponseEntity.ok().body(new JwtRefreshResponse(refreshedToken));
     }
 }
