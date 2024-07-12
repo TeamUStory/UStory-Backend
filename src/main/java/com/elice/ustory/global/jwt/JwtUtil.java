@@ -35,7 +35,7 @@ public class JwtUtil {
     private static final String INVALID_TOKEN_MESSAGE = "토큰이 없거나 형식에 맞지 않습니다.";
     private static final String REFRESH_TOKEN_EXPIRED_MESSAGE = "RefreshToken이 만료되었습니다, 재로그인해주세요.";
 
-    public String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
+    public String refreshAuthentication(HttpServletRequest request) {
         String accessToken = getTokenFromRequest(request);
         RefreshToken refreshToken = refreshTokenService.getByAccessToken(accessToken)
                 .orElseThrow((() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE)));

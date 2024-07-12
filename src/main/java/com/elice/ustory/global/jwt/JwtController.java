@@ -34,10 +34,10 @@ public class JwtController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/re-issue")
-    public ResponseEntity<JwtRefreshResponse> reIssueAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<JwtRefreshResponse> reIssueAccessToken(HttpServletRequest request) {
         log.info("[reIssueAccessToken API] AccessToken 재발급 API 시작");
 
-        String refreshedToken = jwtUtil.refreshAuthentication(request, response);
+        String refreshedToken = jwtUtil.refreshAuthentication(request);
 
         log.info("[handleAccessTokenExpiredException] AccessToken 갱신 완료");
         return ResponseEntity.ok().body(new JwtRefreshResponse(refreshedToken));
