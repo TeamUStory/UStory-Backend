@@ -1,7 +1,6 @@
 package com.elice.ustory.global.oauth.kakao;
 
 import com.elice.ustory.domain.user.dto.LoginResponse;
-import com.elice.ustory.domain.user.dto.LogoutResponse;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,14 +9,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,17 +52,5 @@ public class KakaoController {
 
         log.info("[kakaoLogin] 카카오 닉네임: {}", nickname);
         return ResponseEntity.ok().body(loginResponse);
-    }
-
-    @Operation(summary = "KAKAO LOGOUT API", description = "카카오 로그아웃")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LogoutResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @RequestMapping(value = "/auth/logout/kakao", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<LogoutResponse> kakaoLogout(HttpServletRequest request) {
-        LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
-        return ResponseEntity.ok().body(logoutResponse);
     }
 }
