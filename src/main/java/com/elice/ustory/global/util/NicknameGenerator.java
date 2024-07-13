@@ -1,16 +1,22 @@
 package com.elice.ustory.global.util;
 
 import com.elice.ustory.domain.user.constant.RegexPatterns;
+import com.elice.ustory.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
 @Component
+@RequiredArgsConstructor
 public class NicknameGenerator {
+    private final UserRepository userRepository;
+
     private static final int NICKNAME_MAX_LENGTH = RegexPatterns.NICKNAME_MAX_LENGTH;
-    private static final String SEPARATOR = "#"; // 닉네임과 임의값 사이의 구분자
+    public static final String SEPARATOR = "#"; // 닉네임과 임의값 사이의 구분자
 
     private static final int POSTFIX_LENGTH = 2;
+    private static final int POSTFIX_LENGTH_WITH_SEPARATOR = POSTFIX_LENGTH + 1;
 
     public String generateRandomPostfix() {
         int leftLimit = 48; // 숫자 '0'의 ASCII 코드
@@ -42,5 +48,22 @@ public class NicknameGenerator {
         }
         String trimmedNickname = cleanedNickname.length() > NICKNAME_MAX_LENGTH ? cleanedNickname.substring(0, NICKNAME_MAX_LENGTH) : cleanedNickname;
         return trimmedNickname;
+    }
+
+    public String trimNicknameForPostfix(String nickname) {
+        if (nickname == null) {
+            return null;
+        }
+        int availableLength = NICKNAME_MAX_LENGTH - POSTFIX_LENGTH_WITH_SEPARATOR;
+        String trimmedNickname = nickname.length() > (availableLength) ? nickname.substring(0, availableLength) : nickname;
+        return trimmedNickname;
+    }
+
+    public boolean checkDuplicateNickname(String nickname) {
+        if (userRepository.countByNicknameWithSoftDeleted(nickname) > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -41,14 +41,17 @@ public class NaverService {
         String encodedPassword = passwordEncoder.encode(randomPassword);
         // 닉네임에 포함된 특수문자를 제거한다.
         String cleanedNickname = nicknameGenerator.normalizeNicknameForOAuth(naverNickname);
-        // 닉네임을 정해진 길이에 맞게 자른다.
+        // 닉네임을 규정된 길이에 맞게 자른다.
         String trimmedNickname = nicknameGenerator.trimNicknameForOAuth(cleanedNickname);
-        // TODO: 중복 여부를 조회한다. 중복이면 닉네임을 7자 이내로 자른다. 임의의 값을 추가한다.
-//        if (userRepository.countByNicknameWithSoftDeleted(cleanedNickname) > 0) {
-//
-//        }
-//        String generatedNickname = trimmedNickname + "#" + nicknameGenerator.generateRandomPostfix();
-        // 중복이 아니면, 닉네임을 10자 이내로 자른다.
+        // 중복 여부를 조회한다. 중복이면 닉네임을 7자 이내로 자르고, 겹치지 않을 때까지 임의의 postfix 3글자를 만들어 붙인다.
+        if (nicknameGenerator.checkDuplicateNickname(trimmedNickname)) {
+            trimmedNickname = nicknameGenerator.trimNicknameForPostfix(trimmedNickname);
+
+            do {
+                trimmedNickname = trimmedNickname + nicknameGenerator.SEPARATOR + nicknameGenerator.generateRandomPostfix();
+            } while (nicknameGenerator.checkDuplicateNickname(trimmedNickname));
+        }
+
         Users builtUser = Users.addUserBuilder()
                 .email(naverEmail)
                 .loginType(Users.LoginType.NAVER)
