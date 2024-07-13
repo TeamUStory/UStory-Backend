@@ -18,6 +18,23 @@ public class NicknameGenerator {
     private static final int POSTFIX_LENGTH = 2;
     private static final int POSTFIX_LENGTH_WITH_SEPARATOR = POSTFIX_LENGTH + 1;
 
+    public String formatNickname(String nickname) {
+        // 닉네임에 포함된 특수문자를 제거한다.
+        String formattedNickname = normalizeNicknameForOAuth(nickname);
+        // 닉네임을 규정된 길이에 맞게 자른다.
+        formattedNickname = trimNicknameForOAuth(nickname);
+        // 중복 여부를 조회한다. 중복이면 닉네임을 7자 이내로 자르고, 겹치지 않을 때까지 임의의 postfix 3글자를 만들어 붙인다.
+        if (checkDuplicateNickname(nickname)) {
+            formattedNickname = trimNicknameForPostfix(formattedNickname);
+
+            do {
+                formattedNickname = formattedNickname + SEPARATOR + generateRandomPostfix();
+            } while (checkDuplicateNickname(formattedNickname));
+        }
+
+        return formattedNickname;
+    }
+
     public String generateRandomPostfix() {
         int leftLimit = 48; // 숫자 '0'의 ASCII 코드
         int rightLimit = 122; // 알파벳 'z'의 ASCII 코드

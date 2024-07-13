@@ -37,7 +37,7 @@ public class KakaoController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @RequestMapping(value = "/login/oauth2/code/kakao", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
+    public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam(name = "code") String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoOauth.getKakaoAccessToken(code);
         Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(kakaoAccessToken);
 

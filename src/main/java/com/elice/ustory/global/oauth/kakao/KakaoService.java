@@ -42,13 +42,13 @@ public class KakaoService {
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
-        String generatedNickname = kakaoNickname + "#" + nicknameGenerator.generateRandomPostfix();
+        String formattedNickname = nicknameGenerator.formatNickname(kakaoNickname);
 
         Users builtUser = Users.addUserBuilder()
                 .email(kakaoUserId+"@ustory.com")
                 .loginType(Users.LoginType.KAKAO)
-                .name(kakaoNickname)
-                .nickname(generatedNickname)
+                .name(formattedNickname)
+                .nickname(formattedNickname)
                 .password(encodedPassword)
                 .profileImgUrl("")
                 .profileDescription("자기소개")

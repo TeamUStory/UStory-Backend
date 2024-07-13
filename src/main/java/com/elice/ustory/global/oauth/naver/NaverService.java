@@ -39,24 +39,13 @@ public class NaverService {
     public void naverSignUp(String naverNickname, String naverEmail){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
-        // 닉네임에 포함된 특수문자를 제거한다.
-        String cleanedNickname = nicknameGenerator.normalizeNicknameForOAuth(naverNickname);
-        // 닉네임을 규정된 길이에 맞게 자른다.
-        String trimmedNickname = nicknameGenerator.trimNicknameForOAuth(cleanedNickname);
-        // 중복 여부를 조회한다. 중복이면 닉네임을 7자 이내로 자르고, 겹치지 않을 때까지 임의의 postfix 3글자를 만들어 붙인다.
-        if (nicknameGenerator.checkDuplicateNickname(trimmedNickname)) {
-            trimmedNickname = nicknameGenerator.trimNicknameForPostfix(trimmedNickname);
-
-            do {
-                trimmedNickname = trimmedNickname + nicknameGenerator.SEPARATOR + nicknameGenerator.generateRandomPostfix();
-            } while (nicknameGenerator.checkDuplicateNickname(trimmedNickname));
-        }
+        String formattedNickname = nicknameGenerator.formatNickname(naverNickname);
 
         Users builtUser = Users.addUserBuilder()
                 .email(naverEmail)
                 .loginType(Users.LoginType.NAVER)
-                .name(trimmedNickname)
-                .nickname(trimmedNickname)
+                .name(formattedNickname)
+                .nickname(formattedNickname)
                 .password(encodedPassword)
                 .profileImgUrl("")
                 .profileDescription("자기소개")
