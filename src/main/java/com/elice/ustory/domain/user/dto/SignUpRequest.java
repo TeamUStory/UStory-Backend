@@ -16,7 +16,7 @@ public class SignUpRequest {
     private String email; // 인증 여부: done
 
     @NotEmpty
-    @Pattern(regexp = RegexPatterns.NICKNAME_REG, message = UserMessageConstants.NOT_APPROPIRATE_NICKNAME_MSSAGE)
+    @Pattern(regexp = RegexPatterns.NICKNAME_REG_FULL, message = UserMessageConstants.NOT_APPROPIRATE_NICKNAME_MSSAGE)
     @Schema(requiredMode = REQUIRED, description = "빈 스트링은 허용되지 않습니다.", example = "피카츄")
     private String name; // 인증 여부: to do
 

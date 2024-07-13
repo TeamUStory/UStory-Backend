@@ -39,8 +39,14 @@ public class NaverService {
     public void naverSignUp(String naverNickname, String naverEmail){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
-        String generatedNickname = naverNickname + "#" + nicknameGenerator.generateRandomPostfix();
-
+        // 특수문자를 제거한다.
+        String cleanedNickname = nicknameGenerator.normalizeNicknameForOAuth(naverNickname);
+        // TODO: 중복 여부를 조회한다. 중복이면 닉네임을 7자 이내로 자른다. 임의의 값을 추가한다.
+//        if (userRepository.countByNicknameWithSoftDeleted(cleanedNickname) > 0) {
+//
+//        }
+        String generatedNickname = cleanedNickname + "#" + nicknameGenerator.generateRandomPostfix();
+        // 중복이 아니면, 닉네임을 10자 이내로 자른다.
         Users builtUser = Users.addUserBuilder()
                 .email(naverEmail)
                 .loginType(Users.LoginType.NAVER)

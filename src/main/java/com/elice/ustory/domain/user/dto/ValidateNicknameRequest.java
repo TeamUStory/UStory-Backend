@@ -7,6 +7,6 @@ import lombok.Data;
 
 @Data
 public class ValidateNicknameRequest {
-    @Pattern(regexp = RegexPatterns.NICKNAME_REG, message = UserMessageConstants.NOT_APPROPIRATE_NICKNAME_MSSAGE)
+    @Pattern(regexp = RegexPatterns.NICKNAME_REG_FULL, message = UserMessageConstants.NOT_APPROPIRATE_NICKNAME_MSSAGE)
     private String nickname;
 }
