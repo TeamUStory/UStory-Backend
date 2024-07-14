@@ -12,6 +12,7 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
+import com.elice.ustory.global.redis.google.GoogleTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
 import com.elice.ustory.global.util.NicknameGenerator;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +39,7 @@ public class GoogleService {
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
 
+    private final GoogleTokenService googleTokenService;
     private final RefreshTokenService refreshTokenService;
 
     private final PasswordEncoder passwordEncoder;
@@ -93,9 +95,9 @@ public class GoogleService {
         response.addHeader(AUTHORIZATION_LITERAL, accessToken);
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, REFRESH_TOKEN_TTL);
-        //TODO: 구글 토큰 저장
+        googleTokenService.saveGoogleTokenInfo(loginUser.getId(), googleToken, accessToken);
 
-        //TODO: log.info 로그인
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;
     }
 }
