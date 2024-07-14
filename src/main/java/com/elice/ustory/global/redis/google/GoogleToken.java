@@ -2,6 +2,7 @@ package com.elice.ustory.global.redis.google;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
@@ -12,6 +13,8 @@ import org.springframework.data.redis.core.index.Indexed;
 public class GoogleToken {
     @Id
     private String id;
+
+    @Getter
     private String googleToken;
 
     @Indexed
