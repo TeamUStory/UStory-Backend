@@ -13,12 +13,14 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Component
 public class GoogleOauth {
     final String AUTHORIZATION_CODE = "authorization_code";
     final String ACCESS_TOKEN = "access_token";
+    final String BEARER_TOKEN_PREFIX = "Bearer ";
     final String NOT_FOUND_ACCESS_TOKEN = "구글 액세스 토큰을 찾을 수 없습니다.";
 
     @Value("${google.clientId}")
@@ -34,6 +36,9 @@ public class GoogleOauth {
 
     @Value("${google.accessTokenUri}")
     private String accessTokenUri;
+
+    @Value("${google.accountProfileUri}")
+    private String accountProfileUri;
 
     public String requestGoogleAccessToken(final String code) {
         RestTemplate restTemplate = new RestTemplate(); //TODO: 스프링 빈으로 관리
@@ -55,5 +60,25 @@ public class GoogleOauth {
         return Optional.ofNullable(responseJson.get(ACCESS_TOKEN))
                 .map(JsonElement::getAsString)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ACCESS_TOKEN));
+    }
+
+    public HashMap<String, String> requestGoogleAccountProfile(String accessToken) {
+        HashMap<String, String> accountProfile = new HashMap<>();
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_PREFIX + accessToken);
+        final HttpEntity<MultiValueMap<String, String>> requestHeaderEntity = new HttpEntity<>(headers);
+        final String responseBody = restTemplate.exchange(accountProfileUri, HttpMethod.GET, requestHeaderEntity, String.class).getBody();
+        JsonObject responseJson = JsonParser.parseString(responseBody).getAsJsonObject();
+
+        String name = responseJson.get("name").getAsString();
+        String email = responseJson.get("email").getAsString();
+
+        accountProfile.put("name", name);
+        accountProfile.put("email", email);
+
+        return accountProfile;
     }
 }
