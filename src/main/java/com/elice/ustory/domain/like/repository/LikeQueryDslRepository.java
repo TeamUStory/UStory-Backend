@@ -14,4 +14,6 @@ public interface LikeQueryDslRepository {
 
     /** userId에 해당하는 Bookmark 들의 Paper List 가져오기 */
     List<Paper> findLikesByUserId(Long userId, Pageable pageable);
+
+    Integer countLikeById(Long paperId);
 }

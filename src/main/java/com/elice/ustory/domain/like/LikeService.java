@@ -7,6 +7,7 @@ import com.elice.ustory.domain.paper.repository.PaperRepository;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
 import com.elice.ustory.global.exception.model.ConflictException;
+import com.elice.ustory.global.exception.model.InternalServerException;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -63,5 +64,15 @@ public class LikeService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_LIKE_MESSAGE));
 
         likeRepository.delete(like);
+    }
+
+    /** 좋아요 총 개수 반환 메서드 **/
+    public int countLikedById(Long paperId) {
+
+        // 먼저 해당 페이퍼가 있는지 없는지 체크한 뒤, 페이퍼가 없다면 에러 반환
+        Paper paper = paperRepository.findById(paperId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId)));
+
+        return likeRepository.countLikeById(paperId);
     }
 }

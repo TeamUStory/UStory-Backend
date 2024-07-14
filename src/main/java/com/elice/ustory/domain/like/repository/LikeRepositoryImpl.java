@@ -38,4 +38,12 @@ public class LikeRepositoryImpl implements LikeQueryDslRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
     }
+
+    @Override
+    public Integer countLikeById(Long paperId) {
+        return queryFactory.select(like.count().intValue())
+                .from(like)
+                .where(like.paper.id.eq(paperId))
+                .fetchOne();
+    }
 }
