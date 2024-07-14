@@ -11,4 +11,9 @@ public class GoogleTokenService {
     public void saveGoogleTokenInfo(Long userId, String googleToken, String accessToken) {
         googleTokenRepository.save(new GoogleToken(String.valueOf(userId), googleToken, accessToken));
     }
+
+    public void removeGoogleTokenInfo(String accessToken) {
+        googleTokenRepository.findByAccessToken(accessToken)
+                .ifPresent(googleTokenRepository::delete);
+    }
 }

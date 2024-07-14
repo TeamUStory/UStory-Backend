@@ -9,6 +9,7 @@ import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
 import com.elice.ustory.global.jwt.JwtAuthorization;
 import com.elice.ustory.global.jwt.JwtUtil;
+import com.elice.ustory.global.oauth.google.GoogleService;
 import com.elice.ustory.global.oauth.kakao.KakaoService;
 import com.elice.ustory.global.oauth.naver.NaverService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,10 +38,12 @@ public class UserController {
     private final EmailService emailService;
     private final KakaoService kakaoService;
     private final NaverService naverService;
+    private final GoogleService googleService;
     private final JwtUtil jwtUtil;
 
     private static final String KAKAO_LOGIN_TYPE = "KAKAO";
     private static final String NAVER_LOGIN_TYPE = "NAVER";
+    private static final String GOOGLE_LOGIN_TYPE = "GOOGLE";
 
     @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다." +
             "<br>비밀번호는 **숫자, 영문, 특수문자 각 1개를 포함한 8~16자** 이며," +
@@ -110,10 +113,12 @@ public class UserController {
         String accessToken = jwtUtil.getTokenFromRequest(request);
         String loginType = jwtUtil.getLoginType(accessToken);
 
-        if(loginType.equals(KAKAO_LOGIN_TYPE)){
+        if (loginType.equals(KAKAO_LOGIN_TYPE)) {
             kakaoService.kakaoLogout(accessToken);
-        }else if(loginType.equals(NAVER_LOGIN_TYPE)){
+        } else if (loginType.equals(NAVER_LOGIN_TYPE)) {
             naverService.naverLogout(accessToken);
+        } else if (loginType.equals(GOOGLE_LOGIN_TYPE)) {
+            googleService.googleLogout(accessToken);
         }
 
         LogoutResponse logoutResponse = userService.logout(accessToken, loginType);
@@ -160,7 +165,7 @@ public class UserController {
 
     @Operation(summary = "Send Mail To Validate Email For Sign-Up API",
             description = "회원가입 시 이메일 검증을 위한 인증코드를 해당 메일로 발송한다. 이미 가입된 이메일인 경우 예외 발생." +
-            "<br>detailMessage는 둘 중 하나: '사용중인\\_이메일' 또는 '탈퇴된\\_이메일'")
+                    "<br>detailMessage는 둘 중 하나: '사용중인\\_이메일' 또는 '탈퇴된\\_이메일'")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthCodeCreateResponse.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

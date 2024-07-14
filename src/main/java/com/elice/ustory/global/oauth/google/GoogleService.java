@@ -100,4 +100,6 @@ public class GoogleService {
         log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", loginUser.getId(), loginResponse.getAccessToken());
         return loginResponse;
     }
+
+    public void googleLogout(String accessToken) { googleTokenService.removeGoogleTokenInfo(accessToken); }
 }
