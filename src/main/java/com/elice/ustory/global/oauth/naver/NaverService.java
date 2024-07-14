@@ -10,13 +10,11 @@ import com.elice.ustory.domain.diaryUser.repository.DiaryUserRepository;
 import com.elice.ustory.domain.user.dto.LoginResponse;
 import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.repository.UserRepository;
-import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.model.NotFoundException;
 import com.elice.ustory.global.jwt.JwtTokenProvider;
-import com.elice.ustory.global.jwt.JwtUtil;
 import com.elice.ustory.global.redis.naver.NaverTokenService;
 import com.elice.ustory.global.redis.refresh.RefreshTokenService;
-import com.elice.ustory.global.util.RandomGenerator;
+import com.elice.ustory.global.util.NicknameGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,19 +33,19 @@ public class NaverService {
     private final RefreshTokenService refreshTokenService;
     private final NaverTokenService naverTokenService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RandomGenerator randomGenerator;
+    private final NicknameGenerator nicknameGenerator;
     private final PasswordEncoder passwordEncoder;
 
     public void naverSignUp(String naverNickname, String naverEmail){
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
-        String generatedNickname = naverNickname + "#" + randomGenerator.generateRandomPostfix();
+        String formattedNickname = nicknameGenerator.formatNickname(naverNickname);
 
         Users builtUser = Users.addUserBuilder()
                 .email(naverEmail)
                 .loginType(Users.LoginType.NAVER)
-                .name(naverNickname)
-                .nickname(generatedNickname)
+                .name(formattedNickname)
+                .nickname(formattedNickname)
                 .password(encodedPassword)
                 .profileImgUrl("")
                 .profileDescription("자기소개")
