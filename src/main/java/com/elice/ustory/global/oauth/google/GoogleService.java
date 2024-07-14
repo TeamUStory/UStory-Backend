@@ -20,6 +20,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class GoogleService {
+    private final String EMAIL_LITERAL = "email";
+    private final String NAME_LITERAL = "name";
+
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
     private final DiaryUserRepository diaryUserRepository;
@@ -28,8 +31,8 @@ public class GoogleService {
     private final NicknameGenerator nicknameGenerator;
 
     public void googleSignUp(HashMap<String, String> accountProfile) {
-        String email = accountProfile.get("email");
-        String name = accountProfile.get("name");
+        String email = accountProfile.get(EMAIL_LITERAL);
+        String name = accountProfile.get(NAME_LITERAL);
 
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0, 8);
         String encodedPassword = passwordEncoder.encode(randomPassword);
