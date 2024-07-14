@@ -1,6 +1,8 @@
 package com.elice.ustory.global.oauth.google;
 
+import com.elice.ustory.domain.user.dto.LoginResponse;
 import com.elice.ustory.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,8 @@ public class GoogleController {
     private final UserService userService;
 
     @RequestMapping(value = "/login/oauth2/code/google", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<HashMap<String, String>> googleLogin(@RequestParam(name = "code") String code) {
+    public ResponseEntity<LoginResponse> googleLogin(@RequestParam(name = "code") String code,
+                                                               HttpServletResponse response) {
         String accessToken = googleOauth.requestGoogleAccessToken(code);
         HashMap<String, String> accountProfile = googleOauth.requestGoogleAccountProfile(accessToken);
 
@@ -32,7 +35,9 @@ public class GoogleController {
         }
         //TODO: 이미 구글 이메일로 기본 회원가입을 했는데, 소셜로그인을 시도할 경우? -> "이미 가입된 이메일입니다. 다른 로그인 방식을 시도해보세요."
 
+        LoginResponse loginResponse = googleService.googleLogin(email, response, accessToken);
+
         log.info("[googleLogin] 구글 닉네임: {}", name);
-        return ResponseEntity.ok().body(accountProfile);
+        return ResponseEntity.ok().body(loginResponse);
     }
 }
