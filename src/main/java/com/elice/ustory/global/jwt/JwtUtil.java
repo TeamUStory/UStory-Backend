@@ -4,8 +4,6 @@ import com.elice.ustory.domain.user.entity.Users;
 import com.elice.ustory.domain.user.service.UserService;
 import com.elice.ustory.global.exception.model.InvalidTokenException;
 import com.elice.ustory.global.exception.model.RefreshTokenExpiredException;
-import com.elice.ustory.global.redis.google.GoogleToken;
-import com.elice.ustory.global.redis.google.GoogleTokenService;
 import com.elice.ustory.global.redis.kakao.KakaoToken;
 import com.elice.ustory.global.redis.kakao.KakaoTokenService;
 import com.elice.ustory.global.redis.naver.NaverToken;
@@ -31,11 +29,9 @@ public class JwtUtil {
     private final RefreshTokenService refreshTokenService;
     private final KakaoTokenService kakaoTokenService;
     private final NaverTokenService naverTokenService;
-    private final GoogleTokenService googleTokenService;
 
     private static final String KAKAO_LOGIN_TYPE = "KAKAO";
     private static final String NAVER_LOGIN_TYPE = "NAVER";
-    private static final String GOOGLE_LOGIN_TYPE = "GOOGLE";
     private static final String INVALID_TOKEN_MESSAGE = "토큰이 없거나 형식에 맞지 않습니다.";
     private static final String REFRESH_TOKEN_EXPIRED_MESSAGE = "RefreshToken이 만료되었습니다, 재로그인해주세요.";
 
@@ -65,11 +61,6 @@ public class JwtUtil {
                         .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE));
 
                 naverTokenService.saveNaverTokenInfo(loginUser.getId(), naverToken.getNaverToken(), newAccessToken);
-            } else if (loginUser.getLoginType().toString().equals(GOOGLE_LOGIN_TYPE)) {
-                GoogleToken googleToken = googleTokenService.getByAccessToken(accessToken)
-                        .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN_MESSAGE));
-
-                googleTokenService.saveGoogleTokenInfo(loginUser.getId(), googleToken.getGoogleToken(), newAccessToken);
             }
             log.info("[refreshToken] AccessToken이 재발급 되었습니다: {}", newAccessToken);
             log.info("[refreshToken] RefreshToken이 재발급 되었습니다: {}", newRefreshToken);
