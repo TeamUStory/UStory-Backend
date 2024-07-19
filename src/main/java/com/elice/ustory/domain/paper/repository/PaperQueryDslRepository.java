@@ -1,6 +1,8 @@
 package com.elice.ustory.domain.paper.repository;
 
+import com.elice.ustory.domain.address.Address;
 import com.elice.ustory.domain.paper.entity.Paper;
+import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
@@ -21,4 +23,6 @@ public interface PaperQueryDslRepository {
      *  정렬 기준은 생성날짜이다.
      */
     List<Paper> findByWriterId(Long writerId, LocalDateTime requestTime, Pageable pageable);
+
+    List<Paper> joinPaperByAddress(Address address);
 }

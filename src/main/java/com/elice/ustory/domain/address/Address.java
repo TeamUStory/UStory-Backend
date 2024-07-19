@@ -1,6 +1,8 @@
 package com.elice.ustory.domain.address;
 
 import com.elice.ustory.domain.paper.entity.Paper;
+import com.elice.ustory.domain.recommand.dto.RecommendCountDTO;
+import com.elice.ustory.global.entity.BaseEntity;
 import com.elice.ustory.global.exception.ErrorCode;
 import com.elice.ustory.global.exception.model.ValidationException;
 import jakarta.persistence.Column;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "address")
-public class Address {
+public class Address extends BaseEntity {
 
     private static final String PARAMETER_TOO_LONG = "%s: 해당 파라미터의 길이가 너무 깁니다.";
     private static final String WRONG_COORDINATE_X = "설정한 주소의 X좌표의 값이 잘못되었습니다.";
@@ -64,6 +66,13 @@ public class Address {
         this.store = validateAddressSize(store, 80, "상호명");
         this.coordinateX = validateCoordinateX(coordinateX);
         this.coordinateY = validateCoordinateY(coordinateY);
+    }
+
+    public Address(RecommendCountDTO recommendCountDTO) {
+        this.city = recommendCountDTO.getCity();
+        this.store = recommendCountDTO.getStore();
+        this.coordinateX = recommendCountDTO.getCoordinateX();
+        this.coordinateY = recommendCountDTO.getCoordinateY();
     }
 
     /**
