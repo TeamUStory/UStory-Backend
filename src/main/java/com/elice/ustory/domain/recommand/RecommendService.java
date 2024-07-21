@@ -1,21 +1,18 @@
 package com.elice.ustory.domain.recommand;
 
-import com.elice.ustory.domain.address.Address;
+import com.elice.ustory.domain.address.AddressRecommendDTO;
 import com.elice.ustory.domain.address.AddressRepository;
-import com.elice.ustory.domain.grate.repository.GrateRepository;
+import com.elice.ustory.domain.great.repository.GreatRepository;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.paper.repository.PaperRepository;
-import com.elice.ustory.domain.recommand.dto.MainRecommendResponse;
-import com.elice.ustory.domain.recommand.dto.RecommendCountDTO;
-import com.elice.ustory.domain.recommand.dto.RecommendPaperRequest;
-import com.elice.ustory.domain.recommand.dto.RecommendPaperResponse;
+import com.elice.ustory.domain.recommand.dto.*;
 import com.elice.ustory.global.exception.model.NotFoundException;
+import com.elice.ustory.global.redis.recommend.RecommendRedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,37 +23,70 @@ public class RecommendService {
 
     private final AddressRepository addressRepository;
     private final PaperRepository paperRepository;
-    private final GrateRepository grateRepository;
+    private final GreatRepository greatRepository;
+    private final RecommendRedisService recommendRedisService;
 
     private static final String NOT_FOUND_PAPER_MESSAGE = "%d: 해당하는 페이퍼가 존재하지 않습니다.";
+    private static final String NOT_FOUND_PAPERS = "어떠한 페이퍼도 찾을 수 없습니다.";
 
-    public List<MainRecommendResponse> getRecommendPapers(Pageable pageable, LocalDateTime requestTime) {
+    /**
+     * 매일 자정마다 추천 페이퍼들을 뽑아낸다. (생명주기 또한 자정까지)
+     *
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void setRecommendPapers() {
 
-        List<MainRecommendResponse> mainRecommendResponses = new ArrayList<>();
+        recommendRedisService.deleteKeysWithPattern("RecommendPaper*");
 
-        // Tuple로 가져왔다.
-        List<RecommendCountDTO> RecommendCountDTOS = addressRepository.countEqualAddress(pageable, requestTime);
+        List<RecommendCountDTO> recommendCountDTOS = addressRepository.countEqualAddress();
 
-        if (RecommendCountDTOS.isEmpty()) {
-            return mainRecommendResponses;
+        if (recommendCountDTOS.isEmpty()) {
+            throw new NotFoundException(NOT_FOUND_PAPERS);
         }
 
-        for (RecommendCountDTO recommendCountDTO : RecommendCountDTOS) {
-            MainRecommendResponse mainRecommendResponse = new MainRecommendResponse();
-            mainRecommendResponse.setStore(recommendCountDTO.getStore());
+        for (RecommendCountDTO recommendCountDTO : recommendCountDTOS) {
+            AddressRecommendDTO addressRecommendDTO = new AddressRecommendDTO(recommendCountDTO);
+            RecommendRedisDTO recommendRedisDTO = new RecommendRedisDTO();
 
-            log.info(recommendCountDTO.getStore());
+            recommendRedisDTO.setAddressRecommendDTO(addressRecommendDTO);
 
-            Address address = new Address(recommendCountDTO);
-            List<Paper> papers = paperRepository.joinPaperByAddress(address);
+            List<Paper> papers = paperRepository.joinPaperByAddress(addressRecommendDTO);
 
             List<Long> paperIds = new ArrayList<>();
 
             for (Paper paper : papers) {
                 paperIds.add(paper.getId());
             }
-            mainRecommendResponse.setPaperIds(paperIds);
-            mainRecommendResponse.setImgUrl(papers.get(0).getThumbnailImageUrl());
+
+            recommendRedisDTO.setPaperIds(paperIds);
+
+            recommendRedisService.saveData(recommendRedisDTO);
+        }
+    }
+
+    public List<MainRecommendResponse> getRecommendM(int page, int size) {
+
+        List<MainRecommendResponse> mainRecommendResponses = new ArrayList<>();
+
+        int startIndex = (page - 1) * size + 1; // 페이지 번호가 1부터 시작한다고 가정
+        int endIndex = page * size;
+
+        for (int i = startIndex; i <= endIndex; i++) {
+            MainRecommendResponse mainRecommendResponse = new MainRecommendResponse();
+            mainRecommendResponse.setRecommendPaperKey("RecommendPaper" + i);
+
+            RecommendRedisDTO recommendRedisDTO = recommendRedisService.getData("RecommendPaper" + i);
+
+            if (recommendRedisDTO == null) {
+                break;
+            }
+
+            mainRecommendResponse.setStore(recommendRedisDTO.getAddressRecommendDTO().getStore());
+
+            Paper getPaper = paperRepository.findById(recommendRedisDTO.getPaperIds().get(0))
+                    .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, recommendRedisDTO.getPaperIds().get(0))));
+
+            mainRecommendResponse.setImgUrl(getPaper.getThumbnailImageUrl());
 
             mainRecommendResponses.add(mainRecommendResponse);
 
@@ -66,22 +96,23 @@ public class RecommendService {
 
     }
 
-    // TODO : 좋아요 갯수 순으로 반납하면 되지 않을까?
-    public List<RecommendPaperResponse> getRecommendPaper(RecommendPaperRequest request) {
+    public List<RecommendPaperResponse> getRecommendPaper(String recommendPaperKey) {
 
         List<RecommendPaperResponse> recommendPaperResponses = new ArrayList<>();
 
-        List<Long> paperIds = request.getPaperIds();
+        List<Long> paperIds = recommendRedisService.getData(recommendPaperKey).getPaperIds();
 
         for (Long paperId : paperIds) {
             Paper paper = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId)));
             RecommendPaperResponse recommendPaperResponse = new RecommendPaperResponse(paper);
 
-            Integer i = grateRepository.countGrateById(paperId);
-            recommendPaperResponse.setCountGrate(i);
+            Integer countGreatById = greatRepository.countGreatById(paperId);
+            recommendPaperResponse.setCountGreat(countGreatById);
 
             recommendPaperResponses.add(recommendPaperResponse);
         }
+
+        recommendPaperResponses.sort((r1, r2) -> Integer.compare(r2.getCountGreat(), r1.getCountGreat()));
 
         return recommendPaperResponses;
     }

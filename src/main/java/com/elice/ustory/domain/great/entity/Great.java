@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.grate.entity;
+package com.elice.ustory.domain.great.entity;
 
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.elice.ustory.domain.user.entity.Users;
@@ -19,9 +19,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@IdClass(GrateId.class)
-@Table(name = "grate")
-public class Grate extends BaseEntity {
+@IdClass(GreatId.class)
+@Table(name = "great")
+public class Great extends BaseEntity {
 
     @Id
     @ManyToOne
@@ -33,7 +33,7 @@ public class Grate extends BaseEntity {
     @JoinColumn(name = "paper_id", nullable = false)
     private Paper paper;
 
-    public Grate(Users user, Paper paper) {
+    public Great(Users user, Paper paper) {
         this.user = user;
         this.paper = paper;
     }

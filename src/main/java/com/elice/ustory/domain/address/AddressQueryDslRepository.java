@@ -7,5 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AddressQueryDslRepository {
+
+    List<RecommendCountDTO> countEqualAddress();
     List<RecommendCountDTO> countEqualAddress(Pageable pageable, LocalDateTime requestTime);
 }

@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.grate.dto;
+package com.elice.ustory.domain.great.dto;
 
 import com.elice.ustory.domain.paper.entity.Paper;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class GrateListResponse {
+public class GreatListResponse {
 
     @Schema(description = "타이틀", example = "우규 갔다 왔어요.")
     private String title;
@@ -24,7 +24,7 @@ public class GrateListResponse {
     @Schema(description = "paper Id", example = "12345678")
     private Long paperId;
 
-    public GrateListResponse(Paper paper) {
+    public GreatListResponse(Paper paper) {
         this.title = paper.getTitle();
         this.thumbnailImageUrl = paper.getThumbnailImageUrl();
         this.visitedAt = paper.getVisitedAt();

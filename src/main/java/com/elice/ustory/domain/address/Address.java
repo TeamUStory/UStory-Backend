@@ -101,6 +101,10 @@ public class Address extends BaseEntity {
     public void setPaper(Paper paper) {
         this.paper = paper;
 
+        if (paper == null) {
+            return;
+        }
+
         if (paper.getAddress() != this) {
             paper.setAddress(this);
         }

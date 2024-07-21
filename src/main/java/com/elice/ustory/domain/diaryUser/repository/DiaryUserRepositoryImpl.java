@@ -47,7 +47,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
                         diaryUser.id.users.id.eq(userId)
                                 .and(diaryUser.id.diary.createdAt.loe(dateTime))
                                 .and(categoryEq(diaryCategory))
-                                .and(wordGrate(searchWord))
+                                .and(wordGreat(searchWord))
                 )
                 .orderBy(diaryUser.id.diary.id.desc())
                 .offset(pageable.getOffset())
@@ -169,7 +169,7 @@ public class DiaryUserRepositoryImpl implements DiaryUserQueryDslRepository {
         return diaryCategory != null ? diaryUser.id.diary.diaryCategory.eq(diaryCategory) : null;
     }
 
-    private BooleanExpression wordGrate(String searchWord) {
+    private BooleanExpression wordGreat(String searchWord) {
         return searchWord != null ? diaryUser.id.diary.name.contains(searchWord) : null;
     }
 

@@ -1,6 +1,7 @@
 package com.elice.ustory.domain.paper.repository;
 
 import com.elice.ustory.domain.address.Address;
+import com.elice.ustory.domain.address.AddressRecommendDTO;
 import com.elice.ustory.domain.paper.entity.Paper;
 import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Pageable;
@@ -24,5 +25,5 @@ public interface PaperQueryDslRepository {
      */
     List<Paper> findByWriterId(Long writerId, LocalDateTime requestTime, Pageable pageable);
 
-    List<Paper> joinPaperByAddress(Address address);
+    List<Paper> joinPaperByAddress(AddressRecommendDTO addressRecommendDTO);
 }

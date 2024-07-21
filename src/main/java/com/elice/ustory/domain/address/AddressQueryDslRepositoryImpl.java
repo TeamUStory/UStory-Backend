@@ -19,6 +19,23 @@ public class AddressQueryDslRepositoryImpl implements AddressQueryDslRepository 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public List<RecommendCountDTO> countEqualAddress() {
+
+        return jpaQueryFactory
+                .select(Projections.constructor(RecommendCountDTO.class,
+                        address.store,
+                        address.city,
+                        address.coordinateX,
+                        address.coordinateY,
+                        address.id.count()
+                ))
+                .from(address)
+                .groupBy(address.store, address.city, address.coordinateX, address.coordinateY)
+                .orderBy(address.id.count().desc())
+                .fetch();
+    }
+
+    @Override
     public List<RecommendCountDTO> countEqualAddress(Pageable pageable, LocalDateTime requestTime) {
 
         return jpaQueryFactory
