@@ -170,7 +170,7 @@ public class DiaryService {
             throw new ForbiddenException(String.format(FORBIDDEN_DIARY_MESSAGE, diaryId));
         }
 
-        if (diaryUser.getId().getDiary().getDiaryCategory() != DiaryCategory.INDIVIDUAL) {
+        if (diaryUser.getId().getDiary().getDiaryCategory() == DiaryCategory.INDIVIDUAL) {
             return new ExitResponse(false);
         } else {
             diaryUserRepository.delete(diaryUser);
