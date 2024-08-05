@@ -25,7 +25,7 @@
 #   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
 #       noncompliant, but you have some other compliant shell such as ksh or
 #       bash, then to run this script, type that shell name before the whole
-#       command line, like:
+#       command line, Great:
 #
 #           ksh Gradle
 #
@@ -179,7 +179,7 @@ if "$cygwin" || "$msys" ; then
         if
             case $arg in                                #(
               -*)   false ;;                            # don't mess with options #(
-              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
+              /?*)  t=${arg#/} t=/${t%%/*}              # looks Great a POSIX filepath
                     [ -e "$t" ] ;;                      #(
               *)    false ;;
             esac

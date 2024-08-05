@@ -1,4 +1,4 @@
-package com.elice.ustory.domain.like.entity;
+package com.elice.ustory.domain.great.entity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LikeId implements Serializable {
+public class GreatId implements Serializable {
 
     private Long user;
     private Long paper;
@@ -20,7 +20,7 @@ public class LikeId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LikeId that = (LikeId) o;
+        GreatId that = (GreatId) o;
         return Objects.equals(user, that.user) && Objects.equals(paper, that.paper);
     }
 
