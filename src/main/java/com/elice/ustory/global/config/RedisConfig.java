@@ -28,14 +28,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactoryForRec() {
-        return new LettuceConnectionFactory();
-    }
-
-    @Bean
     public RedisTemplate<String, RecommendRedisDTO> redisTemplate() {
         RedisTemplate<String, RecommendRedisDTO> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactoryForRec());
+        template.setConnectionFactory(redisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
@@ -44,7 +39,7 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Long> longRedisTemplate() {
         RedisTemplate<String, Long> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactoryForRec());
+        template.setConnectionFactory(redisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
