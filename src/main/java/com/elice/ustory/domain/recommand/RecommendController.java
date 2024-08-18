@@ -1,7 +1,7 @@
 package com.elice.ustory.domain.recommand;
 
-import com.elice.ustory.domain.paper.dto.PaperListResponse;
 import com.elice.ustory.domain.recommand.dto.MainRecommendResponse;
+import com.elice.ustory.domain.recommand.dto.RecommendPaperDTO;
 import com.elice.ustory.domain.recommand.dto.RecommendPaperResponse;
 import com.elice.ustory.global.Validation.PageableValidation;
 import com.elice.ustory.global.exception.dto.ErrorResponse;
@@ -43,13 +43,13 @@ public class RecommendController {
 
     @Operation(summary = "Get Recommend Papers", description = "추천하는 장소에 따른 페이퍼들을 보여줍니다. <br> 좋아요의 개수 순으로 반환됩니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RecommendPaperResponse.class)))),
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RecommendPaperDTO.class)))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/papers")
-    public ResponseEntity<List<RecommendPaperResponse>> getRecommendPaper(@RequestParam(name = "recommendPaperKey") String recommendPaperKey) {
-        List<RecommendPaperResponse> recommendPaper = recommendService.getRecommendPaper(recommendPaperKey);
-        return ResponseEntity.ok(recommendPaper);
+    public ResponseEntity<RecommendPaperResponse> getRecommendPaper(@RequestParam(name = "recommendPaperKey") String recommendPaperKey) {
+        RecommendPaperResponse recommendPapers = recommendService.getRecommendPaper(recommendPaperKey);
+        return ResponseEntity.ok(recommendPapers);
     }
 
     @Operation(summary = "Reset Recommend Redis DataBase", description = "새로운 추천 리스트들을 보여줍니다. <br> 원래는 자정마다 변경됩니다. <br> 실행시키면 주소 개수에 따라 추천이 변경됩니다.")

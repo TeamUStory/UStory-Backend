@@ -29,6 +29,8 @@ public class RecommendService {
     private static final String NOT_FOUND_PAPER_MESSAGE = "%d: 해당하는 페이퍼가 존재하지 않습니다.";
     private static final String NOT_FOUND_PAPERS = "어떠한 페이퍼도 찾을 수 없습니다.";
 
+    private static final String NOT_FOUND_STORE = "상호명을 불러올 수 없습니다.";
+
     /**
      * 매일 자정마다 추천 페이퍼들을 뽑아낸다. (생명주기 또한 자정까지)
      *
@@ -96,24 +98,34 @@ public class RecommendService {
 
     }
 
-    public List<RecommendPaperResponse> getRecommendPaper(String recommendPaperKey) {
+    public RecommendPaperResponse getRecommendPaper(String recommendPaperKey) {
 
-        List<RecommendPaperResponse> recommendPaperResponses = new ArrayList<>();
+        List<RecommendPaperDTO> recommendPaperResponses = new ArrayList<>();
+        RecommendPaperResponse recommendPaperResponse = new RecommendPaperResponse();
 
         List<Long> paperIds = recommendRedisService.getData(recommendPaperKey).getPaperIds();
 
         for (Long paperId : paperIds) {
             Paper paper = paperRepository.findById(paperId).orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PAPER_MESSAGE, paperId)));
-            RecommendPaperResponse recommendPaperResponse = new RecommendPaperResponse(paper);
+            RecommendPaperDTO recommendPaperDTO = new RecommendPaperDTO(paper);
 
             Integer countGreatById = greatRepository.countGreatById(paperId);
-            recommendPaperResponse.setCountGreat(countGreatById);
+            recommendPaperDTO.setCountGreat(countGreatById);
 
-            recommendPaperResponses.add(recommendPaperResponse);
+            recommendPaperResponses.add(recommendPaperDTO);
         }
 
         recommendPaperResponses.sort((r1, r2) -> Integer.compare(r2.getCountGreat(), r1.getCountGreat()));
 
-        return recommendPaperResponses;
+        if (recommendPaperResponses.isEmpty()) {
+            throw new NotFoundException(NOT_FOUND_STORE);
+        }
+
+        Paper paper = paperRepository.findById(recommendPaperResponses.get(0).getPaperId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_STORE));
+
+        recommendPaperResponse.setStore(paper.getAddress().getStore());
+        recommendPaperResponse.setRecommendPaper(recommendPaperResponses);
+
+        return recommendPaperResponse;
     }
 }
