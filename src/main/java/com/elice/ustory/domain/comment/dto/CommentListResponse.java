@@ -41,7 +41,7 @@ public class CommentListResponse {
 //        this.userId = comment.getUser().getId();
         this.userNickname = comment.getUser().getNickname();
         this.profileImg = comment.getUser().getProfileImgUrl();
-        this.createdAt = LocalDate.now();
+        this.createdAt = comment.getCreatedAt().toLocalDate();
         this.isUpdatable = comment.getUser().getId() == userId ? 1 : 0;
     }
 }

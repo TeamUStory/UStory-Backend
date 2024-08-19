@@ -36,6 +36,6 @@ public class CommentResponse {
 //        this.userId = comment.getUser().getId();
         this.userNickname = comment.getUser().getNickname();
         this.profileImg = comment.getUser().getProfileImgUrl();
-        this.createdAt = LocalDate.now();
+        this.createdAt = comment.getCreatedAt().toLocalDate();
     }
 }
