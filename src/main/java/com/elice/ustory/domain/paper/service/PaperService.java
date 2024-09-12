@@ -222,14 +222,16 @@ public class PaperService {
         return paper;
     }
 
-    public Integer countPapersByWriterId(Long userId) {
+    public int countPapersByWriterId(Long userId) {
         List<Paper> findByWriterId = paperRepository.findByWriterId(userId);
-        for(Paper paper : findByWriterId) {
-            if (paper.isDeleted()) {
-                findByWriterId.remove(paper);
+        int count = 0;
+
+        for (Paper paper : findByWriterId) {
+            if (!paper.isDeleted()) {
+                count++;
             }
         }
-        return findByWriterId.size();
+        return count;
     }
 
     // 작성자를 제외한 멤버들에게 코멘트를 달아달라고 알림 전송, 트랜잭션?
