@@ -64,24 +64,22 @@
 
 ## 👥 Backend Team Members
 
-|                                                                                      **고경아**                                                                                      |                                                                                         **임준용**                                                                                          |                                                                                                                        **정재원**                                                                                                                        |
-|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a href="https://github.com/GyungA"><img src="https://i.namu.wiki/i/l0x04r27DjSQmS-WgYk6I5x6IkKMyvZjRMyK5dI3EMoMikzCd2Kfl2SMRdvL3-y4zpxI_qLP-fs3QToSR7AU3g.webp" width="100"></a> | <a href="https://github.com/wambatcodeeee"><img src="https://i.namu.wiki/i/GTnpTVODp_oyQDbDTmkHYHduBH5QIkpSk_Eu7FgcOfEyGG3zpq211gdfqefqNZt3BHYWei4XumV10DfkbeUWAw.webp" width="100"></a> | <a href="https://github.com/jaewon0926"><img src="https://i.namu.wiki/i/8-r9BgfPYasUYDiWms-PCwuAJfVcv3npodctFKWxpOpeiPN8m_HF_v3Weh4OgpHUstAQN6SFkXgIIkYHneNiqyy06frIQD5bqG3ITLkGPnMR4KpDh6-EXXG-Gt_zcE4tDvbgfiXVjK40bfUt0YQzKA.webp" width="100"></a> |
-|                                                                       [@GyungA](https://github.com/GyungA)                                                                        |                                                                    [@wambatcodeeee](https://github.com/wambatcodeeee)                                                                    |                                                                                                     [@jaewon0926](https://github.com/jaewon0926)                                                                                                      |                                                                                                 
-
-|                                                                                                                        **박기중**                                                                                                                        |                                                                                                                        **박진희**                                                                                                                        |                                                                                                                      **최윤기**                                                                                                                      |
-|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a href="https://github.com/GiJungPark"><img src="https://i.namu.wiki/i/U2TtaVH9bz8DykOSx5pA6971dxGwwzMPbQzFe4CvFdTFTzVEk9xJWF6TjMGQ0IiIQejl6XkbMvGvdYUUdD0mc_C-Yp3PKZSQruMCBU3PoVCi2jbwh3flj2FfULXpw_62-LtcjBz8l9KALPCZmFRnCQ.webp" width="100"></a> | <a href="https://github.com/bellra-jin"><img src="https://i.namu.wiki/i/SK_oMahBUbHREWPHHIDNUbXPbSLR7ylgZOMNcwrTXk3I2oslWi8RkhEKO824DnZkf7rPTT3DqM-SSh0NI_wxJDd4oJqXTrIdbk5gqfUYvdaw_-CF3GFMlzBmdBelTb97nyBEud8Sj4Dp7Jn3vdmB7g.webp" width="100"></a> | <a href="https://github.com/yungic"><img src="https://i.namu.wiki/i/V6iDOavGqNeYqdc-0pGVVkJw-cqH3Oob-RIqdh9tS5vUQCEcHDF4GRSm7tK9EaXorRZmDUcO76HqWLksq8JYarCZ1LIEjgL3TJE_cCvwyfeQzUu8pF072WB2yCbuwOF9KxXx9o62decCc1d-qC6XEw.webp" width="100"></a> |
-|                                                                                                     [@GiJungPark](https://github.com/GiJungPark)                                                                                                      |                                                                                                     [@bellra-jin](https://github.com/bellra-jin)                                                                                                      |                                                                                                       [@yungic](https://github.com/yungic)                                                                                                        |
+| **이름** | **GitHub** | **역할** |
+|----------|------------|----------|
+| 고경아   | [@GyungA](https://github.com/GyungA) | 백엔드 개발 |
+| 임준용   | [@wambatcodeeee](https://github.com/wambatcodeeee) | 백엔드 개발 |
+| 정재원   | [@jaewon0926](https://github.com/jaewon0926) | 백엔드 개발 |
+| 박기중   | [@GiJungPark](https://github.com/GiJungPark) | 백엔드 개발, 인프라 구축 |
+| 박진희   | [@bellra-jin](https://github.com/bellra-jin) | 백엔드 개발 |
+| 최윤기   | [@yungic](https://github.com/yungic) | 백엔드 개발 |
 
 ## 👥 Frontend Team Members
 
-|                                                                                                                         **강경림**                                                                                                                         |                                                                                                                      **양혜지**                                                                                                                       |
-|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a href="https://github.com/KangKyungRim"><img src="https://i.namu.wiki/i/TlyPubxjKlSXuj0iA7vuvph0m9BoCZa0Jr1HiHzdD_0luwrqKvnhuR9QMf4w_01iqAtfOQkE38wCvgGccJPPtdBOlgWCUBKUns4te3b1ouSgNAA86hYt5qbquq80ecDEGtt5s3_n0ZFUE99b1rEU4w.webp" width="100"></a> | <a href="https://github.com/hyeji17"><img src="https://i.namu.wiki/i/ouLHXY13jKD3CIkyB9_-0CUyGMEBBkrmfvP8NtmXYFx0r9YVk_U9Ciz3I5xeb6CG7idy_eUzHbDrCYrUzPd3YwEMeAg1vPrLT965Is4bLwyQHmRYpzw90nraPgKU6MLzV7CXjVwrJfgzFEsxvuJbZA.webp" width="100"></a> |
-|                                                                                                          [@KangKyungRim](https://github.com/KangKyungRim)                                                                                                           |                                                                                                                    [@hyeji17](https://github.com/hyeji17)                                                                                                                    |
+| **이름** | **GitHub** | **역할** |
+|----------|------------|----------|
+| 강경림   | [@KangKyungRim](https://github.com/KangKyungRim) | 프론트엔드 개발 |
+| 양혜지   | [@hyeji17](https://github.com/hyeji17) | 프론트엔드 개발 |
 
-<br>
 
 ---
 
@@ -91,7 +89,7 @@
 
 ## 📄 API (Swagger)
 
-### [API 명세서 바로 확인하기](http://34.64.93.16:8080/swagger-ui/index.html)
+### 운영 중단으로 스웨거 문서는 확인할 수 없습니다.
 
 ## 🥽 테스트 데이터
 
